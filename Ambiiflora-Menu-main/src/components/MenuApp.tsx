@@ -45,8 +45,6 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
   const sections = useRef<Record<string, HTMLElement | null>>({});
   const rail = useRef<HTMLDivElement>(null);
 
-  if (catalogBranch !== branch.id) return <main className="menu-loading" aria-live="polite">Loading {branch.name} menu…</main>;
-
   const count = lines.reduce((s, l) => s + l.qty, 0);
   const total = lines.reduce((s, l) => { const it = findItem(l.itemId); return s + (it ? unitPrice(it, l.sel) * l.qty : 0); }, 0);
   const q = query.trim().toLowerCase();
@@ -96,6 +94,8 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
       behavior: reducedMotion() ? "auto" : "smooth",
     });
   }, [active]);
+
+  if (catalogBranch !== branch.id) return <main className="menu-loading" aria-live="polite">Loading {branch.name} menu…</main>;
 
   const go = (id: CategoryId) => {
     setActive(id);
