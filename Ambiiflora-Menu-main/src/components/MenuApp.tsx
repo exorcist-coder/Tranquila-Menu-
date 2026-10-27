@@ -2,6 +2,7 @@
 import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CATEGORIES, ITEMS, findItem, isDrink, setCatalog, type CategoryId, type Item } from "@/lib/catalog";
+import { brand } from "@/lib/config";
 import { orderingStatus, type Hours } from "@/lib/hours";
 import { gsap, motionReady, reducedMotion, ScrollTrigger } from "@/lib/motion";
 import { naira, unitPrice } from "@/lib/pricing";

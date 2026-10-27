@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   if (raw.length > 20_000) return NextResponse.json({ ok: false, errors: ["Request too large."] }, { status: 413 });
   let body: unknown; try { body = JSON.parse(raw); } catch { return NextResponse.json({ ok: false, errors: ["Invalid request."] }, { status: 400 }); }
   const requestedBranch = body && typeof body === "object" ? (body as { branchId?: unknown }).branchId : null;
-  if (!isBranchId(typeof requestedBranch === "string" ? requestedBranch : null)) return NextResponse.json({ ok: false, errors: ["Choose a valid hotel before ordering."] }, { status: 400 });
+  if (typeof requestedBranch !== "string" || !isBranchId(requestedBranch)) return NextResponse.json({ ok: false, errors: ["Choose a valid hotel before ordering."] }, { status: 400 });
   const branchId = requestedBranch;
   const [menu, settings] = await Promise.all([getMenu(true, branchId), getSettings(branchId)]);
   const categoryIds = new Set(menu.categories.filter(c => c.visible !== false).map(c => c.id));
