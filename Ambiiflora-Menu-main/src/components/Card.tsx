@@ -9,12 +9,14 @@ import { IconPlus } from "./icons";
 export default function Card({ item, onOpen }: { item: Item; onOpen: (i: Item) => void }) {
   const [lo, hi] = priceRange(item);
   const price = <>{lo !== hi && <small>from</small>}{naira(lo)}</>;
+  const soldOut = item.available === false;
   if (isDrink(item.category)) {
     const sub = item.details?.find((d) => d.label === "Style")?.value ?? item.description;
     const origin = item.details?.find((d) => d.label === "Country")?.value;
     return (
       <li className="card-li wide">
-        <motion.button type="button" className="wcard" whileTap={{ scale: 0.98 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} onClick={() => onOpen(item)}>
+        <motion.button type="button" className="wcard" disabled={soldOut} data-sold-out={soldOut ? "" : undefined} whileTap={soldOut ? undefined : { scale: 0.98 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} onClick={() => onOpen(item)}>
+          {soldOut && <span className="sold-out-tag">Sold out</span>}
           <span className="wcard-t"><b>{item.name}</b><span>{origin ? `${sub} · ${origin}` : sub}</span><em className="wcard-p">{price}</em></span>
           <span className="wcard-art" aria-hidden><Bottle item={item} /></span>
         </motion.button>
@@ -24,7 +26,8 @@ export default function Card({ item, onOpen }: { item: Item; onOpen: (i: Item) =
   const chips = item.groups.length === 1 && item.groups[0]!.options.length <= 4 ? item.groups[0]!.options.map((o) => o.label) : [];
   return (
     <li className="card-li">
-      <motion.button type="button" className="card" whileTap={{ scale: 0.975 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} onClick={() => onOpen(item)}>
+      <motion.button type="button" className="card" disabled={soldOut} data-sold-out={soldOut ? "" : undefined} whileTap={soldOut ? undefined : { scale: 0.975 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} onClick={() => onOpen(item)}>
+        {soldOut && <span className="sold-out-tag">Sold out</span>}
         <span className="card-media" data-reveal=""><Media item={item} layoutId={`media-${item.id}`} radius={20} /></span>
         <span className="card-name">{item.name}</span>
         {chips.length > 0 ? <span className="chips">{chips.slice(0, 3).map((c) => <i key={c}>{c}</i>)}</span> : <span className="card-desc">{item.description}</span>}

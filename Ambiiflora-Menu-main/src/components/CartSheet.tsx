@@ -9,6 +9,7 @@ import Sheet, { useSheetDrag } from "./Sheet";
 import Stepper from "./Stepper";
 import { Thumb } from "./Media";
 import { IconClose, IconTrash } from "./icons";
+import type { BranchId } from "@/lib/branches";
 
 type Prepared = { ok: true; ref: string; total: number; message: string; waUrl: string };
 type Step = "basket" | "details" | "review";
@@ -17,8 +18,8 @@ const ROOM_NUMBER_ERROR = "Enter your room number.";
 const PICKUP_NAME_ERROR = "Enter a name for collection.";
 const PICKUP_CONTACT_ERROR = "Enter a valid phone number for pickup updates.";
 
-export default function CartSheet({ open, onClose, canOrder, closedReason }: { open: boolean; onClose: () => void; canOrder: boolean; closedReason: string }) {
-  return <Sheet open={open} onClose={onClose} label="Your order" tone="dark"><Body onClose={onClose} canOrder={canOrder} closedReason={closedReason} /></Sheet>;
+export default function CartSheet({ open, branchId, onClose, canOrder, closedReason }: { open: boolean; branchId: BranchId; onClose: () => void; canOrder: boolean; closedReason: string }) {
+  return <Sheet open={open} onClose={onClose} label="Your order" tone="dark"><Body branchId={branchId} onClose={onClose} canOrder={canOrder} closedReason={closedReason} /></Sheet>;
 }
 
 function Choice({ group, checked, onChange, title, sub }: { group: string; checked: boolean; onChange: () => void; title: string; sub?: string }) {
@@ -32,9 +33,9 @@ function Choice({ group, checked, onChange, title, sub }: { group: string; check
   );
 }
 
-function Body({ onClose, canOrder, closedReason }: { onClose: () => void; canOrder: boolean; closedReason: string }) {
+function Body({ branchId, onClose, canOrder, closedReason }: { branchId: BranchId; onClose: () => void; canOrder: boolean; closedReason: string }) {
   const drag = useSheetDrag();
-  const lines = useCart();
+  const lines = useCart(branchId);
   const rows = useMemo(() => lines.flatMap((l) => { const item = findItem(l.itemId); return item ? [{ l, item, unit: unitPrice(item, l.sel) }] : []; }), [lines]);
   const total = rows.reduce((s, r) => s + r.unit * r.l.qty, 0);
   const [step, setStepRaw] = useState<Step>("basket");
@@ -68,15 +69,15 @@ function Body({ onClose, canOrder, closedReason }: { onClose: () => void; canOrd
     if (local.length) return setErrors(local);
     setBusy(true); setErrors([]);
     try {
-      const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lines: rows.map(({ l }) => ({ itemId: l.itemId, sel: l.sel, qty: l.qty, note: l.note })), fulfilment, room, guestName, contact, payment, note }) });
+      const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ branchId, lines: rows.map(({ l }) => ({ itemId: l.itemId, sel: l.sel, qty: l.qty, note: l.note })), fulfilment, room, guestName, contact, payment, note }) });
       const data = await res.json();
       if (data.ok) { setPrepared(data); go("review"); } else setErrors(data.errors ?? ["Something went wrong. Try again."]);
     } catch { setErrors(["No connection. Check your network and try again."]); }
     setBusy(false);
   }
 
-  const sentDone = () => { cart.clear(); onClose(); toast.show("Order cleared. Enjoy your meal."); };
-  const cancelOrder = () => { const prev = cart.clear(); onClose(); toast.show("Order cancelled", { label: "Undo", run: () => cart.restore(prev) }); };
+  const sentDone = () => { cart.clear(branchId); onClose(); toast.show("Order cleared. Enjoy your meal."); };
+  const cancelOrder = () => { const prev = cart.clear(branchId); onClose(); toast.show("Order cancelled", { label: "Undo", run: () => cart.restore(prev, branchId) }); };
   const copy = async () => { try { await navigator.clipboard.writeText(prepared!.message); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { /* the text is selectable */ } };
 
   const title = step === "basket" ? "Your order" : step === "details" ? "Delivery & payment" : "Review & send";
@@ -119,11 +120,11 @@ function Body({ onClose, canOrder, closedReason }: { onClose: () => void; canOrd
                           <b>{item.name}</b>
                           {describeSelection(item, l.sel) && <span>{describeSelection(item, l.sel)}</span>}
                           {l.note && <span>“{l.note}”</span>}
-                          <button type="button" className="link" onClick={() => cart.remove(l.id)}>Remove</button>
+                          <button type="button" className="link" onClick={() => cart.remove(branchId, l.id)}>Remove</button>
                         </div>
                         <div className="line-side">
                           <b>{naira(unit * l.qty)}</b>
-                          <Stepper size="sm" tone="dark" value={l.qty} label={`Quantity for ${item.name}`} onDec={() => (l.qty === 1 ? cart.remove(l.id) : cart.setQty(l.id, l.qty - 1))} onInc={() => cart.setQty(l.id, l.qty + 1)} incDisabled={l.qty >= 20} />
+                          <Stepper size="sm" tone="dark" value={l.qty} label={`Quantity for ${item.name}`} onDec={() => (l.qty === 1 ? cart.remove(branchId, l.id) : cart.setQty(branchId, l.id, l.qty - 1))} onInc={() => cart.setQty(branchId, l.id, l.qty + 1)} incDisabled={l.qty >= 20} />
                         </div>
                       </motion.li>
                     ))}

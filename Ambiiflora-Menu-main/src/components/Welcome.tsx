@@ -5,7 +5,7 @@ import { gsap, motionReady, reducedMotion } from "@/lib/motion";
 import { IconArrowRight } from "./icons";
 
 /** First screen: the logo settles in, then the call to action. One sequence in, one out. */
-export default function Welcome({ statusLine, onStart, onDone }: { statusLine: string; onStart: () => void; onDone: () => void }) {
+export default function Welcome({ hotelName, statusLine, onStart, onDone }: { hotelName: string; statusLine: string; onStart: () => void; onDone: () => void }) {
   const root = useRef<HTMLElement>(null);
   const exiting = useRef(false);
 
@@ -40,7 +40,7 @@ export default function Welcome({ statusLine, onStart, onDone }: { statusLine: s
     <section ref={root} className="welcome" aria-label="Welcome">
       <div className="welcome-inner">
         <img className="welcome-logo" data-in src="/brand/logo.png" alt={`${brand.name} Hotels and Suites`} width={900} height={450} />
-        <p className="welcome-line" data-in>Food, wine and drinks, brought to your room or ready for collection.</p>
+        <p className="welcome-line" data-in>{hotelName}: food, wine and drinks, brought to your room or ready for collection.</p>
       </div>
       <div className="welcome-foot">
         <p className="welcome-status" data-in>{statusLine}</p>
@@ -48,6 +48,7 @@ export default function Welcome({ statusLine, onStart, onDone }: { statusLine: s
           <span>View the menu</span>
           <span className="welcome-arrow"><IconArrowRight width={20} height={20} /></span>
         </button>
+        <a className="welcome-change" href="/">Change hotel</a>
       </div>
     </section>
   );

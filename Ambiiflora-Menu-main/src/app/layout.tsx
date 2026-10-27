@@ -5,8 +5,8 @@ import "@fontsource-variable/figtree/index.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tranquila Hotels and Suites · Food & drinks",
-  description: "Order from the Tranquila food and drinks menu. Delivered to your room or ready for collection.",
+  title: "Tranquila Hotels · Food & drinks",
+  description: "Choose Tranquila Hotel or Tranquila Nest to view the menu and order for your stay.",
   icons: { icon: "/brand/mark.png" },
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#F3F1E8" };

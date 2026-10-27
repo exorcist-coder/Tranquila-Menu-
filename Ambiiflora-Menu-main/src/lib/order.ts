@@ -18,7 +18,7 @@ export type OrderResult =
 const clean = (s: unknown, max: number): string => (typeof s === "string" ? s.replace(/[\u0000-\u001f\u007f]+/g, " ").trim().slice(0, max) : "");
 
 /** The server is the source of truth for price, availability and hours. Nothing from the client is trusted. */
-export function prepareOrder(input: unknown, cfg: { whatsapp: string; hours: Hours }, now: Date = new Date(), ref = `TRQ-${globalThis.crypto.randomUUID().slice(0, 6).toUpperCase()}`, catalogItems?: Item[]): OrderResult {
+export function prepareOrder(input: unknown, cfg: { whatsapp: string; hotelName?: string; hours: Hours }, now: Date = new Date(), ref = `TRQ-${globalThis.crypto.randomUUID().slice(0, 6).toUpperCase()}`, catalogItems?: Item[]): OrderResult {
   const errors: string[] = [];
   const body = (input ?? {}) as Partial<OrderInput>;
   const status = orderingStatus(cfg.hours, now);
@@ -34,6 +34,7 @@ export function prepareOrder(input: unknown, cfg: { whatsapp: string; hours: Hou
     const item = typeof l?.itemId === "string" ? (catalogItems ? catalogItems.find(candidate => candidate.id === l.itemId) : findItem(l.itemId)) : undefined;
     const qty = Number(l?.qty);
     if (!item) { errors.push("An item is no longer on the menu."); continue; }
+    if (item.available === false) { errors.push(`${item.name} is sold out at this hotel. Remove it from your basket to continue.`); continue; }
     const sel = l.sel && typeof l.sel === "object" ? (l.sel as Selection) : {};
     if (!Number.isInteger(qty) || qty < 1 || qty > 20) { errors.push(`Check the quantity for ${item.name}.`); continue; }
     if (!isValidSelection(item, sel)) { errors.push(`Finish choosing options for ${item.name}.`); continue; }
@@ -55,7 +56,7 @@ export function prepareOrder(input: unknown, cfg: { whatsapp: string; hours: Hou
   const total = lines.reduce((s, l) => s + l.lineTotal, 0);
   const vb = vatBreakdown(total);
   const msg = [
-    "*Tranquila Hotels and Suites*", `Order ${ref}`, "",
+    `*${cfg.hotelName ?? "Tranquila Hotels and Suites"}*`, `Order ${ref}`, "",
     body.fulfilment === "room" ? `Room delivery · Room ${room}` : "Collection",
     ...(body.fulfilment === "collect" ? [`Collection for: ${guestName}`, `Pickup contact: ${contact}`] : []),
     `Payment: ${body.payment === "cash" ? "Cash" : "POS"} (in person)`, "",

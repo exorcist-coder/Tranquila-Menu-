@@ -2,7 +2,6 @@
 import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "framer-motion";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CATEGORIES, ITEMS, findItem, isDrink, setCatalog, type CategoryId, type Item } from "@/lib/catalog";
-import { brand } from "@/lib/config";
 import { orderingStatus, type Hours } from "@/lib/hours";
 import { gsap, motionReady, reducedMotion, ScrollTrigger } from "@/lib/motion";
 import { naira, unitPrice } from "@/lib/pricing";
@@ -14,20 +13,22 @@ import Welcome from "./Welcome";
 import { toast } from "./toastStore";
 import { cart, useCart } from "./useCart";
 import { CatIcon, IconArrowRight, IconBag, IconClose, IconSearch } from "./icons";
+import type { Branch } from "@/lib/branches";
 
 type Phase = "welcome" | "entering" | "menu";
 const SEEN = "amb.in";
 
-export default function MenuApp({ hours: initialHours, serverNow }: { hours: Hours; whatsapp: string; serverNow: string }) {
+export default function MenuApp({ branch, hours: initialHours, serverNow }: { branch: Branch; hours: Hours; serverNow: string }) {
   const [hours, setHours] = useState<Hours>(initialHours);
   const [catalogVersion, setCatalogVersion] = useState(0);
-  useEffect(() => { fetch("/api/menu", { cache: "no-store" }).then(r => r.json()).then(data => { if (data?.menu?.items?.length) { setCatalog(data.menu.items, data.menu.categories); cart.pruneInvalid(); setCatalogVersion(v => v + 1); } if (data?.settings) setHours({ open: data.settings.open, close: data.settings.close, paused: data.settings.paused }); }).catch(() => {}); }, []);
+  const [catalogBranch, setCatalogBranch] = useState<string | null>(null);
+  useEffect(() => { fetch(`/api/menu?branch=${branch.id}`, { cache: "no-store" }).then(r => r.json()).then(data => { if (Array.isArray(data?.menu?.items) && Array.isArray(data?.menu?.categories)) { setCatalog(data.menu.items, data.menu.categories); cart.pruneInvalid(branch.id); setCatalogVersion(v => v + 1); } if (data?.settings) setHours({ open: data.settings.open, close: data.settings.close, paused: data.settings.paused }); setCatalogBranch(branch.id); }).catch(() => setCatalogBranch(branch.id)); }, [branch.id]);
   const [now, setNow] = useState(() => new Date(serverNow));
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 30_000); return () => clearInterval(t); }, []);
   const status = orderingStatus(hours, now);
   const statusLine = status.open ? `Kitchen open until ${hours.close}` : hours.paused ? "Ordering is paused right now" : `Kitchen opens at ${hours.open}`;
 
-  const lines = useCart();
+  const lines = useCart(branch.id);
   const [phase, setPhase] = useState<Phase>("welcome");
   useLayoutEffect(() => { if (document.documentElement.classList.contains("skip-welcome")) setPhase("menu"); }, []);
   useEffect(() => {
@@ -42,6 +43,8 @@ export default function MenuApp({ hours: initialHours, serverNow }: { hours: Hou
   const main = useRef<HTMLElement>(null);
   const sections = useRef<Record<string, HTMLElement | null>>({});
   const rail = useRef<HTMLDivElement>(null);
+
+  if (catalogBranch !== branch.id) return <main className="menu-loading" aria-live="polite">Loading {branch.name} menu…</main>;
 
   const count = lines.reduce((s, l) => s + l.qty, 0);
   const total = lines.reduce((s, l) => { const it = findItem(l.itemId); return s + (it ? unitPrice(it, l.sel) * l.qty : 0); }, 0);
@@ -109,9 +112,9 @@ export default function MenuApp({ hours: initialHours, serverNow }: { hours: Hou
           <header className="masthead">
             <div className="brand">
               <img className="brand-mark" src="/brand/mark.png" alt="" width={64} height={30} />
-              <div><h1>{brand.name}</h1><p>Hotels and Suites</p></div>
+              <div><h1>{branch.name}</h1><p>{branch.address}</p></div>
             </div>
-            <span className={`status ${status.open ? "on" : "off"}`}><i aria-hidden />{status.open ? "Open" : hours.paused ? "Paused" : "Closed"}</span>
+            <div className="masthead-actions"><a href="/" className="branch-change">Change hotel</a><span className={`status ${status.open ? "on" : "off"}`}><i aria-hidden />{status.open ? "Open" : hours.paused ? "Paused" : "Closed"}</span></div>
           </header>
 
           <div className="toolbar">
@@ -173,10 +176,10 @@ export default function MenuApp({ hours: initialHours, serverNow }: { hours: Hou
           </main>
         </div>
 
-        <ItemSheet item={item} onClose={() => setItem(null)} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
-        <CartSheet open={cartOpen} onClose={() => setCartOpen(false)} canOrder={status.open} closedReason={status.reason} />
+        <ItemSheet item={item} branchId={branch.id} onClose={() => setItem(null)} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
+        <CartSheet open={cartOpen} branchId={branch.id} onClose={() => setCartOpen(false)} canOrder={status.open} closedReason={status.reason} />
         <Toast lifted={false} />
-        {phase !== "menu" && <Welcome statusLine={statusLine} onStart={() => setPhase("entering")} onDone={enterMenu} />}
+        {phase !== "menu" && <Welcome hotelName={branch.name} statusLine={statusLine} onStart={() => setPhase("entering")} onDone={enterMenu} />}
       </LayoutGroup>
     </MotionConfig>
   );

@@ -4,22 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import { isDrink, type Item } from "@/lib/catalog";
 import { describeSelection, missingGroups, naira, normalize, priceRange, showsPrice, unitPrice, visibleGroups, visibleOptions, type Selection } from "@/lib/pricing";
 import { cart } from "./useCart";
+import type { BranchId } from "@/lib/branches";
 import Sheet, { useSheetDrag } from "./Sheet";
 import Media, { Bottle } from "./Media";
 import Stepper from "./Stepper";
 import { IconClose } from "./icons";
 
-export default function ItemSheet({ item, onClose, canOrder, onAdded }: { item: Item | null; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
+export default function ItemSheet({ item, branchId, onClose, canOrder, onAdded }: { item: Item | null; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
   const last = useRef<Item | null>(item);
   if (item) last.current = item; // keep content mounted while the sheet animates out
   return (
     <Sheet open={!!item} onClose={onClose} label={last.current?.name ?? "Dish"}>
-      {last.current ? <Body key={last.current.id} item={last.current} onClose={onClose} canOrder={canOrder} onAdded={onAdded} /> : null}
+      {last.current ? <Body key={last.current.id} item={last.current} branchId={branchId} onClose={onClose} canOrder={canOrder} onAdded={onAdded} /> : null}
     </Sheet>
   );
 }
 
-function Body({ item, onClose, canOrder, onAdded }: { item: Item; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
+function Body({ item, branchId, onClose, canOrder, onAdded }: { item: Item; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
   const drag = useSheetDrag();
   const [sel, setSel] = useState<Selection>({});
   const [qty, setQty] = useState(1);
@@ -37,8 +38,9 @@ function Body({ item, onClose, canOrder, onAdded }: { item: Item; onClose: () =>
   useEffect(() => { if (tried && missing.length === 0) setTried(false); }, [tried, missing.length]);
 
   function submit() {
+    if (!canOrder || item.available === false) return;
     if (missing.length) { setTried(true); refs.current[missing[0]!.id]?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
-    cart.add({ itemId: item.id, sel: normalize(item, sel), qty, note: note.trim() });
+    cart.add(branchId, { itemId: item.id, sel: normalize(item, sel), qty, note: note.trim() });
     onAdded(item.name);
     onClose();
   }
@@ -114,14 +116,14 @@ function Body({ item, onClose, canOrder, onAdded }: { item: Item; onClose: () =>
         <footer className="wfoot">
           <div className="wprice"><small>{unit > 0 ? "Total" : "From"}</small><b>{unit > 0 ? naira(unit * qty) : naira(lo * qty)}</b></div>
           <Stepper value={qty} tone="light" size="sm" label="Quantity" onDec={() => setQty((q) => Math.max(1, q - 1))} onInc={() => setQty((q) => Math.min(20, q + 1))} incDisabled={qty >= 20} />
-          <motion.button type="button" className="wbtn" whileTap={{ scale: 0.97 }} onClick={submit} disabled={!canOrder}>{canOrder ? "Add to cart" : "Closed"}</motion.button>
+          <motion.button type="button" className="wbtn" whileTap={{ scale: 0.97 }} onClick={submit} disabled={!canOrder || item.available === false}>{item.available === false ? "Sold out" : canOrder ? "Add to cart" : "Closed"}</motion.button>
         </footer>
       ) : (
       <footer className="dock-foot">
         <Stepper value={qty} tone="light" label="Quantity" onDec={() => setQty((q) => Math.max(1, q - 1))} onInc={() => setQty((q) => Math.min(20, q + 1))} incDisabled={qty >= 20} />
-        <motion.button type="button" className="cta" whileTap={{ scale: 0.97 }} onClick={submit} disabled={!canOrder}>
-          <span>{canOrder ? "Add to order" : "Ordering is closed"}</span>
-          {canOrder && <span className="cta-p">{unit > 0 ? naira(unit * qty) : `from ${naira(lo * qty)}`}</span>}
+        <motion.button type="button" className="cta" whileTap={{ scale: 0.97 }} onClick={submit} disabled={!canOrder || item.available === false}>
+          <span>{item.available === false ? "Sold out" : canOrder ? "Add to order" : "Ordering is closed"}</span>
+          {canOrder && item.available !== false && <span className="cta-p">{unit > 0 ? naira(unit * qty) : `from ${naira(lo * qty)}`}</span>}
         </motion.button>
       </footer>
       )}

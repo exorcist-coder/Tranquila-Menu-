@@ -39,26 +39,29 @@ Or push to GitHub and import the repo at vercel.com/new. No build settings neede
 - The cart lives in `localStorage`. There are no accounts and no database.
 
 ## Not built yet
-- Staff dashboard (toggle availability, edit prices and hours without a deploy). Needs a datastore; `catalog.ts` is already shaped for a Supabase table swap.
 - Own photography. Photos live in `public/menu/` and are mapped in `src/lib/catalog.ts` (`photos: [...]`) via `src/lib/photos.ts`. Items without photos show a lotus placeholder card.
 - Order history. Orders live in WhatsApp.
 
 ## Admin CMS and WhatsApp-first ordering
 
-- Guest menu: `/`
+- Hotel chooser: `/`
+- Tranquila Hotel menu: `/?branch=tranquila`
+- Tranquila Nest menu: `/?branch=tranquila-nest`
 - Staff CMS: `/admin`
+- Both branches use the same staff login. Switch hotels inside the admin panel; menus, opening hours, pause state, and WhatsApp numbers are stored separately per branch.
+- Stock switches apply immediately per branch. Sold-out items remain visible to guests with a Sold out label, cannot be added to the cart, and are rechecked when an order is submitted.
 - WhatsApp remains the primary ordering channel. Opening WhatsApp is not treated as proof that the guest sent the message.
-- The admin CMS supports menu items, prices, descriptions, visibility/publication, categories, option-group JSON, service hours and the configured WhatsApp number. Menu changes are draft until published.
+- The admin CMS supports menu items, prices, descriptions, visibility/publication, categories, option-group JSON, service hours and the configured WhatsApp number. Menu changes are draft until published; stock switches are immediate.
 - The starter menu remains in the source as the initial fallback template. Download a JSON backup before loading the starter menu into the editor.
 
 ### Enable persistent CMS
 
 1. Create a Supabase project.
-2. Run `supabase/migrations/202610130001_ambiiflora_cms.sql` in the Supabase SQL editor.
+2. Run `supabase/migrations/202610130001_ambiiflora_cms.sql`, then `supabase/migrations/202610270001_branch_support.sql` in the Supabase SQL editor. The branch migration copies the existing menu and settings into both hotels so they can be managed independently afterward.
 3. Copy `.env.example` to `.env.local` and fill in `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`. Keep the service-role key server-only; never prefix it with `NEXT_PUBLIC_`.
 4. Restart the Next.js server.
 5. Create staff users in Supabase Authentication. Add each user's UUID to `public.ambiiflora_staff` with `role='admin'` or `role='staff'` and `active=true`. Only administrators can edit hotel settings.
-6. Sign in at `/admin`, edit the starter menu and publish it.
+6. Sign in at `/admin`, switch between Tranquila Hotel and Tranquila Nest, configure each branch's WhatsApp number and hours, then edit and publish each branch's menu.
 
 The migration creates a public image bucket named `ambiiflora-menu`; image uploads are restricted by the server to supported image types and 5 MB. The server uses the service-role key only after checking the signed-in user's active staff profile. If Supabase is not configured, the guest menu uses the local starter catalog and the admin login explains that setup is required.
 
@@ -66,6 +69,8 @@ The migration creates a public image bucket named `ambiiflora-menu`; image uploa
 
 - Save draft stores menu edits without changing the published guest menu.
 - Publish menu makes the current CMS menu available to guests and to server-side order validation.
+- The branch menu chooser displays each property's name and address. Branch-specific links can be encoded into each property's QR code.
+- Item availability is stored separately from the menu draft for each branch. Switching an item off does not hide or delete it; guests see Sold out until staff mark it available again.
 - Category and item availability is read from the published menu.
 - The Templates & reset screen can load the original starter menu into the editor and export a JSON backup of the current menu. Publishing is a separate action.
 - Uploaded images are stored in Supabase Storage and referenced by their public URL.
