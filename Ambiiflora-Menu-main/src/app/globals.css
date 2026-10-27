@@ -368,8 +368,14 @@ body{background:var(--mist)}
 /* welcome */
 .welcome{background:var(--mist)}
 .welcome-logo{width:min(84vw,440px);height:auto;display:block}
+.welcome-nest-brand{display:grid;justify-items:center;gap:18px}
+.welcome-nest-brand img{width:min(54vw,260px);height:auto}
+.welcome-nest-brand strong{font:500 54px/1 var(--display);color:var(--ink)}
 .welcome-line{max-width:26ch;font-size:16px;color:var(--muted)}
 .welcome-cta{background:var(--forest);color:#fff}
+.colophon-nest{display:flex;flex-direction:column;align-items:center;gap:8px}
+.colophon .colophon-nest .colophon-mark{width:64px;height:auto}
+.colophon-nest strong{font:500 20px/1.1 var(--display);color:var(--ink)}
 
 /* Branch selection and branch-specific availability */
 .branch-select{min-height:100svh;max-width:900px;margin-inline:auto;padding:calc(42px + var(--safe-t)) 24px calc(28px + var(--safe-b));display:flex;flex-direction:column;justify-content:center}

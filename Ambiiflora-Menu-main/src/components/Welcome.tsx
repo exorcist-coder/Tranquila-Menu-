@@ -2,10 +2,11 @@
 import { useLayoutEffect, useRef } from "react";
 import { brand } from "@/lib/config";
 import { gsap, motionReady, reducedMotion } from "@/lib/motion";
+import type { BranchId } from "@/lib/branches";
 import { IconArrowRight } from "./icons";
 
 /** First screen: the logo settles in, then the call to action. One sequence in, one out. */
-export default function Welcome({ hotelName, statusLine, onStart, onDone }: { hotelName: string; statusLine: string; onStart: () => void; onDone: () => void }) {
+export default function Welcome({ branchId, hotelName, statusLine, onStart, onDone }: { branchId: BranchId; hotelName: string; statusLine: string; onStart: () => void; onDone: () => void }) {
   const root = useRef<HTMLElement>(null);
   const exiting = useRef(false);
 
@@ -39,7 +40,14 @@ export default function Welcome({ hotelName, statusLine, onStart, onDone }: { ho
   return (
     <section ref={root} className="welcome" aria-label="Welcome">
       <div className="welcome-inner">
-        <img className="welcome-logo" data-in src="/brand/logo.png" alt={`${brand.name} Hotels and Suites`} width={900} height={450} />
+        {branchId === "tranquila-nest" ? (
+          <div className="welcome-logo welcome-nest-brand" data-in>
+            <img src="/brand/mark.png" alt="" width={220} height={110} />
+            <strong>NEST Abuja</strong>
+          </div>
+        ) : (
+          <img className="welcome-logo" data-in src="/brand/logo.png" alt={`${brand.name} Hotels and Suites`} width={900} height={450} />
+        )}
         <p className="welcome-line" data-in>{hotelName}: food, wine and drinks, brought to your room or ready for collection.</p>
       </div>
       <div className="welcome-foot">

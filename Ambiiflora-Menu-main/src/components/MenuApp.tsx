@@ -113,7 +113,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
           <header className="masthead">
             <div className="brand">
               <img className="brand-mark" src="/brand/mark.png" alt="" width={64} height={30} />
-              <div><h1>{branch.name}</h1><p>{branch.address}</p></div>
+              <div><h1>{branch.name}</h1></div>
             </div>
             <div className="masthead-actions"><a href="/" className="branch-change">Change hotel</a><span className={`status ${status.open ? "on" : "off"}`}><i aria-hidden />{status.open ? "Open" : hours.paused ? "Paused" : "Closed"}</span></div>
           </header>
@@ -172,7 +172,10 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
                 </section>
               ))
             )}
-            <footer className="colophon"><img className="colophon-mark" src="/brand/logo.png" alt={brand.name} width={220} height={110} /><p>All prices include 7.5% VAT.</p></footer>
+            <footer className="colophon">
+              {branch.id === "tranquila-nest" ? <div className="colophon-nest"><img className="colophon-mark" src="/brand/mark.png" alt="" width={64} height={30} /><strong>NEST Abuja</strong></div> : <img className="colophon-mark" src="/brand/logo.png" alt={brand.name} width={220} height={110} />}
+              <p>All prices include 7.5% VAT.</p>
+            </footer>
             <a className="guest-admin-link" href="/admin">Admin</a>
           </main>
         </div>
@@ -180,7 +183,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
         <ItemSheet item={item} branchId={branch.id} onClose={() => setItem(null)} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
         <CartSheet open={cartOpen} branchId={branch.id} onClose={() => setCartOpen(false)} canOrder={status.open} closedReason={status.reason} />
         <Toast lifted={false} />
-        {phase !== "menu" && <Welcome hotelName={branch.name} statusLine={statusLine} onStart={() => setPhase("entering")} onDone={enterMenu} />}
+        {phase !== "menu" && <Welcome branchId={branch.id} hotelName={branch.name} statusLine={statusLine} onStart={() => setPhase("entering")} onDone={enterMenu} />}
       </LayoutGroup>
     </MotionConfig>
   );
