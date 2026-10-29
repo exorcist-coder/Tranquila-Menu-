@@ -4,7 +4,7 @@ export default function BranchSelector() {
   return (
     <main className="branch-select">
       <header className="branch-select-head">
-        <img src="/brand/mark.png" alt="" width={64} height={30} />
+        <img src="/images/mark.png" alt="" width={64} height={30} />
         <p>TRANQUILA HOTELS</p>
         <h1>Choose your hotel</h1>
         <span>View the menu and order from your hotel’s kitchen.</span>

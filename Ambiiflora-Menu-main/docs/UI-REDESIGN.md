@@ -14,12 +14,12 @@
 | **No navy bar underneath** | The floating bottom order bar (`Dock`) is removed entirely. The cart now lives in the sticky top toolbar as a round button with a count badge. The item sheet footer is flat and light, with no dark bar. | `Dock.tsx` deleted, `MenuApp.tsx`, `ItemSheet.tsx` |
 | Same architecture | Same files, same data model, same sheet flow, same cart store, same order API and WhatsApp message builder | see section 4 |
 | Icons for categories, like the reference | Ten stroke icons in round tiles; active tile fills deep green with a gold icon | `icons.tsx` (`CatIcon`), `MenuApp.tsx` |
-| Wine images in the wine section | The supplied J. Bouchon bottle is cut out to a transparent PNG and used on every wine card and wine detail page | `public/menu/bouchon.png`, `Media.tsx` (`Bottle`) |
+| Wine images in the wine section | The supplied J. Bouchon bottle is cut out to a transparent PNG and used on every wine card and wine detail page | `public/images/bouchon.png`, `Media.tsx` (`Bottle`) |
 | Wine UI in the wine and drinks sections, including water and juice | Wine-list rows (bottle standing out of a white pill card) and a "Product details" page for all five drink categories: Wines, Spirits, Beers, Soft & Hot, Water & Juice | `Card.tsx`, `ItemSheet.tsx` |
 | Same in the detail pages | Drink detail page: top bar with title, bottle panel on the left, name, description and **Details** list on the right, price at the bottom left with a black **Add to cart** button | `ItemSheet.tsx` |
 | Same flow, better UI | Browse, tap, choose options, add, review cart, send via WhatsApp. No step added or removed. | unchanged logic |
 | Menu content | 87 items built from the PDF (278 raw rows consolidated, duplicates merged) | `src/lib/catalog.ts` |
-| Brand | Tranquila logo supplied; mark and full logo cut to transparent PNGs | `public/brand/` |
+| Brand | Tranquila logo supplied; mark and full logo cut to transparent PNGs | `public/images/` |
 
 ---
 
@@ -149,9 +149,9 @@ export const RECEIPT_VAT_RATE = 0.075; // receipt breakdown
 
 | File | Source | Treatment |
 |---|---|---|
-| `public/menu/bouchon.png` | J. Bouchon bottle image | The upload had a checkerboard baked into the background. It was removed by flood-fill from the edges, softened, cropped and resized (520 × 900, transparent). |
-| `public/brand/logo.png` | Tranquila logo | Cropped, white removed to transparent, so it sits on the ivory ground |
-| `public/brand/mark.png` | Tranquila logo | Wave mark only, for the header and favicon |
+| `public/images/bouchon.png` | J. Bouchon bottle image | The upload had a checkerboard baked into the background. It was removed by flood-fill from the edges, softened, cropped and resized (520 × 900, transparent). |
+| `public/images/logo.png` | Tranquila logo | Cropped, white removed to transparent, so it sits on the ivory ground |
+| `public/images/mark.png` | Tranquila logo | Wave mark only, for the header and favicon |
 
 Reference screenshots (the Taste Haven screen and the wine app mock-up) were used for layout, not copied into the app.
 
@@ -159,7 +159,7 @@ Reference screenshots (the Taste Haven screen and the wine app mock-up) were use
 
 ## 7. How to extend
 
-- **More bottle photos:** place a transparent PNG in `public/menu/`, then either set `imageUrl` on the item (CMS or catalog) or extend `bottleOf()` in `Media.tsx` to map categories or item ids to files. Drink cards and the detail page pick it up automatically.
+- **More bottle photos:** place a transparent PNG in `public/images/`, then either set `imageUrl` on the item (CMS or catalog) or extend `bottleOf()` in `Media.tsx` to map categories or item ids to files. Drink cards and the detail page pick it up automatically.
 - **New drink category:** add its id to `DRINK_CATEGORIES` in `catalog.ts` to get the wine-style UI, and add an icon path to `CAT` in `icons.tsx`.
 - **Rating stars:** the reference shows stars. Add a `rating` field to `Item` only when you have real data, then render it in `Card.tsx` and `ItemSheet.tsx`.
 - **Colours:** change the six tokens in `:root`; everything inherits.
@@ -191,5 +191,5 @@ This redesign was assembled without network access, so dependencies were not ins
 ## 10. First-release image policy (supersedes the placeholder notes in 3.3, 3.4 and 8)
 
 - **Every drink** (Wines, Spirits, Beers, Soft & Hot, Water & Juice) uses the supplied J. Bouchon bottle image, on the list rows, the detail page and the cart thumbnail. Set in `bottleOf()` in `Media.tsx`.
-- **Every food dish has a photo.** Dishes with a matching photo keep it; all others are given the 17 supplied food photos in rotation by `rotatePhotos()` in `catalog.ts` (also applied to menus loaded from the CMS). Because of the rotation, some dishes show a photo of a different dish. Replace them as real photos arrive: set the item's photo key or `imageUrl` and it takes priority over the rotation.
-- No icon placeholders are shown anywhere. If an image fails to load, the rice photo is shown instead of an empty tile.
+- **Food photos are assigned by dish.** `src/lib/catalog.ts` lists only images that match the item; the photo keys resolve through `src/lib/photos.ts` to assets in `public/images/`. Menus loaded from the CMS keep their configured photo keys and do not receive random images.
+- Items without a matching photo, and images that fail to load, show a category icon placeholder rather than an unrelated dish.

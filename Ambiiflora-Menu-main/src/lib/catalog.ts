@@ -1,4 +1,3 @@
-import { PHOTOS } from "./photos";
 export type CategoryId = string;
 export type When = { group: string; in: string[] };
 export type Option = { id: string; label: string; price: number; when?: When };
@@ -52,51 +51,51 @@ const spiritMany = (name: string, style: string, brand: string, label: string, o
 
 export const ITEMS: Item[] = [
   // Breakfast
-  one("english-breakfast", "breakfast", "English Breakfast", "The full plate, cooked to order.", 10000),
-  one("nigerian-breakfast", "breakfast", "Nigerian Breakfast", "A hearty local morning plate.", 8000, { photos: ["yam-egg-sauce", "yam-fish"] }),
-  one("kids-breakfast", "breakfast", "Kids English Breakfast", "A smaller plate for little ones.", 3000),
-  one("tea-bread-omelette", "breakfast", "Tea, bread and omelette", "Simple and satisfying.", 4500),
-  many("eggs", "breakfast", "Eggs Your Way", "Cooked how you like them.", "Style", [["Boiled Egg", 1500], ["Fried Egg", 2000], ["Scrambled Egg", 2000], ["Sunny Side Up Egg", 2000, "sunny-side-up"], ["Omelette", 2000], ["Spanish Omelette", 2000], ["Vegetable Omelette", 2000]]),
-  many("porridge-cereal", "breakfast", "Cereal & Porridge", "Warm or cold, to start the day.", "Choose", [["Oat meal", 2000], ["Cornflakes", 2000], ["Cereal", 1500], ["Wheat", 2000], ["Custard", 2000]], { photos: ["akara-custard"] }),
-  many("porridge-local", "breakfast", "Local Porridge", "Slow-cooked and seasoned.", "Porridge", [["Porridge beans", 4000], ["Porridge plantain", 3500], ["Porridge potatoes", 4500], ["Porridge yam", 4500]]),
-  many("pastries", "breakfast", "Pastries & Pies", "Fresh from the kitchen.", "Choose", [["Croissant", 700], ["Meat pie", 2000], ["Fish pie", 700], ["Fish roll", 700]]),
+  one("english-breakfast", "breakfast", "English Breakfast", "The full plate, cooked to order.", 10000, { photos: ["english-breakfast"] }),
+  one("nigerian-breakfast", "breakfast", "Nigerian Breakfast", "A hearty local morning plate.", 8000, { photos: ["nigerian-breakfast"] }),
+  one("kids-breakfast", "breakfast", "Kids English Breakfast", "A smaller plate for little ones.", 3000, { photos: ["kids-pancakes"] }),
+  one("tea-bread-omelette", "breakfast", "Tea, bread and omelette", "Simple and satisfying.", 4500, { photos: ["tea-bread-omelette"] }),
+  many("eggs", "breakfast", "Eggs Your Way", "Cooked how you like them.", "Style", [["Boiled Egg", 1500], ["Fried Egg", 2000], ["Scrambled Egg", 2000], ["Sunny Side Up Egg", 2000, "sunny-side-up"], ["Omelette", 2000], ["Spanish Omelette", 2000], ["Vegetable Omelette", 2000]], { photos: ["fried-egg", "scrambled-eggs", "omelette", "spanish-omelette"] }),
+  many("porridge-cereal", "breakfast", "Cereal & Porridge", "Warm or cold, to start the day.", "Choose", [["Oat meal", 2000], ["Cornflakes", 2000], ["Cereal", 1500], ["Wheat", 2000], ["Custard", 2000]], { photos: ["oatmeal", "cereal-bowl", "custard-bowl"] }),
+  many("porridge-local", "breakfast", "Local Porridge", "Slow-cooked and seasoned.", "Porridge", [["Porridge beans", 4000], ["Porridge plantain", 3500], ["Porridge potatoes", 4500], ["Porridge yam", 4500]], { photos: ["porridge-beans", "porridge-potatoes", "porridge-yam", "porridge-meat-yam"] }),
+  many("pastries", "breakfast", "Pastries & Pies", "Fresh from the kitchen.", "Choose", [["Croissant", 700], ["Meat pie", 2000], ["Fish pie", 700], ["Fish roll", 700]], { photos: ["croissant", "meat-pie", "fish-roll", "fish-roll-snack"] }),
 
   // Soups & swallow
   {
-    id: "swallow-soup", category: "soups", name: "Swallow & Soup", description: "Pick your swallow and your soup. Add a protein if you like.", basePrice: 0, photos: ["amala-ewedu", "okra-fufu", "egusi", "poundo-efo", "efo-riro", "efo-beef", "fufu-ogbono", "okra-seafood"],
+    id: "swallow-soup", category: "soups", name: "Swallow & Soup", description: "Pick your swallow and your soup. Add a protein if you like.", basePrice: 0, photos: ["amala-ewedu", "okra-fufu", "egusi", "poundo-efo", "efo-riro", "efo-beef", "fufu-ogbono", "okra-seafood", "white-soup"],
     groups: [
       add("swallow", "Swallow", [["Poundo Yam", 2000, "pounded-yam"], ["Semo Extra", 1500, "semo"], ["Garri", 1500], ["White Garri", 1000], ["Plantain Flour", 2000], ["Wheat", 2000]]),
       add("soup", "Soup", [["Egusi Soup", 3000, "egusi"], ["Okro Soup", 3000, "okro"], ["Oha Soup", 3000, "oha"], ["Bitter Leaf Soup", 3000, "bitterleaf"], ["Ogbono Soup", 4000, "ogbono"], ["Afang Soup", 4000, "afang"], ["Vegetable Soup", 4000, "vegetable"], ["White Soup", 5000], ["Sea Food Okro Soup Only", 10500, "seafood-okro"], ["Fisherman Soup", 10500, "fisherman-soup"]]),
       add("protein", "Protein (optional)", [["No protein", 0], ["Goat Meat", 6000], ["European Hake Fish (Panla)", 6000, "hake-fish-panla"], ["Turkey Gizzard", 6000], ["Titus Fish", 9000]], { required: false }),
     ],
   },
-  many("pepper-soup", "soups", "Pepper Soup", "Hot, aromatic broth.", "Type", [["Beef Pepper Soup", 6500, "beef"], ["Chicken Pepper Soup", 7500, "chicken"], ["Goat Meat Pepper Soup", 7000, "goat-meat"], ["Catfish Pepper Soup", 8000, "catfish"], ["Catfish Head Pepper Soup", 7000, "catfish-head"], ["Croaker Fish Pepper Soup", 8000, "croaker-fish"], ["Tilapia Pepper Soup", 4000, "tilapia"], ["Turkey Pepper Soup", 13000, "turkey"], ["Full Catfish Pepper Soup", 20000, "full-catfish"], ["Full Croaker Fish Pepper Soup", 25000, "full-croaker-fish"]]),
+  many("pepper-soup", "soups", "Pepper Soup", "Hot, aromatic broth.", "Type", [["Beef Pepper Soup", 6500, "beef"], ["Chicken Pepper Soup", 7500, "chicken"], ["Goat Meat Pepper Soup", 7000, "goat-meat"], ["Catfish Pepper Soup", 8000, "catfish"], ["Catfish Head Pepper Soup", 7000, "catfish-head"], ["Croaker Fish Pepper Soup", 8000, "croaker-fish"], ["Tilapia Pepper Soup", 4000, "tilapia"], ["Turkey Pepper Soup", 13000, "turkey"], ["Full Catfish Pepper Soup", 20000, "full-catfish"], ["Full Croaker Fish Pepper Soup", 25000, "full-croaker-fish"]], { photos: ["pepper-soup", "seafood-pepper-soup"] }),
 
   // Rice & pasta
-  many("rice", "rice", "Rice", "Choose your rice.", "Rice", [["Jollof Rice Only", 4000, "jollof"], ["Fried Rice", 4000, "fried"], ["White Rice Only", 4000, "white"], ["Basmati Rice", 4000, "basmati"], ["Curry Fried Rice", 4000, "curry-fried"], ["Tranquila Special Coconut Rice", 5000, "coconut"], ["Special Fried Rice", 4500, "special-fried"], ["Mexican Fried Rice", 3500, "mexican-fried"], ["Spanish Fried Rice", 3500, "spanish-fried"], ["Chinese Rice Only", 5500, "chinese"], ["Steamed Chicken Fried Rice", 9500, "steamed-chicken-fried"], ["Jambalaya Rice, Chicken Breast, Shrimps, Calamari, Fresh Tomatoes", 12500, "jambalaya"]], { photos: ["rice-stew", "rice-beans-plantain", "rice-beans-egg"] }),
-  many("spaghetti", "rice", "Spaghetti", "Choose your style.", "Style", [["Jollof Spaghetti", 5000, "jollof"], ["Spaghetti & White Sauce", 5000, "white-sauce"], ["Vegetable Spaghetti", 5000, "vegetable"], ["White Spaghetti", 3500, "white"], ["Stir Fried Spaghetti", 10000, "stir-fried"], ["Spaghetti Bolognese", 12000, "bolognese"], ["Alfredo Spaghetti", 18000, "alfredo"]]),
-  many("pasta", "rice", "Pasta", "Rich, creamy and generous.", "Pasta", [["Cream Chicken Pasta", 16000, "creamy-chicken"], ["Alfredo Pasta", 18000, "alfredo"], ["Sea Food Pasta", 22000, "seafood"]]),
+  many("rice", "rice", "Rice", "Choose your rice.", "Rice", [["Jollof Rice Only", 4000, "jollof"], ["Fried Rice", 4000, "fried"], ["White Rice Only", 4000, "white"], ["Basmati Rice", 4000, "basmati"], ["Curry Fried Rice", 4000, "curry-fried"], ["Tranquila Special Coconut Rice", 5000, "coconut"], ["Special Fried Rice", 4500, "special-fried"], ["Mexican Fried Rice", 3500, "mexican-fried"], ["Spanish Fried Rice", 3500, "spanish-fried"], ["Chinese Rice Only", 5500, "chinese"], ["Steamed Chicken Fried Rice", 9500, "steamed-chicken-fried"], ["Jambalaya Rice, Chicken Breast, Shrimps, Calamari, Fresh Tomatoes", 12500, "jambalaya"]], { photos: ["jollof-rice", "white-rice", "fried-rice", "special-rice", "jambalaya-rice"] }),
+  many("spaghetti", "rice", "Spaghetti", "Choose your style.", "Style", [["Jollof Spaghetti", 5000, "jollof"], ["Spaghetti & White Sauce", 5000, "white-sauce"], ["Vegetable Spaghetti", 5000, "vegetable"], ["White Spaghetti", 3500, "white"], ["Stir Fried Spaghetti", 10000, "stir-fried"], ["Spaghetti Bolognese", 12000, "bolognese"], ["Alfredo Spaghetti", 18000, "alfredo"]], { photos: ["tomato-spaghetti", "cream-spaghetti", "stir-fried-spaghetti", "bolognese-spaghetti"] }),
+  many("pasta", "rice", "Pasta", "Rich, creamy and generous.", "Pasta", [["Cream Chicken Pasta", 16000, "creamy-chicken"], ["Alfredo Pasta", 18000, "alfredo"], ["Sea Food Pasta", 22000, "seafood"]], { photos: ["alfredo-pasta", "seafood-pasta", "creamy-pasta"] }),
   many("indomie", "rice", "Indomie", "The late-night favourite.", "Style", [["Indomie", 3000], ["Indomie and Eggs", 5000, "indomie-eggs"]]),
 
   // Mains & grills
-  one("special-steak", "mains", "Tranquila Special Steak", "Our house steak.", 9500),
-  one("special-burger", "mains", "Tranquila Special Burger", "Our house burger.", 5000),
-  many("pizza", "mains", "Pizza", "Baked to order.", "Pizza", [["Pizza Margarita", 6000, "margarita"], ["Tranquila Special Pizza", 8500, "tranquila-special"], ["Vegetable Pizza", 9000, "vegetable"]]),
-  one("pepper-steak", "mains", "Pepper Creamed Steak", "Steak in a peppered cream sauce.", 10000),
-  many("grilled-fish", "mains", "Grilled Fish", "Grilled over charcoal.", "Fish", [["Tilapia Fish Grilled", 15000, "tilapia"], ["Grilled Catfish Big", 20000, "catfish-big"], ["Medium Grilled Croaker Fish", 16000, "croaker-medium"], ["Grilled Croaker Fish Big", 25000, "croaker-big"]]),
-  many("peppered", "mains", "Peppered", "Tossed in hot pepper sauce.", "Choose", [["Pepper Beef", 6000, "beef"], ["Pepper Chicken", 6500, "chicken"], ["Pepper Goat Meat", 6000, "goat-meat"], ["Peppered Chicken Wing", 5500, "chicken-wing"], ["Peppered Catfish", 7000, "catfish"], ["Pepper Croaker Fish", 7000, "croaker-fish"], ["Pepper Turkey", 12000, "turkey"], ["Pepper Snail", 17000, "snail"]]),
-  many("chef-sauces", "mains", "Chef's Sauces", "Rich plates to share or enjoy alone.", "Sauce", [["Chicken Curry Sauce", 8000, "chicken-curry"], ["Prawn in Curry Sauce", 7000], ["Shrimps Provencal", 10000, "shrimps-provenc-al"], ["Prawn Escalope", 10000], ["Sweet and Sour Prawns", 12000, "sweet-sour-prawns"], ["Shredded Beef", 8000], ["Shredded Chicken", 9000]]),
-  many("sides", "mains", "Sides", "Add a little something.", "Side", [["French Fries", 3500], ["Fried Plantain", 3000], ["Boiled Plantain", 4000], ["Fried Yam", 3000, "fried-yam"], ["Boiled Yam", 4000], ["Mashed Potatoes", 4000], ["Boiled Potatoes", 3000], ["Coleslaw", 1000]], { photos: ["plantain-fried", "plantain-boiled"] }),
-  many("buffet", "mains", "Buffet", "A full spread.", "Meal", [["Buffet Lunch", 22500, "lunch-buffet"], ["Dinner Buffet", 18800]]),
+  one("special-steak", "mains", "Tranquila Special Steak", "Our house steak.", 9500, { photos: ["steak"] }),
+  one("special-burger", "mains", "Tranquila Special Burger", "Our house burger.", 5000, { photos: ["burger"] }),
+  many("pizza", "mains", "Pizza", "Baked to order.", "Pizza", [["Pizza Margarita", 6000, "margarita"], ["Tranquila Special Pizza", 8500, "tranquila-special"], ["Vegetable Pizza", 9000, "vegetable"]], { photos: ["margarita-pizza", "special-pizza"] }),
+  one("pepper-steak", "mains", "Pepper Creamed Steak", "Steak in a peppered cream sauce.", 10000, { photos: ["pepper-steak"] }),
+  many("grilled-fish", "mains", "Grilled Fish", "Grilled over charcoal.", "Fish", [["Tilapia Fish Grilled", 15000, "tilapia"], ["Grilled Catfish Big", 20000, "catfish-big"], ["Medium Grilled Croaker Fish", 16000, "croaker-medium"], ["Grilled Croaker Fish Big", 25000, "croaker-big"]], { photos: ["grilled-fish"] }),
+  many("peppered", "mains", "Peppered", "Tossed in hot pepper sauce.", "Choose", [["Pepper Beef", 6000, "beef"], ["Pepper Chicken", 6500, "chicken"], ["Pepper Goat Meat", 6000, "goat-meat"], ["Peppered Chicken Wing", 5500, "chicken-wing"], ["Peppered Catfish", 7000, "catfish"], ["Pepper Croaker Fish", 7000, "croaker-fish"], ["Pepper Turkey", 12000, "turkey"], ["Pepper Snail", 17000, "snail"]], { photos: ["peppered-chicken", "peppered-beef", "peppered-fish", "peppered-fish-red"] }),
+  many("chef-sauces", "mains", "Chef's Sauces", "Rich plates to share or enjoy alone.", "Sauce", [["Chicken Curry Sauce", 8000, "chicken-curry"], ["Prawn in Curry Sauce", 7000], ["Shrimps Provencal", 10000, "shrimps-provenc-al"], ["Prawn Escalope", 10000], ["Sweet and Sour Prawns", 12000, "sweet-sour-prawns"], ["Shredded Beef", 8000], ["Shredded Chicken", 9000]], { photos: ["chicken-curry-rice", "chicken-curry", "prawns", "shredded-beef", "stir-fried-beef"] }),
+  many("sides", "mains", "Sides", "Add a little something.", "Side", [["French Fries", 3500], ["Fried Plantain", 3000], ["Boiled Plantain", 4000], ["Fried Yam", 3000, "fried-yam"], ["Boiled Yam", 4000], ["Mashed Potatoes", 4000], ["Boiled Potatoes", 3000], ["Coleslaw", 1000]], { photos: ["fries", "plantain-fried", "plantain-boiled", "yam-side", "mashed-potatoes"] }),
+  many("buffet", "mains", "Buffet", "A full spread.", "Meal", [["Buffet Lunch", 22500, "lunch-buffet"], ["Dinner Buffet", 18800]], { photos: ["buffet"] }),
 
   // Light bites
-  one("special-salad", "light", "Tranquila Special Salad", "Our house salad.", 7000),
-  one("caesar", "light", "Chicken Caesar Salad", "Classic, crisp and creamy.", 7000),
-  one("veg-salad", "light", "Vegetable Salad", "Fresh and crisp.", 5000),
-  one("fruit-salad", "light", "Fruit Salad", "Seasonal fruit.", 3000),
-  many("club", "light", "Club Sandwich", "Stacked and served with care.", "Filling", [["Chicken Club Sandwiched", 6000, "chicken"], ["Beef Club Sandwiched", 6000, "beef"]]),
-  one("veg-sandwich", "light", "Vegetable Sandwich", "Light and fresh.", 3000),
-  many("shawarma", "light", "Shawarma", "Wrapped warm.", "Filling", [["Chicken Shawarma", 5500, "chicken"], ["Vegetable Shawarma", 4000, "vegetable"]]),
+  one("special-salad", "light", "Tranquila Special Salad", "Our house salad.", 7000, { photos: ["vegetable-salad"] }),
+  one("caesar", "light", "Chicken Caesar Salad", "Classic, crisp and creamy.", 7000, { photos: ["chicken-caesar-salad"] }),
+  one("veg-salad", "light", "Vegetable Salad", "Fresh and crisp.", 5000, { photos: ["vegetable-salad"] }),
+  one("fruit-salad", "light", "Fruit Salad", "Seasonal fruit.", 3000, { photos: ["fruit-salad"] }),
+  many("club", "light", "Club Sandwich", "Stacked and served with care.", "Filling", [["Chicken Club Sandwiched", 6000, "chicken"], ["Beef Club Sandwiched", 6000, "beef"]], { photos: ["club-sandwich", "sandwich"] }),
+  one("veg-sandwich", "light", "Vegetable Sandwich", "Light and fresh.", 3000, { photos: ["sandwich"] }),
+  many("shawarma", "light", "Shawarma", "Wrapped warm.", "Filling", [["Chicken Shawarma", 5500, "chicken"], ["Vegetable Shawarma", 4000, "vegetable"]], { photos: ["shawarma-chicken", "shawarma-chicken-2"] }),
 
   // Wines
   wine("4th Street Red", 10000, "Red wine", "4th Street", "South Africa"),
@@ -166,17 +165,10 @@ export const ITEMS: Item[] = [
   one("chapman", "water", "Chapman", "The Nigerian classic.", 4000),
 ];
 
-/** Every food dish gets a photo: dishes without their own are given the supplied photos in rotation. */
-export function rotatePhotos(list: Item[]): Item[] {
-  const keys = Object.keys(PHOTOS); let k = 0;
-  return list.map((i) => (isDrink(i.category) || i.imageUrl || i.photos?.length ? i : { ...i, photos: [keys[k++ % keys.length]!] }));
-}
-ITEMS.splice(0, ITEMS.length, ...rotatePhotos(ITEMS));
-
 export const findItem = (id: string): Item | undefined => ITEMS.find((i) => i.id === id);
 
 /** Replace the in-memory catalog after loading the published CMS menu. */
 export function setCatalog(nextItems: Item[], nextCategories: { id: CategoryId; label: string }[]) {
-  ITEMS.splice(0, ITEMS.length, ...rotatePhotos(nextItems));
+  ITEMS.splice(0, ITEMS.length, ...nextItems);
   CATEGORIES.splice(0, CATEGORIES.length, ...nextCategories);
 }

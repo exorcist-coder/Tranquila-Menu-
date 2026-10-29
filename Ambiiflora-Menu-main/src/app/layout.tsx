@@ -7,7 +7,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Tranquila Hotels · Food & drinks",
   description: "Choose Tranquila Hotel or Tranquila Nest to view the menu and order for your stay.",
-  icons: { icon: "/brand/mark.png" },
+  icons: { icon: "/images/mark.png" },
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#F3F1E8" };
 

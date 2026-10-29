@@ -42,11 +42,11 @@ export default function Welcome({ branchId, hotelName, statusLine, onStart, onDo
       <div className="welcome-inner">
         {branchId === "tranquila-nest" ? (
           <div className="welcome-logo welcome-nest-brand" data-in>
-            <img src="/brand/mark.png" alt="" width={220} height={110} />
+            <img src="/images/mark.png" alt="" width={220} height={110} />
             <strong>NEST Abuja</strong>
           </div>
         ) : (
-          <img className="welcome-logo" data-in src="/brand/logo.png" alt={`${brand.name} Hotels and Suites`} width={900} height={450} />
+          <img className="welcome-logo" data-in src="/images/logo.png" alt={`${brand.name} Hotels and Suites`} width={900} height={450} />
         )}
         <p className="welcome-line" data-in>{hotelName}: food, wine and drinks, brought to your room or ready for collection.</p>
       </div>

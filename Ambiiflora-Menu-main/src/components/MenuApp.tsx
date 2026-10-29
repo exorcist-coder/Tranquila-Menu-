@@ -112,7 +112,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
         <div id="app-root">
           <header className="masthead">
             <div className="brand">
-              <img className="brand-mark" src="/brand/mark.png" alt="" width={64} height={30} />
+              <img className="brand-mark" src="/images/mark.png" alt="" width={64} height={30} />
               <div><h1>{branch.name}</h1></div>
             </div>
             <div className="masthead-actions"><a href="/" className="branch-change">Change hotel</a><span className={`status ${status.open ? "on" : "off"}`}><i aria-hidden />{status.open ? "Open" : hours.paused ? "Paused" : "Closed"}</span></div>
@@ -154,7 +154,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
                   <p className="hb-sub">Order to your room or collect from the restaurant.</p>
                   <button type="button" className="hb-cta" onClick={() => go(CATEGORIES[0]!.id)}><span>Explore the menu</span><i><IconArrowRight width={18} height={18} /></i></button>
                 </div>
-                <img className="hb-img" src="/menu/egusi.webp" alt="" width={360} height={360} />
+                <img className="hb-img" src="/images/egusi.webp" alt="" width={360} height={360} />
               </section>
             )}
             {q ? (
@@ -173,7 +173,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
               ))
             )}
             <footer className="colophon">
-              {branch.id === "tranquila-nest" ? <div className="colophon-nest"><img className="colophon-mark" src="/brand/mark.png" alt="" width={64} height={30} /><strong>NEST Abuja</strong></div> : <img className="colophon-mark" src="/brand/logo.png" alt={brand.name} width={220} height={110} />}
+              {branch.id === "tranquila-nest" ? <div className="colophon-nest"><img className="colophon-mark" src="/images/mark.png" alt="" width={64} height={30} /><strong>NEST Abuja</strong></div> : <img className="colophon-mark" src="/images/logo.png" alt={brand.name} width={220} height={110} />}
               <p>All prices include 7.5% VAT.</p>
             </footer>
             <a className="guest-admin-link" href="/admin">Admin</a>

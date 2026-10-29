@@ -39,7 +39,7 @@ Or push to GitHub and import the repo at vercel.com/new. No build settings neede
 - The cart lives in `localStorage`. There are no accounts and no database.
 
 ## Not built yet
-- Own photography. Photos live in `public/menu/` and are mapped in `src/lib/catalog.ts` (`photos: [...]`) via `src/lib/photos.ts`. Items without photos show a lotus placeholder card.
+- Photos live in `public/images/` and are mapped to matching dishes in `src/lib/catalog.ts` via `src/lib/photos.ts`. Items without a matching photo show a category placeholder rather than an unrelated dish.
 - Order history. Orders live in WhatsApp.
 
 ## Admin CMS and WhatsApp-first ordering
