@@ -115,7 +115,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
               <img className="brand-mark" src="/images/mark.png" alt="" width={64} height={30} />
               <div><h1>{branch.name}</h1></div>
             </div>
-            <div className="masthead-actions"><a href="/" className="branch-change">Change hotel</a><span className={`status ${status.open ? "on" : "off"}`}><i aria-hidden />{status.open ? "Open" : hours.paused ? "Paused" : "Closed"}</span></div>
+            <div className="masthead-actions"><a href={process.env.NEXT_PUBLIC_HOTEL_SELECTOR_URL || "/"} className="branch-change">Change hotel</a><span className={`status ${status.open ? "on" : "off"}`}><i aria-hidden />{status.open ? "Open" : hours.paused ? "Paused" : "Closed"}</span></div>
           </header>
 
           <div className="toolbar">
