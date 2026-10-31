@@ -11,6 +11,6 @@ export function lagosMinutes(now: Date): number {
 export function orderingStatus(h: Hours, now: Date = new Date()): { open: boolean; reason: string } {
   if (h.paused) return { open: false, reason: "Ordering is paused right now." };
   const m = lagosMinutes(now), o = toMin(h.open), c = toMin(h.close);
-  const open = o <= c ? m >= o && m < c : m >= o || m < c;
-  return { open, reason: open ? `Taking orders until ${h.close}` : `Kitchen opens at ${h.open}` };
+  const open = o === c ? true : o < c ? m >= o && m < c : m >= o || m < c;
+  return { open, reason: open ? (o === c ? "Taking orders 24 hours" : `Taking orders until ${h.close}`) : `Kitchen opens at ${h.open}` };
 }

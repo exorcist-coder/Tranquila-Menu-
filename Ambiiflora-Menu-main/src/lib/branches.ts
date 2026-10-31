@@ -3,11 +3,13 @@ export const BRANCHES = [
     id: "tranquila",
     name: "Tranquila Hotel",
     address: "Plot 1731 off Ahmadu Bello Wy, Mabushi, Abuja 900108, Federal Capital Territory",
+    whatsapp: "2348101702422",
   },
   {
     id: "tranquila-nest",
     name: "Tranquila Nest",
     address: "12 Williams F, William F. Kumuyi St, Gwarinpa, Abuja 900108, Federal Capital Territory",
+    whatsapp: "2348133509133",
   },
 ] as const;
 
