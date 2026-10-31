@@ -1,5 +1,10 @@
 import { BRANCHES } from "@/lib/branches";
 
+const hotelUrls: Record<string, string | undefined> = {
+  tranquila: process.env.NEXT_PUBLIC_MAIN_HOTEL_URL,
+  "tranquila-nest": process.env.NEXT_PUBLIC_NEST_HOTEL_URL,
+};
+
 export default function BranchSelector() {
   return (
     <main className="branch-select">
@@ -11,7 +16,7 @@ export default function BranchSelector() {
       </header>
       <nav className="branch-options" aria-label="Choose a hotel">
         {BRANCHES.map((branch, index) => (
-          <a className="branch-option" key={branch.id} href={`/?branch=${branch.id}`}>
+          <a className="branch-option" key={branch.id} href={hotelUrls[branch.id] ? `${hotelUrls[branch.id]!.replace(/\/$/, "")}/?branch=${branch.id}` : `/?branch=${branch.id}`}>
             <span className="branch-index">0{index + 1}</span>
             <span className="branch-option-copy">
               <strong>{branch.name}</strong>
