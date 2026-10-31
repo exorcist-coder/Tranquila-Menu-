@@ -1,5 +1,5 @@
 import { CATEGORIES, ITEMS, type CategoryId, type Item } from "./catalog";
-import type { BranchId } from "./branches";
+import { BRANCHES, type BranchId } from "./branches";
 
 export type MenuDocument = { categories: { id: CategoryId; label: string; visible?: boolean }[]; items: (Item & { visible?: boolean; published?: boolean; featured?: boolean; image?: string })[] };
 export type HotelSettings = { whatsapp: string; open: string; close: string; paused: boolean };
@@ -47,7 +47,7 @@ export async function saveMenu(menu: MenuDocument, published: boolean, staffId?:
   await db("ambiiflora_audit_log", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ staff_id: staffId ?? null, action: published ? "menu_published" : "menu_draft_saved", details: { branch_id: branchId, item_count: menu.items.length, category_count: menu.categories.length } }) });
 }
 export async function getSettings(branchId: BranchId = "tranquila"): Promise<HotelSettings> {
-  const defaults = { whatsapp: (process.env.WHATSAPP_NUMBER ?? "2348160784818").replace(/\D/g, ""), open: process.env.ORDERING_OPEN ?? "08:00", close: process.env.ORDERING_CLOSE ?? "22:00", paused: process.env.ORDERING_PAUSED === "1" };
+  const defaults = { whatsapp: BRANCHES.find(branch => branch.id === branchId)?.whatsapp ?? "2348101702422", open: process.env.ORDERING_OPEN ?? "08:00", close: process.env.ORDERING_CLOSE ?? "08:00", paused: process.env.ORDERING_PAUSED === "1" };
   if (!cmsConfigured()) return defaults;
   try { const rows = await db(`ambiiflora_branch_settings?branch_id=eq.${encodeURIComponent(branchId)}&select=whatsapp,open,close,paused`); return Array.isArray(rows) && rows[0] ? { ...defaults, ...rows[0] } : defaults; } catch { return defaults; }
 }

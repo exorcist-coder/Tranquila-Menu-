@@ -422,3 +422,16 @@ body{background:var(--mist)}
 .colophon-mark{width:150px;height:auto;opacity:.9}
 .toast{background:var(--forest);color:#fff}
 @media(min-width:720px){.grid-drinks{grid-template-columns:repeat(2,1fr);gap:34px 18px}.card-li.wide{grid-column:auto}}
+
+/* Refinements: content-led cards, balanced mobile masthead and visible support contact. */
+.grid{align-items:start}
+.card{height:auto;min-height:0}
+.contact-support{display:grid;gap:5px;margin-top:8px;text-align:center;font:500 13px/1.5 var(--sans)}
+.contact-support strong{color:var(--ink);font-size:12px}
+.contact-support a{color:var(--forest);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.admin-image-tools{display:flex;align-items:center;gap:14px;padding:12px;border:1px solid #e2e5dc;border-radius:10px;background:#f8f9f6}.admin-image-tools img{width:104px;height:104px;object-fit:cover;border-radius:8px;background:#e4e8df}.admin-image-tools>div{display:grid;gap:5px}.admin-image-tools small{font-size:11px;color:#7b8377;line-height:1.5}.admin-image-tools .admin-text-btn{justify-self:start;padding:4px 0}
+@media(max-width:520px){.masthead{align-items:center;gap:8px;padding-inline:14px}.masthead .brand{align-items:center;gap:7px;min-width:0}.masthead .brand-mark{width:36px}.masthead .brand h1{font-size:clamp(15px,4.5vw,18px);white-space:nowrap}.masthead-actions{align-items:flex-end;flex-direction:column;gap:5px}.masthead-actions .status{padding:5px 9px;font-size:10px;white-space:nowrap}.branch-change{font-size:10px;white-space:nowrap}.admin-image-tools{align-items:flex-start}.admin-image-tools img{width:84px;height:84px}}
+
+.admin-auth-link{display:block;margin:2px 0;text-align:center;color:var(--forest);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px}.admin-success{padding:11px 12px;border-radius:8px;background:#edf5ee;color:#285a36;font-size:13px;line-height:1.5}.admin-auth-button{display:block;text-align:center;text-decoration:none}
+
+.admin-auth-link{display:block;margin-top:12px;text-align:center;color:var(--forest);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px}.admin-success{padding:10px 12px;border:1px solid #b8d9c0;border-radius:8px;background:#f0f8f1;color:#245b32;font-size:13px;line-height:1.5}.admin-auth-button{display:block;text-align:center;text-decoration:none}

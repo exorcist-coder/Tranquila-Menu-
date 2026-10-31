@@ -6,6 +6,6 @@ export const brand = { name: "Tranquila", descriptor: "Hotels and Suites · Food
 export function serverConfig(): { whatsapp: string; hours: Hours } {
   return {
     whatsapp: (process.env.WHATSAPP_NUMBER ?? "2348160784818").replace(/\D/g, ""),
-    hours: { open: process.env.ORDERING_OPEN ?? "08:00", close: process.env.ORDERING_CLOSE ?? "22:00", paused: process.env.ORDERING_PAUSED === "1" },
+    hours: { open: process.env.ORDERING_OPEN ?? "08:00", close: process.env.ORDERING_CLOSE ?? "08:00", paused: process.env.ORDERING_PAUSED === "1" },
   };
 }
