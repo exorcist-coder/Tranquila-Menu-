@@ -66,7 +66,7 @@ export const ITEMS: Item[] = [
     groups: [
       add("swallow", "Swallow", [["Poundo Yam", 2000, "pounded-yam"], ["Semo Extra", 1500, "semo"], ["Garri", 1500], ["White Garri", 1000], ["Plantain Flour", 2000], ["Wheat", 2000]]),
       add("soup", "Soup", [["Egusi Soup", 3000, "egusi"], ["Okro Soup", 3000, "okro"], ["Oha Soup", 3000, "oha"], ["Bitter Leaf Soup", 3000, "bitterleaf"], ["Ogbono Soup", 4000, "ogbono"], ["Afang Soup", 4000, "afang"], ["Vegetable Soup", 4000, "vegetable"], ["White Soup", 5000], ["Sea Food Okro Soup Only", 10500, "seafood-okro"], ["Fisherman Soup", 10500, "fisherman-soup"]]),
-      add("protein", "Protein (optional)", [["No protein", 0], ["Beef", 5000], ["Chicken", 5000], ["Goat Meat", 6000], ["European Hake Fish (Panla)", 6000, "hake-fish-panla"], ["Turkey Gizzard", 6000], ["Titus Fish", 9000]], { required: false }),
+      add("protein", "Protein (optional)", [["No protein", 0], ["Beef", 6600], ["Chicken", 6600], ["Goat Meat", 6000], ["European Hake Fish (Panla)", 6000, "hake-fish-panla"], ["Turkey Gizzard", 6000], ["Titus Fish", 9000]], { required: false }),
     ],
   },
   many("pepper-soup", "soups", "Pepper Soup", "Hot, aromatic broth.", "Type", [["Beef Pepper Soup", 6500, "beef"], ["Chicken Pepper Soup", 7500, "chicken"], ["Goat Meat Pepper Soup", 7000, "goat-meat"], ["Catfish Pepper Soup", 8000, "catfish"], ["Catfish Head Pepper Soup", 7000, "catfish-head"], ["Croaker Fish Pepper Soup", 8000, "croaker-fish"], ["Tilapia Pepper Soup", 4000, "tilapia"], ["Turkey Pepper Soup", 13000, "turkey"], ["Full Catfish Pepper Soup", 20000, "full-catfish"], ["Full Croaker Fish Pepper Soup", 25000, "full-croaker-fish"]], { photos: ["pepper-soup", "seafood-pepper-soup"] }),
