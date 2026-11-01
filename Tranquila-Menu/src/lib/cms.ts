@@ -4,7 +4,7 @@ import { BRANCHES, type BranchId } from "./branches";
 export type MenuDocument = { categories: { id: CategoryId; label: string; visible?: boolean }[]; items: (Item & { visible?: boolean; published?: boolean; featured?: boolean; image?: string })[] };
 export type HotelSettings = { whatsapp: string; open: string; close: string; paused: boolean };
 const fallbackMenu: MenuDocument = { categories: CATEGORIES.map(c => ({ ...c, visible: true })), items: ITEMS.map((i) => ({ ...i, visible: true, published: true, featured: false })) };
-function requirePhotos() { return { "yam-egg-sauce": 1, "rice-stew": 1, "amala-ewedu": 1, "akara-pap": 1, "plantain-fried": 1, "efo-riro": 1, "egusi": 1, "poundo-efo": 1, "okra-fufu": 1, "yam-fish": 1, "rice-beans-egg": 1, "akara-custard": 1, "fufu-ogbono": 1, "efo-beef": 1, "okra-seafood": 1, "plantain-boiled": 1, "rice-beans-plantain": 1 }; }
+function requirePhotos() { return { "yam-egg-sauce": 1, "rice-stew": 1, "akara-pap": 1, "plantain-fried": 1, "efo-riro": 1, "egusi": 1, "poundo-efo": 1, "okra-fufu": 1, "yam-fish": 1, "rice-beans-egg": 1, "akara-custard": 1, "fufu-ogbono": 1, "efo-beef": 1, "okra-seafood": 1, "plantain-boiled": 1, "rice-beans-plantain": 1 }; }
 const url = () => (process.env.SUPABASE_URL ?? "").replace(/\/$/, "");
 const serviceKey = () => process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 export function cmsConfigured() { return !!(url() && serviceKey()); }

@@ -21,5 +21,6 @@ export function getBranch(id: string | null | undefined): Branch | undefined {
 }
 
 export function isBranchId(id: string | null | undefined): id is BranchId {
-  return !!getBranch(id);
+  const selected = process.env.NEXT_PUBLIC_HOTEL_BRANCH_ID;
+  return !!getBranch(id) && (!selected || id === selected);
 }
