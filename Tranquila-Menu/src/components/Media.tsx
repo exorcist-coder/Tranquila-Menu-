@@ -9,13 +9,13 @@ const TONE = "#E4E8D8";
 export const photoOf = (item: Item, i = 0) => { const k = item.photos?.[i]; return k ? PHOTOS[k] : undefined; };
 /** Product-specific cutouts for non-alcoholic drinks; existing bottle for wines, spirits and beers. */
 const DRINK_IMAGE: Record<string, string> = {
-  "soft-drinks": "/images/drinks/soft-drinks.png",
-  malt: "/images/drinks/malt.png",
-  "hot-drinks": "/images/drinks/hot-drinks.png",
-  water: "/images/drinks/water.png",
-  juice: "/images/drinks/juice.png",
-  smoothie: "/images/drinks/smoothie.png",
-  chapman: "/images/drinks/chapman.png",
+  "soft-drinks": "/images/drinks/soft-drinks.webp",
+  malt: "/images/drinks/soft-drinks.webp",
+  "hot-drinks": "/images/drinks/hot-drinks.webp",
+  water: "/images/drinks/water.webp",
+  juice: "/images/drinks/juice.webp",
+  smoothie: "/images/drinks/juice.webp",
+  chapman: "/images/drinks/juice.webp",
 };
 export const bottleOf = (item: Item) => {
   if (!isDrink(item.category)) return undefined;
