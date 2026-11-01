@@ -28,6 +28,8 @@ export async function getMenu(publishedOnly = true, branchId: BranchId = "tranqu
   } catch {
     return { ...fallbackMenu, items: fallbackMenu.items.map(item => ({ ...item, available: false })) };
   }
+  // Keep the stable category ID while showing the updated label, including on previously saved CMS menus.
+  source = { ...source, categories: source.categories.map(category => category.id === "spirits" ? { ...category, label: "Whiskey" } : category) };
   try {
     const availability = await getItemAvailability(branchId);
     return { ...source, items: source.items.map(item => ({ ...item, available: availability[item.id] !== false })) };
