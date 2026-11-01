@@ -13,7 +13,7 @@ import Toast from "./Toast";
 import Welcome from "./Welcome";
 import { toast } from "./toastStore";
 import { cart, useCart } from "./useCart";
-import { CatIcon, IconArrowRight, IconBag, IconClose, IconSearch } from "./icons";
+import { IconArrowRight, IconBag, IconClose, IconSearch } from "./icons";
 import type { Branch } from "@/lib/branches";
 
 type Phase = "welcome" | "entering" | "menu";
