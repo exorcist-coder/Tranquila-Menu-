@@ -5,6 +5,10 @@ import { CATEGORIES, ITEMS } from "@/lib/catalog";
 import { BRANCHES, type BranchId } from "@/lib/branches";
 import { PHOTOS } from "@/lib/photos";
 import OptionGroupsEditor from "./OptionGroupsEditor";
+import AdminHybridShell from "./AdminHybridShell";
+import { AdminMenuWorkspace } from "./AdminMenuWorkspace";
+import AdminItemPreview from "./AdminItemPreview";
+import { AdminIcon } from "./AdminIcon";
 import "./professional-admin.css";
 
 type DisplayItem = Item & { published?: boolean; visible?: boolean };
@@ -44,6 +48,7 @@ export default function ProfessionalAdmin() {
   const [editor, setEditor] = useState<DisplayItem | null>(null);
   const [options, setOptions] = useState<Group[]>([]);
   const [preview, setPreview] = useState<DisplayItem | null>(null);
+  const [previewIsDraft, setPreviewIsDraft] = useState(false);
   const [revisionPreview, setRevisionPreview] = useState<{ id: number; reason: string; menu: Menu } | null>(null);
   const [settings, setSettings] = useState<Settings>({ whatsapp: BRANCHES.find(b => b.id === activeBranch)?.whatsapp ?? "", open: "08:00", close: "22:00", paused: false });
   const [categories, setCategories] = useState<Menu["categories"]>(initialMenu.categories);
@@ -118,6 +123,7 @@ export default function ProfessionalAdmin() {
       return false;
     } finally { setBusy(false); }
   }
+  function showPreview(item: DisplayItem, isDraft: boolean) { setPreview(item); setPreviewIsDraft(isDraft); }
   function edit(item: DisplayItem) { setEditor(structuredClone(item)); setOptions(structuredClone(item.groups ?? [])); setTab("drafts"); window.scrollTo({ top: 0, behavior: "smooth" }); }
   async function saveDraft() {
     if (!editor) return;
@@ -202,21 +208,17 @@ export default function ProfessionalAdmin() {
     <a href="/admin/forgot-password" className="pro-link">Forgot password?</a>
   </form></main>;
 
-  return <main className="pro-shell">
-    <aside className="pro-side">
-      <div className="pro-brand"><span className="pro-brand-icon">T</span><div><strong>TRANQUILA</strong><small>Hotel Management</small></div></div>
-      <div className="pro-location"><span className="pro-location-dot"/> {branchName}<small>Independent hotel workspace</small></div>
-      <div className="pro-nav-caption">WORKSPACE</div>
-      <nav aria-label="Dashboard sections">{nav.map(n => <button key={n.id} className={tab === n.id ? "selected" : ""} onClick={() => { setTab(n.id); setEditor(null); setPreview(null); setQuery(""); }}><span className="pro-nav-icon">{n.icon}</span>{n.label}{n.id === "drafts" && stats.drafts > 0 && <em>{stats.drafts}</em>}</button>)}</nav>
-      <div className="pro-side-footer"><a href={"/?branch=" + activeBranch}>↗ Guest menu</a><button onClick={signout}>Sign out</button></div>
-    </aside>
-    <div className="pro-main">
-      <header className="pro-header"><div><p className="pro-eyebrow">TRANQUILA / {branchName.toUpperCase()}</p><h1>{nav.find(n => n.id === tab)?.label ?? "Dashboard"}</h1><p className="pro-muted">Manage your hotel's menu and operations with confidence.</p></div><div className="pro-header-actions"><span className="pro-live"><i/>Live workspace</span><button className="pro-btn secondary" onClick={() => refresh(token).then(() => setNotice("Workspace refreshed.")).catch(e => setError(String(e)))} disabled={busy}>↻ Refresh</button></div></header>
+  return <AdminHybridShell
+    tab={tab} branchName={branchName} branchId={activeBranch}
+    drafts={stats.drafts} busy={busy}
+    onTab={next => { setTab(next); setEditor(null); setPreview(null); setQuery(""); }}
+    onSignout={signout}
+    onRefresh={() => { void refresh(token).then(() => setNotice("Everything is up to date.")).catch(e => setError(e instanceof Error ? e.message : "Refresh failed.")); }}>
       <div className="pro-toast-stack" aria-live="polite">
         {error && <div role="alert" className="pro-alert error"><span aria-hidden="true">!</span><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Dismiss error">×</button></div>}
         {notice && <div role="status" className="pro-alert success"><span aria-hidden="true">✓</span><span>{notice}</span><button type="button" onClick={() => setNotice("")} aria-label="Dismiss notification">×</button></div>}
       </div>
-      {busy && <p className="pro-working" role="status">Saving and verifying changes…</p>}
+      {busy && <p className="pro-working" role="status"><AdminIcon name="refresh" size={14}/> Saving changes securely…</p>}
       {tab === "overview" && <>
         <div className="pro-metrics"><Metric label="Live menu items" value={stats.live} hint="Visible to guests"/><Metric label="Sold out" value={stats.unavailable} hint="Inventory changes immediately"/><Metric label="Saved drafts" value={stats.drafts} hint="Not visible to guests"/><Metric label="Archived items" value={stats.archives} hint="Recoverable items"/></div>
         <div className="pro-columns"><section className="pro-panel"><h2>Quick actions</h2><p>Work safely without affecting what guests see until you choose to publish.</p><div className="pro-quick"><button onClick={() => edit(baseItem())}><b>＋</b><span><strong>Create menu item</strong><small>Start a new editable draft</small></span>›</button><button onClick={() => setTab("drafts")}><b>✎</b><span><strong>Review drafts</strong><small>Preview, edit or publish individual items</small></span>›</button><button onClick={() => setTab("live")}><b>▤</b><span><strong>Manage availability</strong><small>Mark dishes sold out or restock</small></span>›</button></div></section>
@@ -240,7 +242,6 @@ export default function ProfessionalAdmin() {
       {tab === "settings" && <section className="pro-panel"><h2>Service settings</h2><p>Configure the ordering experience for {branchName}. The number below is where guest WhatsApp orders are sent.</p><div className="pro-form-grid"><label className="span-two">WhatsApp number<input value={settings.whatsapp} onChange={e => setSettings(v => ({ ...v, whatsapp: e.target.value }))} placeholder="2348101702422"/></label><label>Opening time<input type="time" value={settings.open} onChange={e => setSettings(v => ({ ...v, open: e.target.value }))}/></label><label>Closing time<input type="time" value={settings.close} onChange={e => setSettings(v => ({ ...v, close: e.target.value }))}/></label><label className="span-two pro-checkbox"><input type="checkbox" checked={settings.paused} onChange={e => setSettings(v => ({ ...v, paused: e.target.checked }))}/> Pause new orders temporarily</label></div><button className="pro-btn primary" disabled={busy} onClick={saveService}>Save service settings</button></section>}
       {preview && <div className="pro-modal-bg" onMouseDown={e => { if (e.target === e.currentTarget) setPreview(null); }}><section role="dialog" aria-modal="true" aria-label="Draft item preview" className="pro-modal"><button className="pro-modal-close" onClick={() => setPreview(null)} aria-label="Close">×</button><span className="pro-status draft">PREVIEW ONLY · NOT PUBLISHED</span><div className="pro-preview-hero">{photo(preview) ? <img src={photo(preview)} alt={preview.name} /> : <span>◈</span>}</div><h2>{preview.name}</h2><strong>{cash(preview.basePrice)}</strong><p>{preview.description}</p>{preview.groups?.map(g => <div key={g.id} className="pro-preview-group"><strong>{g.label}</strong><small>{g.options.map(o => o.label).join(" · ")}</small></div>)}<button className="pro-btn secondary" onClick={() => setPreview(null)}>Close preview</button></section></div>}
       {revisionPreview && <div className="pro-modal-bg"><section role="dialog" aria-modal="true" aria-label="Snapshot preview" className="pro-modal"><button className="pro-modal-close" onClick={() => setRevisionPreview(null)} aria-label="Close">×</button><span className="pro-status draft">HISTORY SNAPSHOT</span><h2>{revisionPreview.reason}</h2><p>{revisionPreview.menu.items.length} menu items · {revisionPreview.menu.categories.length} categories</p><div className="pro-snapshot-list">{revisionPreview.menu.items.slice(0, 100).map(i => <div key={i.id}><strong>{i.name}</strong><small>{cash(i.basePrice)}</small></div>)}</div><div className="pro-actions"><button className="pro-btn secondary" onClick={() => setRevisionPreview(null)}>Close</button><button className="pro-btn primary" disabled={busy} onClick={async () => { if (!confirm("Restore this snapshot to the LIVE menu? A backup of the current menu will be saved first.")) return; const ok = await action({ action: "restore_revision", revisionId: revisionPreview.id }, "Previous menu version restored."); if (ok) setRevisionPreview(null); }}>Restore this version</button></div></section></div>}
-    </div>
-  </main>;
+  </AdminHybridShell>;
 }
 function Metric({ label, value, hint }: { label: string; value: number; hint: string }) { return <div className="pro-metric"><span>{label}</span><strong>{value}</strong><small>{hint}</small></div>; }
