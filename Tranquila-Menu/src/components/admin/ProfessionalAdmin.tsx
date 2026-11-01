@@ -99,13 +99,24 @@ export default function ProfessionalAdmin() {
   async function action(payload: Record<string, unknown>, success: string) {
     setBusy(true); setError(""); setNotice("");
     try {
-      const r = await fetch(workspaceUrl, { method: "POST", headers: headers(), body: JSON.stringify(payload) });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error ?? "Could not save changes.");
-      await refresh(token);
-      setNotice(success); return true;
-    } catch (e) { setError(e instanceof Error ? e.message : "Operation failed."); return false; }
-    finally { setBusy(false); }
+      const response = await fetch(workspaceUrl, { method: "POST", headers: headers(), body: JSON.stringify(payload) });
+      const result = await response.json();
+      if (!response.ok || result.ok !== true) {
+        throw new Error(result.error ?? "The server did not confirm the change.");
+      }
+      // A refresh failure must never turn a successful database commit into a
+      // misleading "save failed" message that encourages duplicate actions.
+      setNotice(success);
+      try {
+        await refresh(token);
+      } catch {
+        setError("Your change was saved, but the dashboard could not refresh. Reload to see the latest information.");
+      }
+      return true;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "The change was not confirmed.");
+      return false;
+    } finally { setBusy(false); }
   }
   function edit(item: DisplayItem) { setEditor(structuredClone(item)); setOptions(structuredClone(item.groups ?? [])); setTab("drafts"); window.scrollTo({ top: 0, behavior: "smooth" }); }
   async function saveDraft() {
