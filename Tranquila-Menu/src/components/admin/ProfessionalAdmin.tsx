@@ -10,6 +10,7 @@ import { AdminMenuWorkspace } from "./AdminMenuWorkspace";
 import AdminItemPreview from "./AdminItemPreview";
 import { AdminIcon } from "./AdminIcon";
 import "./professional-admin.css";
+import "./hybrid-admin.css";
 
 type DisplayItem = Item & { published?: boolean; visible?: boolean };
 type Menu = { categories: { id: string; label: string; visible?: boolean }[]; items: DisplayItem[] };
