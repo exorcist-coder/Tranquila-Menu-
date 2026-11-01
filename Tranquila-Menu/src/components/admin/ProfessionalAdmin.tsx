@@ -14,6 +14,7 @@ import { AdminIcon } from "./AdminIcon";
 import { AdminArchivePanel, AdminHistoryPanel, AdminCategoriesPanel, AdminServicePanel } from "./AdminManagementPanels";
 import "./professional-admin.css";
 import "./hybrid-admin.css";
+import "./apple-admin.css";
 
 type DisplayItem = Item & { published?: boolean; visible?: boolean };
 type Menu = { categories: { id: string; label: string; visible?: boolean }[]; items: DisplayItem[] };
