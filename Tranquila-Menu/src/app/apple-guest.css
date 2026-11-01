@@ -1,0 +1,43 @@
+/* Quiet, content-first guest menu; preserve ordering logic and image assets. */
+body:has(#app-root){background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif}
+#app-root{--mist:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--muted:#6e6e73;--forest:#176b4a;--line:rgba(0,0,0,.08);background:#f5f5f7;color:#1d1d1f;font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif}
+#app-root button,#app-root input{font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif}
+#app-root .masthead{padding:calc(16px + var(--safe-t,0px)) 20px 16px;gap:14px}
+#app-root .brand h1{font:600 22px/1.25 -apple-system,"SF Pro Display",Inter,system-ui,sans-serif;letter-spacing:-.02em}
+#app-root .toolbar{background:rgba(245,245,247,.78);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border:0;padding:8px 0}
+#app-root .search{border-radius:14px;background:#fff;box-shadow:none;color:#6e6e73;margin:0 20px 12px}
+#app-root .search input{color:#1d1d1f;font-size:16px}
+#app-root .cart-btn{background:#e5eee8;color:#176b4a;box-shadow:none;border-radius:14px}
+#app-root .rail{padding:3px 20px 5px;gap:4px}
+#app-root .rail button{min-height:44px;border-radius:99px;padding:8px 15px;color:#6e6e73;font-size:15px}
+#app-root .rail button[data-on]{background:#176b4a;color:#fff}
+#app-root .rail button[data-on] .rail-lbl{color:#fff}
+#app-root .hero-banner{position:relative;background:#183629;margin:14px 20px 0;border-radius:22px;min-height:300px;isolation:isolate}
+#app-root .hero-banner:after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.08));border-radius:inherit}
+#app-root .hb-copy{z-index:2;padding:32px 26px}
+#app-root .hb-script{font:500 13px/1.4 -apple-system,Inter,system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#fff}
+#app-root .hero-banner h2{font-family:-apple-system,"SF Pro Display",Inter,system-ui,sans-serif;font-size:clamp(30px,5vw,48px);font-style:normal;font-weight:700;letter-spacing:-.02em;line-height:1.17;color:#fff}
+#app-root .hero-banner h2 em{font-family:inherit;font-style:normal;color:#fff}
+#app-root .hb-sub{color:#f5f5f7;font-size:15px}
+#app-root .hb-cta{background:#fff;color:#176b4a;border-radius:14px;min-height:50px;padding:10px 17px;box-shadow:none}
+#app-root .sec{scroll-margin-top:150px}
+#app-root .sec-title{color:#1d1d1f;font:700 28px/1.25 -apple-system,"SF Pro Display",Inter,system-ui,sans-serif;letter-spacing:-.02em;margin-top:34px}
+#app-root .grid{padding-inline:20px;gap:16px}
+#app-root .card{border:0;border-radius:22px;padding:8px 8px 17px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.045)}
+#app-root .card-media{border-radius:16px;aspect-ratio:4/5}
+#app-root .card-name{font:600 17px/1.35 -apple-system,Inter,system-ui,sans-serif;color:#1d1d1f;letter-spacing:0}
+#app-root .card-desc{color:#6e6e73;font-size:13px;line-height:1.45}
+#app-root .card-price{color:#1d1d1f;font-size:16px;font-weight:600}
+#app-root .add{background:#e5eee8;color:#176b4a;border-radius:50%}
+#app-root .wcard{background:#fff;border:0;border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.045)}
+#app-root .wcard-p{color:#1d1d1f}
+.apple-floating-order{position:fixed;z-index:50;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:12px;width:min(440px,calc(100vw - 40px));min-height:68px;padding:10px 17px;border-radius:22px;color:#1d1d1f;background:rgba(255,255,255,.84);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);box-shadow:0 8px 30px rgba(0,0,0,.11);text-align:left;border:0;cursor:pointer;font:inherit}
+.apple-floating-order .apple-order-icon{display:grid;place-items:center;width:42px;height:42px;flex:none;background:#e5eee8;color:#176b4a;border-radius:14px}
+.apple-order-details{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.apple-order-details strong{font-size:15px;font-weight:600}
+.apple-order-details small{font-size:13px;color:#6e6e73}
+.apple-order-total{font-size:16px;font-weight:600;white-space:nowrap;color:#176b4a}
+.apple-floating-order:active{transform:translateX(-50%) scale(.97)}
+.apple-floating-order:focus-visible{outline:3px solid #176b4a;outline-offset:3px}
+@media(max-width:600px){#app-root .hero-banner{margin-inline:20px;min-height:270px}#app-root .hb-copy{padding:24px 20px}#app-root .sec-title{font-size:26px;margin-inline:20px}#app-root .grid{gap:12px}#app-root .card{border-radius:20px}#app-root .card-media{border-radius:14px}}
+@media(prefers-reduced-motion:reduce){#app-root *, .apple-floating-order{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
