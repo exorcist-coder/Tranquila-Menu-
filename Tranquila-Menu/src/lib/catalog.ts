@@ -26,7 +26,7 @@ export const CATEGORIES: { id: CategoryId; label: string }[] = [
   { id: "mains", label: "Mains & Grills" },
   { id: "light", label: "Light Bites" },
   { id: "wines", label: "Wines" },
-  { id: "spirits", label: "Spirits" },
+  { id: "spirits", label: "Whiskey" },
   { id: "beers", label: "Beers" },
   { id: "soft", label: "Soft & Hot" },
   { id: "water", label: "Water & Juice" },
