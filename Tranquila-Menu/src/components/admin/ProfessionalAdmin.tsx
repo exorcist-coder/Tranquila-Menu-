@@ -1,0 +1,205 @@
+"use client";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Item, Group } from "@/lib/catalog";
+import { CATEGORIES, ITEMS } from "@/lib/catalog";
+import { BRANCHES, type BranchId } from "@/lib/branches";
+import { PHOTOS } from "@/lib/photos";
+import OptionGroupsEditor from "./OptionGroupsEditor";
+import "./professional-admin.css";
+
+type DisplayItem = Item & { published?: boolean; visible?: boolean };
+type Menu = { categories: { id: string; label: string; visible?: boolean }[]; items: DisplayItem[] };
+type Draft = { id: number; item_id: string; item: DisplayItem; updated_at: string; created_at: string };
+type Archive = { id: number; item_id: string; item: DisplayItem; archived_at: string };
+type Event = { id: number; action: string; details: Record<string, unknown>; created_at: string };
+type Revision = { id: number; reason: string; created_at: string };
+type Workspace = { published: Menu; drafts: Draft[]; archived: Archive[]; history: { events: Event[]; revisions: Revision[] } };
+type Settings = { whatsapp: string; open: string; close: string; paused: boolean };
+type Tab = "overview" | "live" | "drafts" | "archive" | "history" | "categories" | "settings";
+const activeBranch: BranchId = process.env.NEXT_PUBLIC_HOTEL_BRANCH_ID === "tranquila-nest" ? "tranquila-nest" : "tranquila";
+const initialMenu: Menu = { categories: CATEGORIES, items: ITEMS };
+const baseItem = (): DisplayItem => ({ id: "new-item-" + Date.now().toString(36), name: "", description: "", category: "breakfast", basePrice: 0, groups: [], photos: [], published: true, visible: true });
+const blank: Workspace = { published: initialMenu, drafts: [], archived: [], history: { events: [], revisions: [] } };
+const date = (s: string) => new Date(s).toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" });
+const cash = (n: number) => "₦" + Number(n || 0).toLocaleString("en-NG");
+const photo = (i: DisplayItem) => i.imageUrl || (i.photos?.[0] ? PHOTOS[i.photos[0]]?.src : undefined);
+const branchName = BRANCHES.find(b => b.id === activeBranch)?.name ?? "Tranquila Hotels";
+const nav: { id: Tab; label: string; icon: string }[] = [
+  { id: "overview", label: "Overview", icon: "▦" }, { id: "live", label: "Live menu", icon: "▤" },
+  { id: "drafts", label: "Draft library", icon: "✎" }, { id: "archive", label: "Archive", icon: "▣" },
+  { id: "history", label: "History & recovery", icon: "◷" }, { id: "categories", label: "Categories", icon: "☷" },
+  { id: "settings", label: "Service settings", icon: "⚙" }
+];
+
+export default function ProfessionalAdmin() {
+  const [token, setToken] = useState("");
+  const [authInput, setAuthInput] = useState({ email: "", password: "" });
+  const [workspace, setWorkspace] = useState<Workspace>(blank);
+  const [tab, setTab] = useState<Tab>("overview");
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
+  const [editor, setEditor] = useState<DisplayItem | null>(null);
+  const [options, setOptions] = useState<Group[]>([]);
+  const [preview, setPreview] = useState<DisplayItem | null>(null);
+  const [revisionPreview, setRevisionPreview] = useState<{ id: number; reason: string; menu: Menu } | null>(null);
+  const [settings, setSettings] = useState<Settings>({ whatsapp: BRANCHES.find(b => b.id === activeBranch)?.whatsapp ?? "", open: "08:00", close: "22:00", paused: false });
+  const [categories, setCategories] = useState<Menu["categories"]>(initialMenu.categories);
+
+  const headers = useCallback(() => ({ Authorization: "Bearer " + token, "Content-Type": "application/json" }), [token]);
+  const workspaceUrl = "/api/admin/workspace?branch=" + activeBranch;
+  const refresh = useCallback(async (authToken: string) => {
+    const h = { Authorization: "Bearer " + authToken };
+    const [res, sr] = await Promise.all([
+      fetch(workspaceUrl, { headers: h, cache: "no-store" }),
+      fetch("/api/admin/settings?branch=" + activeBranch, { headers: h, cache: "no-store" })
+    ]);
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error ?? "Unable to load admin workspace.");
+    setWorkspace(body);
+    setCategories(body.published.categories);
+    if (sr.ok) setSettings((await sr.json()).settings);
+  }, [workspaceUrl]);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("tranquila-admin-token");
+    if (!saved) return;
+    setToken(saved);
+    setLoading(true);
+    refresh(saved).catch(e => { setError(e instanceof Error ? e.message : "Session expired."); sessionStorage.removeItem("tranquila-admin-token"); setToken(""); }).finally(() => setLoading(false));
+  }, [refresh]);
+
+  async function signin(event: React.FormEvent) {
+    event.preventDefault(); setBusy(true); setError("");
+    try {
+      const r = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(authInput) });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error ?? "Unable to sign in.");
+      await refresh(data.access_token);
+      setToken(data.access_token); sessionStorage.setItem("tranquila-admin-token", data.access_token);
+      setAuthInput({ email: "", password: "" });
+    } catch (e) { setError(e instanceof Error ? e.message : "Sign in failed."); }
+    finally { setBusy(false); }
+  }
+  function signout() { sessionStorage.removeItem("tranquila-admin-token"); setToken(""); setWorkspace(blank); setEditor(null); setError(""); }
+  async function action(payload: Record<string, unknown>, success: string) {
+    setBusy(true); setError(""); setNotice("");
+    try {
+      const r = await fetch(workspaceUrl, { method: "POST", headers: headers(), body: JSON.stringify(payload) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Could not save changes.");
+      await refresh(token);
+      setNotice(success); return true;
+    } catch (e) { setError(e instanceof Error ? e.message : "Operation failed."); return false; }
+    finally { setBusy(false); }
+  }
+  function edit(item: DisplayItem) { setEditor(structuredClone(item)); setOptions(structuredClone(item.groups ?? [])); setTab("drafts"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  async function saveDraft() {
+    if (!editor) return;
+    const item = { ...editor, groups: options, published: true };
+    if (!item.name.trim()) { setError("Enter an item name."); return; }
+    if (!workspace.published.categories.some(c => c.id === item.category)) { setError("Select a valid category."); return; }
+    if (await action({ action: "save_draft", item }, "Draft saved to your library. The guest menu has not changed.")) setEditor(null);
+  }
+  async function inventory(item: DisplayItem) {
+    const available = item.available === false;
+    setBusy(true); setError(""); setNotice("");
+    try {
+      const r = await fetch("/api/admin/availability?branch=" + activeBranch, { method: "PATCH", headers: headers(), body: JSON.stringify({ itemId: item.id, available }) });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Inventory could not be updated.");
+      await refresh(token);
+      setNotice(item.name + (available ? " is available again." : " is marked sold out."));
+    } catch (e) { setError((e instanceof Error ? e.message : "Inventory could not be updated.") + " The previous state has been kept."); }
+    finally { setBusy(false); }
+  }
+  async function upload(file: File) {
+    if (!editor) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5_000_000) { setError("Choose a JPG, PNG or WebP under 5 MB."); return; }
+    setBusy(true); setError("");
+    try {
+      const form = new FormData(); form.append("file", file);
+      const r = await fetch("/api/admin/upload", { method: "POST", headers: { Authorization: "Bearer " + token }, body: form });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Upload failed.");
+      setEditor(v => v ? { ...v, imageUrl: d.url, photos: [] } : null);
+      setNotice("Image uploaded. Save the item to keep it in the draft library.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Upload failed."); }
+    finally { setBusy(false); }
+  }
+  async function saveService() {
+    setBusy(true); setError("");
+    try {
+      const r = await fetch("/api/admin/settings?branch=" + activeBranch, { method: "PUT", headers: headers(), body: JSON.stringify(settings) });
+      const d = await r.json(); if (!r.ok) throw new Error(d.error || "Unable to save service settings.");
+      setNotice("Service settings saved."); await refresh(token);
+    } catch (e) { setError(e instanceof Error ? e.message : "Unable to save service settings."); }
+    finally { setBusy(false); }
+  }
+  async function publishCategories() {
+    if (!confirm("Publish these category changes to the LIVE hotel menu?")) return;
+    setBusy(true); setError("");
+    try {
+      const r = await fetch("/api/admin/menu?branch=" + activeBranch, { method: "PUT", headers: headers(), body: JSON.stringify({ menu: { categories, items: workspace.published.items }, publish: true }) });
+      const d = await r.json(); if (!r.ok) throw new Error(d.error ?? "Unable to publish categories.");
+      await refresh(token); setNotice("Category changes published successfully.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Category changes failed."); }
+    finally { setBusy(false); }
+  }
+
+  const items = useMemo(() => workspace.published.items.filter(i => [i.name, i.description, i.category].some(v => v?.toLowerCase().includes(query.toLowerCase()))), [workspace, query]);
+  const draftList = useMemo(() => workspace.drafts.filter(d => d.item.name.toLowerCase().includes(query.toLowerCase())), [workspace, query]);
+  const stats = { live: workspace.published.items.filter(i => i.visible !== false && i.published !== false).length, unavailable: workspace.published.items.filter(i => i.available === false).length, drafts: workspace.drafts.length, archives: workspace.archived.length };
+
+  if (!token) return <main className="pro-login"><form className="pro-login-card" onSubmit={signin}>
+    <div className="pro-brand"><span className="pro-brand-icon">T</span><div><strong>TRANQUILA</strong><small>{branchName} · Administration</small></div></div>
+    <p className="pro-eyebrow">SECURE STAFF ACCESS</p><h1>Welcome back.</h1><p>Sign in to manage the hotel menu, stock and publishing workflow.</p>
+    <label>Email address<input required type="email" autoComplete="username" value={authInput.email} onChange={e => setAuthInput(v => ({ ...v, email: e.target.value }))} /></label>
+    <label>Password<input required type="password" autoComplete="current-password" value={authInput.password} onChange={e => setAuthInput(v => ({ ...v, password: e.target.value }))}/></label>
+    {error && <div role="alert" className="pro-alert error">{error}</div>}
+    <button className="pro-btn primary" disabled={busy || loading}>{busy ? "Signing in…" : "Sign in securely"}</button>
+    <a href="/admin/forgot-password" className="pro-link">Forgot password?</a>
+  </form></main>;
+
+  return <main className="pro-shell">
+    <aside className="pro-side">
+      <div className="pro-brand"><span className="pro-brand-icon">T</span><div><strong>TRANQUILA</strong><small>Hotel Management</small></div></div>
+      <div className="pro-location"><span className="pro-location-dot"/> {branchName}<small>Independent hotel workspace</small></div>
+      <div className="pro-nav-caption">WORKSPACE</div>
+      <nav aria-label="Dashboard sections">{nav.map(n => <button key={n.id} className={tab === n.id ? "selected" : ""} onClick={() => { setTab(n.id); setEditor(null); setPreview(null); setQuery(""); }}><span className="pro-nav-icon">{n.icon}</span>{n.label}{n.id === "drafts" && stats.drafts > 0 && <em>{stats.drafts}</em>}</button>)}</nav>
+      <div className="pro-side-footer"><a href={"/?branch=" + activeBranch}>↗ Guest menu</a><button onClick={signout}>Sign out</button></div>
+    </aside>
+    <div className="pro-main">
+      <header className="pro-header"><div><p className="pro-eyebrow">TRANQUILA / {branchName.toUpperCase()}</p><h1>{nav.find(n => n.id === tab)?.label ?? "Dashboard"}</h1><p className="pro-muted">Manage your hotel's menu and operations with confidence.</p></div><div className="pro-header-actions"><span className="pro-live"><i/>Live workspace</span><button className="pro-btn secondary" onClick={() => refresh(token).then(() => setNotice("Workspace refreshed.")).catch(e => setError(String(e)))} disabled={busy}>↻ Refresh</button></div></header>
+      {error && <div role="alert" className="pro-alert error">{error}<button onClick={() => setError("")} aria-label="Dismiss error">×</button></div>}
+      {notice && <div role="status" className="pro-alert success">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss notice">×</button></div>}
+      {busy && <p className="pro-working" role="status">Saving and verifying changes…</p>}
+      {tab === "overview" && <>
+        <div className="pro-metrics"><Metric label="Live menu items" value={stats.live} hint="Visible to guests"/><Metric label="Sold out" value={stats.unavailable} hint="Inventory changes immediately"/><Metric label="Saved drafts" value={stats.drafts} hint="Not visible to guests"/><Metric label="Archived items" value={stats.archives} hint="Recoverable items"/></div>
+        <div className="pro-columns"><section className="pro-panel"><h2>Quick actions</h2><p>Work safely without affecting what guests see until you choose to publish.</p><div className="pro-quick"><button onClick={() => edit(baseItem())}><b>＋</b><span><strong>Create menu item</strong><small>Start a new editable draft</small></span>›</button><button onClick={() => setTab("drafts")}><b>✎</b><span><strong>Review drafts</strong><small>Preview, edit or publish individual items</small></span>›</button><button onClick={() => setTab("live")}><b>▤</b><span><strong>Manage availability</strong><small>Mark dishes sold out or restock</small></span>›</button></div></section>
+        <section className="pro-panel"><h2>Recent activity</h2>{workspace.history.events.length ? <div className="pro-timeline">{workspace.history.events.slice(0, 6).map(e => <div key={e.id}><span className="pro-activity-dot"/><strong>{e.action.replaceAll("_", " ")}</strong><small>{date(e.created_at)}</small></div>)}</div> : <div className="pro-empty">No recorded actions yet. Changes will appear here after they are saved.</div>}<button className="pro-btn secondary" onClick={() => setTab("history")}>View all history</button></section></div>
+      </>}
+      {(tab === "live" || tab === "drafts") && !editor && <>
+        <div className="pro-section-head"><div><h2>{tab === "live" ? "Published menu" : "Draft library"}</h2><p>{tab === "live" ? "Availability changes are live; editing an item creates a separate draft." : "Saved work stays private until you explicitly publish it."}</p></div><button className="pro-btn primary" onClick={() => edit(baseItem())}>＋ New item</button></div>
+        <div className="pro-search"><span>⌕</span><input type="search" placeholder="Search menu items…" value={query} onChange={e => setQuery(e.target.value)}/><span>{tab === "live" ? items.length : draftList.length} items</span></div>
+        {tab === "live" ? <div className="pro-table-wrap"><table className="pro-table"><thead><tr><th>ITEM</th><th>CATEGORY</th><th>PRICE</th><th>STOCK STATUS</th><th>ACTIONS</th></tr></thead><tbody>{items.map(i => <tr key={i.id}><td><div className="pro-item"><div className="pro-thumb">{photo(i) ? <img src={photo(i)} alt="" /> : "◈"}</div><div><strong>{i.name}</strong><small>{i.visible === false ? "Hidden from guests" : i.description || "No description"}</small></div></div></td><td>{workspace.published.categories.find(c => c.id === i.category)?.label ?? i.category}</td><td>{cash(i.basePrice)}</td><td><button className={"pro-stock " + (i.available === false ? "out" : "in")} aria-pressed={i.available !== false} disabled={busy} onClick={() => inventory(i)}>{i.available === false ? "Sold out · Restock" : "Available · Mark sold out"}</button></td><td><div className="pro-actions"><button onClick={() => edit(i)}>Edit draft</button><button onClick={() => setPreview(i)}>Preview</button><button className="danger" disabled={busy} onClick={() => { if (confirm("Archive " + i.name + "? It will disappear from the live menu but can be restored.")) void action({ action: "archive", itemId: i.id }, i.name + " moved to archive."); }}>Archive</button></div></td></tr>)}</tbody></table></div>
+        : <div className="pro-draft-grid">{draftList.map(d => <article key={d.id} className="pro-draft-card"><div className="pro-draft-visual">{photo(d.item) ? <img src={photo(d.item)} alt=""/> : <span>◈</span>}</div><div className="pro-draft-info"><span className="pro-status draft">UNPUBLISHED DRAFT</span><h3>{d.item.name}</h3><p>{d.item.description || "No description"}</p><div className="pro-draft-meta">{cash(d.item.basePrice)}<small>Edited {date(d.updated_at)}</small></div><div className="pro-actions"><button onClick={() => edit(d.item)}>Edit</button><button onClick={() => setPreview(d.item)}>Preview</button><button className="pro-publish" disabled={busy} onClick={() => { if (confirm("Publish " + d.item.name + " to the guest menu now?")) void action({ action: "publish_draft", itemId: d.item_id }, d.item.name + " published to the guest menu."); }}>Publish</button><button className="danger" disabled={busy} onClick={() => { if (confirm("Discard this unpublished draft? The live menu will not change.")) void action({ action: "discard_draft", itemId: d.item_id }, "Draft discarded."); }}>Discard</button></div></div></article>)}</div>}
+        {(tab === "live" ? items.length : draftList.length) === 0 && <div className="pro-empty-large"><strong>{tab === "drafts" ? "No drafts saved yet" : "No matching items"}</strong><p>{tab === "drafts" ? "Create or edit an item, then save it. Your draft will appear here for review." : "Try a different search term."}</p></div>}
+      </>}
+      {editor && tab === "drafts" && <div className="pro-editor"><div className="pro-editor-top"><div><span className="pro-status draft">DRAFT WORKSPACE</span><h2>{editor.name || "New menu item"}</h2><p>Changes are private until you publish from the Draft library.</p></div><button className="pro-btn secondary" onClick={() => setEditor(null)}>← Back to drafts</button></div>
+        <div className="pro-panel"><h3>Item details</h3><div className="pro-form-grid"><label>Item name<input value={editor.name} onChange={e => setEditor({ ...editor, name: e.target.value })} placeholder="e.g. Chicken Caesar Salad"/></label><label>Category<select value={editor.category} onChange={e => setEditor({ ...editor, category: e.target.value })}>{workspace.published.categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}</select></label><label>Price (₦)<input type="number" min={0} value={editor.basePrice} onChange={e => setEditor({ ...editor, basePrice: Number(e.target.value) })}/></label><label>Item reference<input disabled={workspace.published.items.some(i => i.id === editor.id) || workspace.drafts.some(d => d.item_id === editor.id)} value={editor.id} onChange={e => setEditor({ ...editor, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}/></label><label className="span-two">Description<textarea rows={3} value={editor.description} onChange={e => setEditor({ ...editor, description: e.target.value })}/></label><label>Guest visibility<select value={editor.visible === false ? "hidden" : "visible"} onChange={e => setEditor({ ...editor, visible: e.target.value === "visible" })}><option value="visible">Visible when published</option><option value="hidden">Hidden when published</option></select></label><label>Image upload<input type="file" accept="image/png,image/jpeg,image/webp" disabled={busy} onChange={e => { if (e.target.files?.[0]) void upload(e.target.files[0]); }}/></label>{photo(editor) && <div className="pro-image-preview"><img src={photo(editor)} alt="Item preview"/><button onClick={() => setEditor({ ...editor, imageUrl: undefined, photos: [] })}>Remove image</button></div>}</div></div>
+        <div className="pro-panel pro-options"><h3>Choices & customizations</h3><OptionGroupsEditor groups={options} onChange={setOptions}/></div>
+        <div className="pro-editor-footer"><button className="pro-btn secondary" onClick={() => setPreview({ ...editor, groups: options })}>Preview item</button><button className="pro-btn primary" disabled={busy} onClick={saveDraft}>Save to draft library</button></div>
+      </div>}
+      {tab === "archive" && <><div className="pro-section-head"><div><h2>Archived items</h2><p>Archived products are removed from the live menu, but their information can be recovered.</p></div></div><div className="pro-panel"><table className="pro-table"><thead><tr><th>ITEM</th><th>ARCHIVED</th><th>ACTIONS</th></tr></thead><tbody>{workspace.archived.map(a => <tr key={a.id}><td><strong>{a.item.name}</strong><small>{a.item.category}</small></td><td>{date(a.archived_at)}</td><td><div className="pro-actions"><button disabled={busy} onClick={() => action({ action: "restore", itemId: a.item_id }, "Item restored to the live menu.")}>Restore</button><button className="danger" disabled={busy} onClick={() => { const typed = prompt('Type DELETE to permanently remove "' + a.item.name + '". This cannot be undone from the archive.'); if (typed === "DELETE") void action({ action: "delete_permanently", itemId: a.item_id }, "Archived item permanently deleted."); }}>Delete permanently</button></div></td></tr>)}</tbody></table>{!workspace.archived.length && <div className="pro-empty">Your archive is empty. Archived items will appear here.</div>}</div></>}
+      {tab === "history" && <><div className="pro-section-head"><div><h2>Activity & menu versions</h2><p>Review recorded actions and inspect recoverable menu snapshots.</p></div></div><div className="pro-columns"><section className="pro-panel"><h3>Activity log</h3><div className="pro-timeline">{workspace.history.events.map(e => <div key={e.id}><span className="pro-activity-dot"/><strong>{e.action.replaceAll("_", " ")}</strong><small>{date(e.created_at)} {e.details?.item_id ? " · " + e.details.item_id : ""}</small></div>)}</div>{!workspace.history.events.length && <p>No recorded activity yet.</p>}</section><section className="pro-panel"><h3>Recovery snapshots</h3><p>A snapshot is taken before major changes to the published menu.</p><div className="pro-history-list">{workspace.history.revisions.map(r => <div key={r.id}><div><strong>{r.reason}</strong><small>{date(r.created_at)}</small></div><button disabled={busy} onClick={async () => { setBusy(true); try { const response = await fetch(workspaceUrl + "&section=revision&id=" + r.id, { headers: headers() }); const data = await response.json(); if (!response.ok) throw new Error(data.error); setRevisionPreview(data.revision); } catch(e) { setError(e instanceof Error ? e.message : "Could not load revision."); } finally { setBusy(false); } }}>View snapshot</button></div>)}</div>{!workspace.history.revisions.length && <div className="pro-empty">No history snapshots yet.</div>}</section></div></>}
+      {tab === "categories" && <section className="pro-panel"><div className="pro-section-head"><div><h2>Menu categories</h2><p>Organize guest menu sections. Publishing category changes requires confirmation.</p></div><button className="pro-btn secondary" onClick={() => setCategories(v => [...v, { id: "category-" + Date.now().toString(36), label: "New category", visible: true }])}>＋ Add category</button></div>{categories.map((c, i) => <div className="pro-category" key={c.id}><input value={c.label} onChange={e => setCategories(v => v.map((x,j) => i === j ? { ...x, label: e.target.value } : x))}/><label><input type="checkbox" checked={c.visible !== false} onChange={e => setCategories(v => v.map((x,j) => i === j ? { ...x, visible: e.target.checked } : x))}/> Visible</label><button className="pro-btn secondary" disabled={workspace.published.items.some(item => item.category === c.id)} onClick={() => setCategories(v => v.filter((_,j) => i !== j))}>Remove</button></div>)}<div className="pro-editor-footer"><button className="pro-btn primary" disabled={busy} onClick={publishCategories}>Publish category changes</button></div></section>}
+      {tab === "settings" && <section className="pro-panel"><h2>Service settings</h2><p>Configure the ordering experience for {branchName}. The number below is where guest WhatsApp orders are sent.</p><div className="pro-form-grid"><label className="span-two">WhatsApp number<input value={settings.whatsapp} onChange={e => setSettings(v => ({ ...v, whatsapp: e.target.value }))} placeholder="2348101702422"/></label><label>Opening time<input type="time" value={settings.open} onChange={e => setSettings(v => ({ ...v, open: e.target.value }))}/></label><label>Closing time<input type="time" value={settings.close} onChange={e => setSettings(v => ({ ...v, close: e.target.value }))}/></label><label className="span-two pro-checkbox"><input type="checkbox" checked={settings.paused} onChange={e => setSettings(v => ({ ...v, paused: e.target.checked }))}/> Pause new orders temporarily</label></div><button className="pro-btn primary" disabled={busy} onClick={saveService}>Save service settings</button></section>}
+      {preview && <div className="pro-modal-bg" onMouseDown={e => { if (e.target === e.currentTarget) setPreview(null); }}><section role="dialog" aria-modal="true" aria-label="Draft item preview" className="pro-modal"><button className="pro-modal-close" onClick={() => setPreview(null)} aria-label="Close">×</button><span className="pro-status draft">PREVIEW ONLY · NOT PUBLISHED</span><div className="pro-preview-hero">{photo(preview) ? <img src={photo(preview)} alt={preview.name} /> : <span>◈</span>}</div><h2>{preview.name}</h2><strong>{cash(preview.basePrice)}</strong><p>{preview.description}</p>{preview.groups?.map(g => <div key={g.id} className="pro-preview-group"><strong>{g.label}</strong><small>{g.options.map(o => o.label).join(" · ")}</small></div>)}<button className="pro-btn secondary" onClick={() => setPreview(null)}>Close preview</button></section></div>}
+      {revisionPreview && <div className="pro-modal-bg"><section role="dialog" aria-modal="true" aria-label="Snapshot preview" className="pro-modal"><button className="pro-modal-close" onClick={() => setRevisionPreview(null)} aria-label="Close">×</button><span className="pro-status draft">HISTORY SNAPSHOT</span><h2>{revisionPreview.reason}</h2><p>{revisionPreview.menu.items.length} menu items · {revisionPreview.menu.categories.length} categories</p><div className="pro-snapshot-list">{revisionPreview.menu.items.slice(0, 100).map(i => <div key={i.id}><strong>{i.name}</strong><small>{cash(i.basePrice)}</small></div>)}</div><div className="pro-actions"><button className="pro-btn secondary" onClick={() => setRevisionPreview(null)}>Close</button><button className="pro-btn primary" disabled={busy} onClick={async () => { if (!confirm("Restore this snapshot to the LIVE menu? A backup of the current menu will be saved first.")) return; const ok = await action({ action: "restore_revision", revisionId: revisionPreview.id }, "Previous menu version restored."); if (ok) setRevisionPreview(null); }}>Restore this version</button></div></section></div>}
+    </div>
+  </main>;
+}
+function Metric({ label, value, hint }: { label: string; value: number; hint: string }) { return <div className="pro-metric"><span>{label}</span><strong>{value}</strong><small>{hint}</small></div>; }
