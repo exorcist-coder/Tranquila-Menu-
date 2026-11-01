@@ -1,0 +1,108 @@
+/* Apple-inspired visual system. Loaded after the legacy styles.
+   Deliberately presentation-only: ordering and CMS logic are unchanged. */
+.pro-hybrid {
+ --pro-green:#176b4a;--pro-ink:#1d1d1f;--pro-bg:#f5f5f7;
+ --pro-border:rgba(0,0,0,.08);--pro-gold:#987a49;--pro-muted:#6e6e73;
+ grid-template-columns:250px minmax(0,1fr);
+ background:#f5f5f7;color:#1d1d1f;
+ font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif;
+ font-size:15px;line-height:1.45;
+}
+body:has(.pro-hybrid){background:#f5f5f7}
+.pro-hybrid h1,.pro-hybrid h2,.pro-hybrid h3,
+.pro-hybrid button,.pro-hybrid input,.pro-hybrid select,.pro-hybrid textarea{
+ font-family:-apple-system,"SF Pro Text",Inter,system-ui,sans-serif;
+}
+.pro-hybrid h1,.pro-hybrid h2,.pro-hybrid h3{color:#1d1d1f;letter-spacing:-.02em}
+.pro-hybrid .pro-side{
+ background:rgba(249,249,251,.82);color:#1d1d1f;
+ border-right:.5px solid rgba(0,0,0,.08);
+ backdrop-filter:saturate(180%) blur(20px);
+ padding:28px 14px 16px;box-shadow:none;
+}
+.pro-hybrid-brand{padding:2px 12px 26px;gap:12px}
+.pro-hybrid-brand-mark{background:#fff;border:0;border-radius:14px;width:44px;height:44px}
+.pro-hybrid-brand strong{color:#1d1d1f;font-size:14px;letter-spacing:.08em}
+.pro-hybrid-brand small{color:#6e6e73;font-size:10px;letter-spacing:.11em}
+.pro-hybrid .pro-hotel-identity{background:#fff;border:0;border-radius:16px;margin-bottom:26px;box-shadow:0 6px 24px #00000006}
+.pro-hotel-icon{background:#edf5f0;color:#176b4a;border-radius:12px}
+.pro-hotel-identity>div span{color:#6e6e73;font-size:10px;letter-spacing:0}
+.pro-hotel-identity>div strong{color:#1d1d1f;font-size:13px}
+.pro-hotel-online{background:#176b4a;box-shadow:none}
+.pro-hybrid .pro-nav-caption{color:#6e6e73;font-size:11px;letter-spacing:.04em;margin:0 0 8px 13px}
+.pro-hybrid .pro-side nav{gap:3px}
+.pro-hybrid .pro-side nav button{color:#444448;font-size:14px;min-height:44px;padding:11px 13px;border:0;border-radius:12px}
+.pro-hybrid .pro-side nav button svg{color:#6e6e73}
+.pro-hybrid .pro-side nav button:hover{background:#eaeaee;color:#1d1d1f}
+.pro-hybrid .pro-side nav button.selected{background:#e5eee8;color:#176b4a;border:0;box-shadow:none;font-weight:650}
+.pro-hybrid .pro-side nav button.selected svg{color:#176b4a}
+.pro-hybrid .pro-side nav em{background:#e5eee8;color:#176b4a;border-radius:99px;font-size:12px}
+.pro-hybrid .pro-side-footer{border-top:.5px solid #00000014}
+.pro-hybrid .pro-side-footer a,.pro-hybrid .pro-side-footer button{color:#444448;font-size:14px;min-height:44px}
+.pro-hybrid .pro-side-footer a:hover,.pro-hybrid .pro-side-footer button:hover{background:#eaeaee}
+.pro-hybrid .pro-topbar{height:62px;background:rgba(245,245,247,.77);border-bottom:.5px solid #00000012;backdrop-filter:saturate(180%) blur(20px)}
+.pro-hybrid .pro-topbar-route{font-size:13px;color:#6e6e73}
+.pro-hybrid .pro-topbar-route strong{color:#1d1d1f}
+.pro-hybrid .pro-topbar-property{color:#6e6e73;font-size:13px}
+.pro-hybrid .pro-topbar-guest{color:#176b4a;font-size:13px}
+.pro-hybrid .pro-main{max-width:1450px;padding:42px clamp(20px,3.5vw,56px) 34px}
+.pro-hybrid .pro-header{align-items:center;margin-bottom:32px}
+.pro-hybrid .pro-header h1{font-size:34px;line-height:1.22;letter-spacing:-.02em;font-weight:700;margin-bottom:6px}
+.pro-hybrid .pro-header p.pro-muted{color:#6e6e73;font-size:15px}
+.pro-hybrid .pro-btn,.pro-preview-dialog .pro-btn{min-height:50px;border:0!important;border-radius:14px;font-size:15px!important;font-weight:600!important}
+.pro-hybrid .pro-btn.primary,.pro-preview-dialog .pro-btn.primary{background:#176b4a;border:0!important;box-shadow:none}
+.pro-hybrid .pro-btn.primary:hover{background:#11593d;transform:none}
+.pro-hybrid .pro-btn.secondary,.pro-preview-dialog .pro-btn.secondary{background:#e5eee8;color:#176b4a;border:0!important}
+.pro-hybrid .pro-btn.gold{background:#176b4a;color:#fff;border:0!important}
+.pro-hybrid .pro-overview-banner{display:none!important}
+.pro-hybrid .pro-metrics{gap:16px;margin-bottom:24px}
+.pro-hybrid .pro-metric,.pro-hybrid .pro-panel{border:0;border-radius:22px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.04)}
+.pro-hybrid .pro-metric{padding:24px}
+.pro-hybrid .pro-metric:after{display:none}
+.pro-hybrid .pro-metric>span{font-size:13px;color:#6e6e73;font-weight:500}
+.pro-hybrid .pro-metric strong{font:700 34px/1.3 -apple-system,Inter,system-ui,sans-serif;color:#1d1d1f;letter-spacing:-.02em}
+.pro-hybrid .pro-metric>small{font-size:13px;color:#6e6e73}
+.pro-hybrid .pro-panel{padding:24px}
+.pro-hybrid .pro-panel h2{font-size:22px;color:#1d1d1f}
+.pro-hybrid .pro-panel h3{font-size:17px;color:#1d1d1f}
+.pro-hybrid .pro-quick button{background:#f5f5f7;border:0;border-radius:14px;min-height:64px;color:#1d1d1f}
+.pro-hybrid .pro-quick button>b{background:#e5eee8;color:#176b4a}
+.pro-hybrid .pro-quick button strong{font-size:15px;color:#1d1d1f}
+.pro-hybrid .pro-quick button small{font-size:13px;color:#6e6e73}
+.pro-hybrid .pro-food-card{border:0;border-radius:22px;box-shadow:0 8px 30px #00000008}
+.pro-hybrid .pro-food-card:hover{border:0;box-shadow:0 12px 36px #00000010}
+.pro-hybrid .pro-food-visual{height:225px;background:#f5f5f7}
+.pro-hybrid .pro-food-body{padding:19px}
+.pro-hybrid .pro-food-title-block h3{font-size:17px!important;color:#1d1d1f}
+.pro-hybrid .pro-food-title-block p{font-size:13px;color:#6e6e73}
+.pro-hybrid .pro-food-price{color:#1d1d1f;font-size:16px}
+.pro-hybrid .pro-category-tabs{border:0;gap:6px}
+.pro-hybrid .pro-category-tabs button{background:transparent;border:0;border-radius:99px;min-height:44px;font-size:14px;color:#6e6e73}
+.pro-hybrid .pro-category-tabs button.active{background:#176b4a;color:#fff;border:0}
+.pro-hybrid .pro-view-switch{border:0;border-radius:12px;background:#e8e8ed}
+.pro-hybrid .pro-view-switch button.active{background:#fff;color:#176b4a;box-shadow:0 1px 4px #00000012}
+.pro-hybrid .pro-search-input,.pro-hybrid .pro-filter-control{border:0;background:#fff;border-radius:14px;min-height:48px}
+.pro-hybrid .pro-search-input input{font-size:15px;color:#1d1d1f}
+.pro-hybrid .pro-footer{color:#6e6e73;font-size:13px;border-top:.5px solid #00000014}
+.pro-hybrid button:focus-visible,.pro-hybrid a:focus-visible{outline:3px solid #176b4a;outline-offset:3px}
+.pro-hybrid button:active:not(:disabled){transform:scale(.97)}
+@media(max-width:900px){
+ .pro-hybrid{display:block}
+ .pro-hybrid .pro-main{padding:28px 20px 110px}
+ .pro-hybrid .pro-header h1{font-size:34px}
+ .pro-hybrid .pro-side{background:rgba(249,249,251,.96)}
+ .pro-hybrid .pro-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .pro-hybrid .pro-topbar{height:58px}
+}
+@media(max-width:560px){
+ .pro-hybrid .pro-columns{grid-template-columns:1fr}
+ .pro-hybrid .pro-food-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .pro-hybrid .pro-food-visual{height:165px}
+ .pro-hybrid .pro-food-body{padding:14px}
+ .pro-hybrid .pro-metric{padding:18px}
+ .pro-hybrid .pro-metric strong{font-size:28px}
+ .pro-hybrid .pro-topbar-property{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ .pro-hybrid *, .pro-hybrid *::before,.pro-hybrid *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
