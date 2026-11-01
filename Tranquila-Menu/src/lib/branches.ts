@@ -1,0 +1,26 @@
+export const BRANCHES = [
+  {
+    id: "tranquila",
+    name: "Tranquila Hotel",
+    address: "Plot 1731 off Ahmadu Bello Wy, Mabushi, Abuja 900108, Federal Capital Territory",
+    whatsapp: "2348101702422",
+  },
+  {
+    id: "tranquila-nest",
+    name: "Tranquila Nest",
+    address: "12 Williams F, William F. Kumuyi St, Gwarinpa, Abuja 900108, Federal Capital Territory",
+    whatsapp: "2348133509133",
+  },
+] as const;
+
+export type BranchId = (typeof BRANCHES)[number]["id"];
+export type Branch = (typeof BRANCHES)[number];
+
+export function getBranch(id: string | null | undefined): Branch | undefined {
+  return BRANCHES.find((branch) => branch.id === id);
+}
+
+export function isBranchId(id: string | null | undefined): id is BranchId {
+  const selected = process.env.NEXT_PUBLIC_HOTEL_BRANCH_ID;
+  return !!getBranch(id) && (!selected || id === selected);
+}
