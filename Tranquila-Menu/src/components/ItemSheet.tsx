@@ -1,12 +1,13 @@
 "use client";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { isDrink, type Item } from "@/lib/catalog";
 import { describeSelection, missingGroups, naira, normalize, priceRange, showsPrice, unitPrice, visibleGroups, visibleOptions, type Selection } from "@/lib/pricing";
 import { cart } from "./useCart";
 import type { BranchId } from "@/lib/branches";
 import Sheet, { useSheetDrag } from "./Sheet";
-import Media, { Bottle } from "./Media";
+import Media, { Bottle, photoOf } from "./Media";
 import Stepper from "./Stepper";
 import { IconClose } from "./icons";
 
@@ -27,12 +28,14 @@ function Body({ item, branchId, onClose, canOrder, onAdded }: { item: Item; bran
   const [note, setNote] = useState("");
   const [tried, setTried] = useState(false);
   const [slide, setSlide] = useState(0);
+  const [expandedPhoto, setExpandedPhoto] = useState<number | null>(null);
   const refs = useRef<Record<string, HTMLFieldSetElement | null>>({});
   const missing = missingGroups(item, sel);
   const groups = visibleGroups(item, sel);
   const unit = unitPrice(item, sel);
   const [lo] = priceRange(item);
   const photos = Math.max(1, item.photos?.length ?? 0);
+  const photoUrls = Array.from({ length: photos }, (_, i) => i === 0 && item.imageUrl ? item.imageUrl : photoOf(item, i)?.src);
   const drink = isDrink(item.category);
 
   useEffect(() => { if (tried && missing.length === 0) setTried(false); }, [tried, missing.length]);
@@ -68,7 +71,7 @@ function Body({ item, branchId, onClose, canOrder, onAdded }: { item: Item; bran
         <div className="hero">
           <div className="gallery" onScroll={(e) => setSlide(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))} tabIndex={photos > 1 ? 0 : undefined} aria-label={photos > 1 ? `${item.name} photos` : undefined}>
             {Array.from({ length: photos }, (_, i) => (
-              <div className="slide" key={i}><Media item={item} index={i} radius={28} layoutId={i === 0 ? `media-${item.id}` : undefined} eager alt={i === 0 ? item.name : ""} /></div>
+              <div className="slide" key={i}><button type="button" className="gallery-open" onClick={() => setExpandedPhoto(i)} disabled={!photoUrls[i]} aria-label={`View ${item.name} photo ${i + 1} full screen`}><Media item={item} index={i} radius={28} layoutId={i === 0 ? `media-${item.id}` : undefined} eager alt={i === 0 ? item.name : ""} /></button></div>
             ))}
           </div>
           {photos > 1 && <div className="dots" aria-hidden>{Array.from({ length: photos }, (_, i) => <i key={i} data-on={i === slide ? "" : undefined} />)}</div>}
@@ -127,7 +130,57 @@ function Body({ item, branchId, onClose, canOrder, onAdded }: { item: Item; bran
         </motion.button>
       </footer>
       )}
+      {expandedPhoto !== null && <PhotoViewer itemName={item.name} urls={photoUrls} initialIndex={expandedPhoto} onClose={() => setExpandedPhoto(null)} />}
       <p className="sr-only" aria-live="polite">{describeSelection(item, sel)}</p>
     </div>
+  );
+}
+
+/** A separate portal avoids clipping the enlarged photo inside the draggable item sheet. */
+function PhotoViewer({ itemName, urls, initialIndex, onClose }: { itemName: string; urls: (string | undefined)[]; initialIndex: number; onClose: () => void }) {
+  const available = urls.map((src, i) => ({ src, i })).filter((p): p is { src: string; i: number } => !!p.src);
+  const [index, setIndex] = useState(() => Math.max(0, available.findIndex(p => p.i === initialIndex)));
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const startX = useRef<number | null>(null);
+  const count = available.length;
+  const previous = () => setIndex(i => (i - 1 + count) % count);
+  const next = () => setIndex(i => (i + 1) % count);
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeButton.current?.focus();
+    return () => previouslyFocused?.focus?.();
+  }, []);
+
+  function onKeyDown(event: React.KeyboardEvent) {
+    // Stop the parent sheet from interpreting Escape or trapping focus behind this dialog.
+    event.stopPropagation();
+    if (event.key === "Escape") { onClose(); return; }
+    if (event.key === "ArrowLeft" && count > 1) { event.preventDefault(); previous(); }
+    if (event.key === "ArrowRight" && count > 1) { event.preventDefault(); next(); }
+    if (event.key === "Tab") {
+      const controls = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)"));
+      const active = document.activeElement;
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && (active === first || active === event.currentTarget)) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && active === last) { event.preventDefault(); first?.focus(); }
+    }
+  }
+
+  if (!count) return null;
+  return createPortal(
+    <div className="photo-viewer" role="dialog" aria-modal="true" aria-label={itemName + " photo viewer"} tabIndex={-1} onKeyDown={onKeyDown}
+      onTouchStart={e => { startX.current = e.touches[0]?.clientX ?? null; }}
+      onTouchEnd={e => { if (startX.current === null || count < 2) return; const delta = (e.changedTouches[0]?.clientX ?? startX.current) - startX.current; startX.current = null; if (delta > 50) previous(); else if (delta < -50) next(); }}>
+      <button type="button" className="photo-viewer-close" ref={closeButton} onClick={onClose} aria-label="Close full-screen photo"><IconClose /></button>
+      <div className="photo-viewer-stage">
+        <img key={available[index]!.src} src={available[index]!.src} alt={itemName + " photo " + (index + 1)} draggable={false} />
+      </div>
+      {count > 1 && <>
+        <button type="button" className="photo-viewer-nav photo-viewer-prev" onClick={previous} aria-label="Previous photo">‹</button>
+        <button type="button" className="photo-viewer-nav photo-viewer-next" onClick={next} aria-label="Next photo">›</button>
+        <span className="photo-viewer-count" aria-live="polite">{index + 1} / {count}</span>
+      </>}
+    </div>, document.body
   );
 }
