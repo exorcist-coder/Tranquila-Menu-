@@ -9,6 +9,7 @@ import AdminHybridShell from "./AdminHybridShell";
 import { AdminMenuWorkspace } from "./AdminMenuWorkspace";
 import AdminItemPreview from "./AdminItemPreview";
 import { AdminIcon } from "./AdminIcon";
+import { AdminArchivePanel, AdminHistoryPanel, AdminCategoriesPanel, AdminServicePanel } from "./AdminManagementPanels";
 import "./professional-admin.css";
 import "./hybrid-admin.css";
 
@@ -255,10 +256,29 @@ export default function ProfessionalAdmin() {
         <div className="pro-panel pro-options"><h3>Choices & customizations</h3><OptionGroupsEditor groups={options} onChange={setOptions}/></div>
         <div className="pro-editor-footer"><button className="pro-btn secondary" onClick={() => showPreview({ ...editor, groups: options }, true)}>Preview item</button><button className="pro-btn primary" disabled={busy} onClick={saveDraft}>Save to draft library</button></div>
       </div>}
-      {tab === "archive" && <><div className="pro-section-head"><div><h2>Archived items</h2><p>Archived products are removed from the live menu, but their information can be recovered.</p></div></div><div className="pro-panel"><table className="pro-table"><thead><tr><th>ITEM</th><th>ARCHIVED</th><th>ACTIONS</th></tr></thead><tbody>{workspace.archived.map(a => <tr key={a.id}><td><strong>{a.item.name}</strong><small>{a.item.category}</small></td><td>{date(a.archived_at)}</td><td><div className="pro-actions"><button disabled={busy} onClick={() => action({ action: "restore", itemId: a.item_id }, "Item restored to the live menu.")}>Restore</button><button className="danger" disabled={busy} onClick={() => { const typed = prompt('Type DELETE to permanently remove "' + a.item.name + '". This cannot be undone from the archive.'); if (typed === "DELETE") void action({ action: "delete_permanently", itemId: a.item_id }, "Archived item permanently deleted."); }}>Delete permanently</button></div></td></tr>)}</tbody></table>{!workspace.archived.length && <div className="pro-empty">Your archive is empty. Archived items will appear here.</div>}</div></>}
-      {tab === "history" && <><div className="pro-section-head"><div><h2>Activity & menu versions</h2><p>Review recorded actions and inspect recoverable menu snapshots.</p></div></div><div className="pro-columns"><section className="pro-panel"><h3>Activity log</h3><div className="pro-timeline">{workspace.history.events.map(e => <div key={e.id}><span className="pro-activity-dot"/><strong>{e.action.replaceAll("_", " ")}</strong><small>{date(e.created_at)} {e.details?.item_id ? " · " + e.details.item_id : ""}</small></div>)}</div>{!workspace.history.events.length && <p>No recorded activity yet.</p>}</section><section className="pro-panel"><h3>Recovery snapshots</h3><p>A snapshot is taken before major changes to the published menu.</p><div className="pro-history-list">{workspace.history.revisions.map(r => <div key={r.id}><div><strong>{r.reason}</strong><small>{date(r.created_at)}</small></div><button disabled={busy} onClick={async () => { setBusy(true); try { const response = await fetch(workspaceUrl + "&section=revision&id=" + r.id, { headers: headers() }); const data = await response.json(); if (!response.ok) throw new Error(data.error); setRevisionPreview(data.revision); } catch(e) { setError(e instanceof Error ? e.message : "Could not load revision."); } finally { setBusy(false); } }}>View snapshot</button></div>)}</div>{!workspace.history.revisions.length && <div className="pro-empty">No history snapshots yet.</div>}</section></div></>}
-      {tab === "categories" && <section className="pro-panel"><div className="pro-section-head"><div><h2>Menu categories</h2><p>Organize guest menu sections. Publishing category changes requires confirmation.</p></div><button className="pro-btn secondary" onClick={() => setCategories(v => [...v, { id: "category-" + Date.now().toString(36), label: "New category", visible: true }])}>＋ Add category</button></div>{categories.map((c, i) => <div className="pro-category" key={c.id}><input value={c.label} onChange={e => setCategories(v => v.map((x,j) => i === j ? { ...x, label: e.target.value } : x))}/><label><input type="checkbox" checked={c.visible !== false} onChange={e => setCategories(v => v.map((x,j) => i === j ? { ...x, visible: e.target.checked } : x))}/> Visible</label><button className="pro-btn secondary" disabled={workspace.published.items.some(item => item.category === c.id)} onClick={() => setCategories(v => v.filter((_,j) => i !== j))}>Remove</button></div>)}<div className="pro-editor-footer"><button className="pro-btn primary" disabled={busy} onClick={publishCategories}>Publish category changes</button></div></section>}
-      {tab === "settings" && <section className="pro-panel"><h2>Service settings</h2><p>Configure the ordering experience for {branchName}. The number below is where guest WhatsApp orders are sent.</p><div className="pro-form-grid"><label className="span-two">WhatsApp number<input value={settings.whatsapp} onChange={e => setSettings(v => ({ ...v, whatsapp: e.target.value }))} placeholder="2348101702422"/></label><label>Opening time<input type="time" value={settings.open} onChange={e => setSettings(v => ({ ...v, open: e.target.value }))}/></label><label>Closing time<input type="time" value={settings.close} onChange={e => setSettings(v => ({ ...v, close: e.target.value }))}/></label><label className="span-two pro-checkbox"><input type="checkbox" checked={settings.paused} onChange={e => setSettings(v => ({ ...v, paused: e.target.checked }))}/> Pause new orders temporarily</label></div><button className="pro-btn primary" disabled={busy} onClick={saveService}>Save service settings</button></section>}
+      {tab === "archive" && <AdminArchivePanel entries={workspace.archived} busy={busy}
+        onRestore={entry => { void action({ action: "restore", itemId: entry.item_id }, entry.item.name + " restored to the live menu."); }}
+        onDelete={entry => {
+          const typed = prompt("Type DELETE to permanently remove \"" + entry.item.name + "\". You cannot recover it from the archive afterwards.");
+          if (typed === "DELETE") void action({ action: "delete_permanently", itemId: entry.item_id }, "Item permanently removed from the archive.");
+        }}
+      />}
+      {tab === "history" && <AdminHistoryPanel events={workspace.history.events} revisions={workspace.history.revisions} busy={busy}
+        onViewRevision={revision => {
+          void (async () => {
+            setBusy(true); setError("");
+            try {
+              const response = await fetch(workspaceUrl + "&section=revision&id=" + revision.id, { headers: headers() });
+              const data = await response.json();
+              if (!response.ok) throw new Error(data.error || "Could not load this snapshot.");
+              setRevisionPreview(data.revision);
+            } catch (e) { setError(e instanceof Error ? e.message : "Could not load this snapshot."); }
+            finally { setBusy(false); }
+          })();
+        }}
+      />}
+      {tab === "categories" && <AdminCategoriesPanel categories={categories} items={workspace.published.items} busy={busy} onChange={setCategories} onPublish={() => { void publishCategories(); }}/>}
+      {tab === "settings" && <AdminServicePanel settings={settings} branchName={branchName} busy={busy} onChange={setSettings} onSave={() => { void saveService(); }}/>}
       {preview && <AdminItemPreview
         item={preview}
         category={workspace.published.categories.find(c => c.id === preview.category)?.label ?? preview.category}
