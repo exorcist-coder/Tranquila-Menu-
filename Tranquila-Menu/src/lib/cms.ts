@@ -36,15 +36,22 @@ export async function getMenu(publishedOnly = true, branchId: BranchId = "tranqu
   }
 }
 export async function saveMenu(menu: MenuDocument, published: boolean, staffId?: string, branchId: BranchId = "tranquila") {
+  if (!staffId) throw new Error("STAFF_AUTHORIZATION_REQUIRED");
   const cleanMenu = { ...menu, items: menu.items.map(({ available: _available, ...item }) => item) };
-  const current = await db(`tranquila_branch_cms?branch_id=eq.${encodeURIComponent(branchId)}&select=menu,published_menu`);
-  const currentRow = Array.isArray(current) ? current[0] : null;
-  if (currentRow?.menu) await db("tranquila_menu_backups", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ branch_id: branchId, menu: currentRow.menu, created_by: staffId ?? null, reason: published ? "before publish" : "before draft save" }) });
-  const existing = await db(`tranquila_branch_cms?branch_id=eq.${encodeURIComponent(branchId)}&select=branch_id`);
-  const row = { branch_id: branchId, menu: cleanMenu, draft_initialized: true, ...(published ? { published_menu: cleanMenu, published_initialized: true, published_at: new Date().toISOString() } : {}) };
-  if (Array.isArray(existing) && existing.length) await db(`tranquila_branch_cms?branch_id=eq.${encodeURIComponent(branchId)}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify(row) });
-  else await db("tranquila_branch_cms", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ ...row, published_menu: published ? cleanMenu : fallbackMenu, published_initialized: published }) });
-  await db("tranquila_audit_log", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ staff_id: staffId ?? null, action: published ? "menu_published" : "menu_draft_saved", details: { branch_id: branchId, item_count: menu.items.length, category_count: menu.categories.length } }) });
+  // One RPC means backup, menu save and audit always commit together.
+  const result = await db("rpc/tranquila_admin_save_menu", {
+    method: "POST",
+    body: JSON.stringify({
+      p_branch: branchId,
+      p_actor: staffId,
+      p_menu: cleanMenu,
+      p_publish: published,
+      p_fallback_menu: fallbackMenu
+    })
+  });
+  if (result?.ok !== true || result.branch !== branchId || result.action !== (published ? "menu_published" : "menu_draft_saved")) {
+    throw new Error("MENU_SAVE_NOT_CONFIRMED");
+  }
 }
 export async function getSettings(branchId: BranchId = "tranquila"): Promise<HotelSettings> {
   const defaults = { whatsapp: BRANCHES.find(branch => branch.id === branchId)?.whatsapp ?? "2348101702422", open: process.env.ORDERING_OPEN ?? "08:00", close: process.env.ORDERING_CLOSE ?? "08:00", paused: process.env.ORDERING_PAUSED === "1" };
