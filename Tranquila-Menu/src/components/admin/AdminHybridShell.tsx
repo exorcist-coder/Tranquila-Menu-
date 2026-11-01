@@ -14,7 +14,7 @@ const sections: { id: AdminSection; label: string; icon: AdminIconName; group: "
   { id: "settings", label: "Service settings", icon: "settings", group: "system" }
 ];
 const title: Record<AdminSection, string> = {
-  overview: "Good to have you back.",
+  overview: "Overview",
   live: "Live menu",
   drafts: "Draft library",
   archive: "Archive",
@@ -23,7 +23,7 @@ const title: Record<AdminSection, string> = {
   settings: "Service settings"
 };
 const descriptions: Record<AdminSection, string> = {
-  overview: "Here's what's happening across your hotel's dining workspace.",
+  overview: "Your menu at a glance.",
   live: "A curated collection, always ready for your guests.",
   drafts: "Create, refine and review before you publish.",
   archive: "A safe home for dishes you've taken off the menu.",
@@ -63,7 +63,7 @@ export default function AdminHybridShell({
         </div>)}
       </div>
       <div className="pro-side-footer"><a href={"/?branch=" + branchId}><AdminIcon name="arrow" size={17}/> View guest menu</a><button type="button" onClick={onSignout}><AdminIcon name="logout" size={17}/> Sign out</button></div>
-      <div className="pro-side-signature">TRANQUILA <span>·</span> DINING MANAGEMENT</div>
+
     </aside>
     <div className="pro-workspace">
       <div className="pro-topbar">
@@ -73,15 +73,13 @@ export default function AdminHybridShell({
         </div>
         <div className="pro-topbar-right">
           <span className="pro-topbar-property">{branchLabel}</span>
-          <span className="pro-connection-pill"><span/> Systems connected</span>
           <a className="pro-topbar-guest" href={"/?branch=" + branchId} title="View the guest menu"><AdminIcon name="store" size={18}/><span>Guest view</span></a>
-          <span className="pro-profile-avatar" aria-label="Hotel administrator">T</span>
         </div>
       </div>
       <div className="pro-main">
         <header className="pro-header">
-          <div><p className="pro-eyebrow"><span className="pro-eyebrow-diamond"/> TRANQUILA ADMINISTRATION / {branchLabel.toUpperCase()}</p><h1>{title[tab]}</h1><p className="pro-muted">{descriptions[tab]}</p></div>
-          <div className="pro-header-actions"><span className="pro-live"><i/> Live workspace</span><button type="button" className="pro-btn secondary pro-refresh-button" disabled={busy} onClick={onRefresh}><AdminIcon name="refresh" size={16}/> Refresh</button></div>
+          <div><h1>{title[tab]}</h1><p className="pro-muted">{descriptions[tab]}</p></div>
+          <div className="pro-header-actions"><button type="button" className="pro-btn secondary pro-refresh-button" disabled={busy} onClick={onRefresh}><AdminIcon name="refresh" size={16}/> Refresh</button></div>
         </header>
         {children}
         <footer className="pro-footer"><span>© Tranquila Hotels & Suites</span><span>Thoughtful hospitality. Considered details.</span></footer>
