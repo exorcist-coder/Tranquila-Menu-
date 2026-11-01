@@ -181,6 +181,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
           </main>
         </div>
 
+        {count > 0 && <button type="button" className="apple-floating-order" onClick={() => setCartOpen(true)} aria-label={`View order, ${count} items, ${naira(total)}`}><span className="apple-order-icon"><IconBag width={19} height={19}/></span><span className="apple-order-details"><strong>View your order</strong><small>{count} {count === 1 ? "item" : "items"}</small></span><strong className="apple-order-total">{naira(total)}</strong><IconArrowRight width={18} height={18}/></button>}
         <ItemSheet item={item} branchId={branch.id} onClose={() => setItem(null)} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
         <CartSheet open={cartOpen} branchId={branch.id} onClose={() => setCartOpen(false)} canOrder={status.open} closedReason={status.reason} />
         <Toast lifted={false} />
