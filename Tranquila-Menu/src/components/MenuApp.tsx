@@ -17,7 +17,7 @@ import { CatIcon, IconArrowRight, IconBag, IconClose, IconSearch } from "./icons
 import type { Branch } from "@/lib/branches";
 
 type Phase = "welcome" | "entering" | "menu";
-const SEEN = "amb.in";
+const SEEN = "tranquila.in";
 
 export default function MenuApp({ branch, hours: initialHours, serverNow }: { branch: Branch; hours: Hours; serverNow: string }) {
   const [hours, setHours] = useState<Hours>(initialHours);

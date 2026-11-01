@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover", themeColor: "#F3F1E8" };
 
 /** Marks the page as script-enabled before first paint. If the motion layer has not started after 4s, show everything as-is. */
-const boot = `document.documentElement.classList.add("js");try{if(sessionStorage.getItem("amb.in")||JSON.parse(localStorage.getItem("tranquila.cart.v1")||"[]").length)document.documentElement.classList.add("skip-welcome")}catch(e){}setTimeout(function(){if(!document.documentElement.dataset.motion)document.documentElement.classList.add("no-motion")},4000)`;
+const boot = `document.documentElement.classList.add("js");try{if(sessionStorage.getItem("tranquila.in")||JSON.parse(localStorage.getItem("tranquila.cart.v1")||"[]").length)document.documentElement.classList.add("skip-welcome")}catch(e){}setTimeout(function(){if(!document.documentElement.dataset.motion)document.documentElement.classList.add("no-motion")},4000)`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

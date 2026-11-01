@@ -14,7 +14,7 @@ npm run build
 To put this in a **new** project (leaves any existing one untouched):
 ```
 npm i -g vercel
-vercel --name ambiiflora-ordering-v2 --prod
+vercel --name tranquila-ordering-v2 --prod
 ```
 First run asks to create the project; answer `y`. Then in the Vercel dashboard, Settings → Deployment Protection, choose what guests can open without logging in.
 
@@ -57,13 +57,13 @@ Or push to GitHub and import the repo at vercel.com/new. No build settings neede
 ### Enable persistent CMS
 
 1. Create a Supabase project.
-2. Run `supabase/migrations/202610130001_ambiiflora_cms.sql`, then `supabase/migrations/202610270001_branch_support.sql` in the Supabase SQL editor. The branch migration copies the existing menu and settings into both hotels so they can be managed independently afterward.
+2. Run `supabase/migrations/202610130001_tranquila_cms.sql`, then `supabase/migrations/202610270001_branch_support.sql` in the Supabase SQL editor. The branch migration copies the existing menu and settings into both hotels so they can be managed independently afterward.
 3. Copy `.env.example` to `.env.local` and fill in `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`. Keep the service-role key server-only; never prefix it with `NEXT_PUBLIC_`.
 4. Restart the Next.js server.
-5. Create staff users in Supabase Authentication. Add each user's UUID to `public.ambiiflora_staff` with `role='admin'` or `role='staff'` and `active=true`. Only administrators can edit hotel settings.
+5. Create staff users in Supabase Authentication. Add each user's UUID to `public.tranquila_staff` with `role='admin'` or `role='staff'` and `active=true`. Only administrators can edit hotel settings.
 6. Sign in at `/admin`, switch between Tranquila Hotel and Tranquila Nest, configure each branch's WhatsApp number and hours, then edit and publish each branch's menu.
 
-The migration creates a public image bucket named `ambiiflora-menu`; image uploads are restricted by the server to supported image types and 5 MB. The server uses the service-role key only after checking the signed-in user's active staff profile. If Supabase is not configured, the guest menu uses the local starter catalog and the admin login explains that setup is required.
+The migration creates a public image bucket named `tranquila-menu`; image uploads are restricted by the server to supported image types and 5 MB. The server uses the service-role key only after checking the signed-in user's active staff profile. If Supabase is not configured, the guest menu uses the local starter catalog and the admin login explains that setup is required.
 
 ### CMS behaviour
 
