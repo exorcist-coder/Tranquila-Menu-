@@ -62,12 +62,22 @@ export async function getItemAvailability(branchId: BranchId): Promise<Record<st
   return Object.fromEntries((Array.isArray(rows) ? rows : []).map((row: { item_id: string; available: boolean }) => [row.item_id, row.available]));
 }
 export async function setItemAvailability(branchId: BranchId, itemId: string, available: boolean, staffId: string) {
-  await db("tranquila_item_availability?on_conflict=branch_id,item_id", {
+  // Availability and its audit record must commit together. A failed audit
+  // must never leave the switch changed while telling staff it failed.
+  const result = await db("rpc/tranquila_admin_action", {
     method: "POST",
-    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify({ branch_id: branchId, item_id: itemId, available, updated_by: staffId, updated_at: new Date().toISOString() }),
+    body: JSON.stringify({
+      p_action: "set_availability",
+      p_branch: branchId,
+      p_actor: staffId,
+      p_item_id: itemId,
+      p_available: available,
+      p_fallback_menu: fallbackMenu
+    })
   });
-  await db("tranquila_audit_log", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ staff_id: staffId, action: available ? "item_restocked" : "item_marked_sold_out", details: { branch_id: branchId, item_id: itemId } }) });
+  if (result?.ok !== true || result.action !== "set_availability" || result.item_id !== itemId) {
+    throw new Error("STOCK_CHANGE_NOT_CONFIRMED");
+  }
 }
 export async function requireAdmin(request: Request, minimum: "staff" | "admin" = "staff") {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
