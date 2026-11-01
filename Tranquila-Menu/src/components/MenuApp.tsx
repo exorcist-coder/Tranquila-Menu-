@@ -135,7 +135,6 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
                 <nav className="rail" ref={rail} aria-label="Menu sections">
                   {CATEGORIES.map((c) => (
                     <button key={c.id} type="button" data-chip={c.id} data-on={c.id === active ? "" : undefined} aria-current={c.id === active} onClick={() => go(c.id)}>
-                      <span className="rail-ico"><CatIcon id={c.id} width={24} height={24} /></span>
                       <span className="rail-lbl">{c.label}</span>
                     </button>
                   ))}
