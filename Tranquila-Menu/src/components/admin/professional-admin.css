@@ -16,3 +16,25 @@
 .pro-login-card .pro-back{display:inline-flex;align-items:center;gap:9px;width:fit-content;margin-bottom:24px;padding:9px 0;color:#315443;font-size:14px;font-weight:700;text-decoration:none;text-underline-offset:4px}
 .pro-login-card .pro-back:hover{text-decoration:underline;color:#143c2c}
 .pro-login-card .pro-back:focus-visible{outline:2px solid #143c2c;outline-offset:4px;border-radius:4px}
+
+/* Production inventory control and ephemeral feedback, scoped to hotel admin. */
+.pro-stock{display:inline-flex;align-items:center;gap:9px;min-height:38px;padding:7px 11px!important;transition:background-color .2s,color .2s,box-shadow .2s}
+.pro-stock .pro-stock-track{position:relative;display:inline-flex;flex:none;align-items:center;width:36px;height:20px;border-radius:99px;background:#c9b3ab;transition:background-color .2s}
+.pro-stock .pro-stock-track>span{width:14px;height:14px;margin:3px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:transform .2s}
+.pro-stock.in .pro-stock-track{background:#398359}
+.pro-stock.in .pro-stock-track>span{transform:translateX(16px)}
+.pro-stock.out .pro-stock-track{background:#b65a47}
+.pro-stock .pro-stock-label{min-width:62px;text-align:left;white-space:nowrap}
+.pro-stock:hover:not(:disabled){box-shadow:0 0 0 2px rgba(32,79,52,.12)}
+.pro-stock:focus-visible{outline:2px solid #143c2c;outline-offset:3px}
+.pro-toast-stack{position:fixed;top:calc(22px + env(safe-area-inset-top,0px));right:clamp(12px,2.5vw,34px);z-index:120;width:min(430px,calc(100vw - 24px));display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.pro-toast-stack:empty{display:none}
+.pro-toast-stack .pro-alert{display:flex;gap:12px;align-items:center;pointer-events:auto;min-height:56px;margin:0;padding:12px 14px;border-radius:12px;box-shadow:0 20px 55px rgba(15,35,24,.18);animation:pro-toast-enter .23s ease-out both;font-weight:600}
+.pro-toast-stack .pro-alert>span:first-child{display:grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:rgba(20,78,43,.12);font-weight:800}
+.pro-toast-stack .pro-alert.error>span:first-child{background:rgba(160,39,25,.12)}
+.pro-toast-stack .pro-alert>span:nth-child(2){flex:1;min-width:0}
+.pro-toast-stack .pro-alert button{flex:none;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:500}
+.pro-toast-stack .pro-alert button:hover{background:rgba(0,0,0,.08)}
+@keyframes pro-toast-enter{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){.pro-stock,.pro-stock .pro-stock-track,.pro-stock .pro-stock-track>span,.pro-toast-stack .pro-alert{transition:none;animation:none}}
+@media (max-width:600px){.pro-toast-stack{top:calc(12px + env(safe-area-inset-top,0px));right:12px;left:12px;width:auto}.pro-stock{min-width:132px;justify-content:flex-start}}

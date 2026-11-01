@@ -1,6 +1,6 @@
 import { CATEGORIES, ITEMS, type Item } from "./catalog";
 import type { BranchId } from "./branches";
-import type { MenuDocument } from "./cms";
+import { getItemAvailability, type MenuDocument } from "./cms";
 
 export type SavedDraft = { id: number; branch_id: BranchId; item_id: string; item: Item; updated_at: string; created_at: string };
 export type ArchivedItem = { id: number; item_id: string; item: Item; archived_at: string };
@@ -75,7 +75,17 @@ async function writePublished(branch: BranchId, actor: string, operation: string
   await history(branch, actor, operation, { item_id: itemId, count: updated.items.length });
 }
 export async function getPublished(branch: BranchId) {
-  return savedMenu(await selectRow(branch), true);
+  const menu = savedMenu(await selectRow(branch), true);
+  // Availability is intentionally held outside the menu JSON so stock changes
+  // can go live immediately without republishing the dish or changing a draft.
+  const availability = await getItemAvailability(branch);
+  return {
+    ...menu,
+    items: menu.items.map(item => ({
+      ...item,
+      available: availability[item.id] !== false
+    }))
+  };
 }
 export async function getDrafts(branch: BranchId): Promise<SavedDraft[]> {
   const rows = await query("tranquila_item_drafts?" + branchQuery(branch) + "&select=id,branch_id,item_id,item,created_at,updated_at&order=updated_at.desc&limit=500");

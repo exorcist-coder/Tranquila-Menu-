@@ -48,6 +48,18 @@ export default function ProfessionalAdmin() {
   const [settings, setSettings] = useState<Settings>({ whatsapp: BRANCHES.find(b => b.id === activeBranch)?.whatsapp ?? "", open: "08:00", close: "22:00", paused: false });
   const [categories, setCategories] = useState<Menu["categories"]>(initialMenu.categories);
 
+  // Success and error notifications are temporary, accessible, and dismissible.
+  useEffect(() => {
+    if (!notice) return;
+    const timeout = window.setTimeout(() => setNotice(""), 4800);
+    return () => window.clearTimeout(timeout);
+  }, [notice]);
+  useEffect(() => {
+    if (!error) return;
+    const timeout = window.setTimeout(() => setError(""), 8500);
+    return () => window.clearTimeout(timeout);
+  }, [error]);
+
   const headers = useCallback(() => ({ Authorization: "Bearer " + token, "Content-Type": "application/json" }), [token]);
   const workspaceUrl = "/api/admin/workspace?branch=" + activeBranch;
   const refresh = useCallback(async (authToken: string) => {
@@ -104,16 +116,32 @@ export default function ProfessionalAdmin() {
     if (await action({ action: "save_draft", item }, "Draft saved to your library. The guest menu has not changed.")) setEditor(null);
   }
   async function inventory(item: DisplayItem) {
+    // Stock is independent of menu publishing. The button only changes after
+    // the server confirms that this specific item's state was persisted.
     const available = item.available === false;
     setBusy(true); setError(""); setNotice("");
     try {
-      const r = await fetch("/api/admin/availability?branch=" + activeBranch, { method: "PATCH", headers: headers(), body: JSON.stringify({ itemId: item.id, available }) });
+      const r = await fetch("/api/admin/availability?branch=" + activeBranch, {
+        method: "PATCH", headers: headers(), body: JSON.stringify({ itemId: item.id, available })
+      });
       const data = await r.json();
-      if (!r.ok) throw new Error(data.error || "Inventory could not be updated.");
-      await refresh(token);
-      setNotice(item.name + (available ? " is available again." : " is marked sold out."));
-    } catch (e) { setError((e instanceof Error ? e.message : "Inventory could not be updated.") + " The previous state has been kept."); }
-    finally { setBusy(false); }
+      if (!r.ok || data.ok !== true || data.itemId !== item.id || data.available !== available) {
+        throw new Error(data.error || "The server did not confirm the inventory change.");
+      }
+      // Keep the UI accurate even if reloading the rest of the admin workspace
+      // fails after the inventory write itself succeeds.
+      setWorkspace(current => ({
+        ...current,
+        published: {
+          ...current.published,
+          items: current.published.items.map(i => i.id === item.id ? { ...i, available } : i)
+        }
+      }));
+      setNotice(available ? item.name + " is available again." : item.name + " marked SOLD OUT. Guests can no longer order it.");
+      try { await refresh(token); } catch { setError("Stock status was saved, but the dashboard could not refresh. Please reload the page."); }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "The stock change could not be saved.");
+    } finally { setBusy(false); }
   }
   async function upload(file: File) {
     if (!editor) return;
@@ -173,8 +201,10 @@ export default function ProfessionalAdmin() {
     </aside>
     <div className="pro-main">
       <header className="pro-header"><div><p className="pro-eyebrow">TRANQUILA / {branchName.toUpperCase()}</p><h1>{nav.find(n => n.id === tab)?.label ?? "Dashboard"}</h1><p className="pro-muted">Manage your hotel's menu and operations with confidence.</p></div><div className="pro-header-actions"><span className="pro-live"><i/>Live workspace</span><button className="pro-btn secondary" onClick={() => refresh(token).then(() => setNotice("Workspace refreshed.")).catch(e => setError(String(e)))} disabled={busy}>↻ Refresh</button></div></header>
-      {error && <div role="alert" className="pro-alert error">{error}<button onClick={() => setError("")} aria-label="Dismiss error">×</button></div>}
-      {notice && <div role="status" className="pro-alert success">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss notice">×</button></div>}
+      <div className="pro-toast-stack" aria-live="polite">
+        {error && <div role="alert" className="pro-alert error"><span aria-hidden="true">!</span><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Dismiss error">×</button></div>}
+        {notice && <div role="status" className="pro-alert success"><span aria-hidden="true">✓</span><span>{notice}</span><button type="button" onClick={() => setNotice("")} aria-label="Dismiss notification">×</button></div>}
+      </div>
       {busy && <p className="pro-working" role="status">Saving and verifying changes…</p>}
       {tab === "overview" && <>
         <div className="pro-metrics"><Metric label="Live menu items" value={stats.live} hint="Visible to guests"/><Metric label="Sold out" value={stats.unavailable} hint="Inventory changes immediately"/><Metric label="Saved drafts" value={stats.drafts} hint="Not visible to guests"/><Metric label="Archived items" value={stats.archives} hint="Recoverable items"/></div>
@@ -184,7 +214,7 @@ export default function ProfessionalAdmin() {
       {(tab === "live" || tab === "drafts") && !editor && <>
         <div className="pro-section-head"><div><h2>{tab === "live" ? "Published menu" : "Draft library"}</h2><p>{tab === "live" ? "Availability changes are live; editing an item creates a separate draft." : "Saved work stays private until you explicitly publish it."}</p></div><button className="pro-btn primary" onClick={() => edit(baseItem())}>＋ New item</button></div>
         <div className="pro-search"><span>⌕</span><input type="search" placeholder="Search menu items…" value={query} onChange={e => setQuery(e.target.value)}/><span>{tab === "live" ? items.length : draftList.length} items</span></div>
-        {tab === "live" ? <div className="pro-table-wrap"><table className="pro-table"><thead><tr><th>ITEM</th><th>CATEGORY</th><th>PRICE</th><th>STOCK STATUS</th><th>ACTIONS</th></tr></thead><tbody>{items.map(i => <tr key={i.id}><td><div className="pro-item"><div className="pro-thumb">{photo(i) ? <img src={photo(i)} alt="" /> : "◈"}</div><div><strong>{i.name}</strong><small>{i.visible === false ? "Hidden from guests" : i.description || "No description"}</small></div></div></td><td>{workspace.published.categories.find(c => c.id === i.category)?.label ?? i.category}</td><td>{cash(i.basePrice)}</td><td><button className={"pro-stock " + (i.available === false ? "out" : "in")} aria-pressed={i.available !== false} disabled={busy} onClick={() => inventory(i)}>{i.available === false ? "Sold out · Restock" : "Available · Mark sold out"}</button></td><td><div className="pro-actions"><button onClick={() => edit(i)}>Edit draft</button><button onClick={() => setPreview(i)}>Preview</button><button className="danger" disabled={busy} onClick={() => { if (confirm("Archive " + i.name + "? It will disappear from the live menu but can be restored.")) void action({ action: "archive", itemId: i.id }, i.name + " moved to archive."); }}>Archive</button></div></td></tr>)}</tbody></table></div>
+        {tab === "live" ? <div className="pro-table-wrap"><table className="pro-table"><thead><tr><th>ITEM</th><th>CATEGORY</th><th>PRICE</th><th>STOCK STATUS</th><th>ACTIONS</th></tr></thead><tbody>{items.map(i => <tr key={i.id}><td><div className="pro-item"><div className="pro-thumb">{photo(i) ? <img src={photo(i)} alt="" /> : "◈"}</div><div><strong>{i.name}</strong><small>{i.visible === false ? "Hidden from guests" : i.description || "No description"}</small></div></div></td><td>{workspace.published.categories.find(c => c.id === i.category)?.label ?? i.category}</td><td>{cash(i.basePrice)}</td><td><button type="button" role="switch" className={"pro-stock " + (i.available === false ? "out" : "in")} aria-label={i.name + " availability"} aria-checked={i.available !== false} disabled={busy} onClick={() => inventory(i)}><span className="pro-stock-track" aria-hidden="true"><span /></span><span className="pro-stock-label">{i.available === false ? "Sold out" : "Available"}</span></button></td><td><div className="pro-actions"><button onClick={() => edit(i)}>Edit draft</button><button onClick={() => setPreview(i)}>Preview</button><button className="danger" disabled={busy} onClick={() => { if (confirm("Archive " + i.name + "? It will disappear from the live menu but can be restored.")) void action({ action: "archive", itemId: i.id }, i.name + " moved to archive."); }}>Archive</button></div></td></tr>)}</tbody></table></div>
         : <div className="pro-draft-grid">{draftList.map(d => <article key={d.id} className="pro-draft-card"><div className="pro-draft-visual">{photo(d.item) ? <img src={photo(d.item)} alt=""/> : <span>◈</span>}</div><div className="pro-draft-info"><span className="pro-status draft">UNPUBLISHED DRAFT</span><h3>{d.item.name}</h3><p>{d.item.description || "No description"}</p><div className="pro-draft-meta">{cash(d.item.basePrice)}<small>Edited {date(d.updated_at)}</small></div><div className="pro-actions"><button onClick={() => edit(d.item)}>Edit</button><button onClick={() => setPreview(d.item)}>Preview</button><button className="pro-publish" disabled={busy} onClick={() => { if (confirm("Publish " + d.item.name + " to the guest menu now?")) void action({ action: "publish_draft", itemId: d.item_id }, d.item.name + " published to the guest menu."); }}>Publish</button><button className="danger" disabled={busy} onClick={() => { if (confirm("Discard this unpublished draft? The live menu will not change.")) void action({ action: "discard_draft", itemId: d.item_id }, "Draft discarded."); }}>Discard</button></div></div></article>)}</div>}
         {(tab === "live" ? items.length : draftList.length) === 0 && <div className="pro-empty-large"><strong>{tab === "drafts" ? "No drafts saved yet" : "No matching items"}</strong><p>{tab === "drafts" ? "Create or edit an item, then save it. Your draft will appear here for review." : "Try a different search term."}</p></div>}
       </>}
