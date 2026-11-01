@@ -158,6 +158,6 @@ export const PHOTOS: Record<string, Photo> = {
   "fruit-salad": { "src": "/images/IMG_7733.JPG", "tone": "#816f68", "w": 736, "h": 736 },
   "club-sandwich": { "src": "/images/IMG_7734.JPG", "tone": "#d4b887", "w": 736, "h": 736 },
   "sandwich": { "src": "/images/IMG_7735.JPG", "tone": "#af8b67", "w": 736, "h": 1104 },
-  "indomie-noodles": { "src": "/images/indomie-noodles.jpg", "tone": "#b18b57", "w": 736, "h": 736 },
-  "indomie-eggs-photo": { "src": "/images/indomie-eggs.jpg", "tone": "#a17a4e", "w": 675, "h": 1200 }
+  "indomie-noodles": { "src": "/images/indomie-noodles.webp", "tone": "#b18b57", "w": 736, "h": 736 },
+  "indomie-eggs-photo": { "src": "/images/indomie-eggs.webp", "tone": "#a17a4e", "w": 675, "h": 1200 }
 };
