@@ -1,12 +1,6 @@
 // Generated from the supplied photo set. Tone is the average colour, shown while the image loads.
 export type Photo = { src: string; tone: string; w: number; h: number };
 export const PHOTOS: Record<string, Photo> = {
-  "amala-ewedu": {
-    "src": "/images/amala-ewedu.webp",
-    "tone": "#8f6f51",
-    "w": 720,
-    "h": 724
-  },
   "okra-seafood": {
     "src": "/images/okra-seafood.webp",
     "tone": "#846342",

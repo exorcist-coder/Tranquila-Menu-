@@ -62,7 +62,7 @@ export const ITEMS: Item[] = [
 
   // Soups & swallow
   {
-    id: "swallow-soup", category: "soups", name: "Swallow & Soup", description: "Pick your swallow and your soup. Add a protein if you like.", basePrice: 0, photos: ["amala-ewedu", "okra-fufu", "egusi", "poundo-efo", "efo-riro", "efo-beef", "fufu-ogbono", "okra-seafood", "white-soup"],
+    id: "swallow-soup", category: "soups", name: "Swallow & Soup", description: "Pick your swallow and your soup. Add a protein if you like.", basePrice: 0, photos: ["okra-fufu", "egusi", "poundo-efo", "efo-riro", "efo-beef", "fufu-ogbono", "okra-seafood", "white-soup"],
     groups: [
       add("swallow", "Swallow", [["Poundo Yam", 2000, "pounded-yam"], ["Semo Extra", 1500, "semo"], ["Garri", 1500], ["White Garri", 1000], ["Plantain Flour", 2000], ["Wheat", 2000]]),
       add("soup", "Soup", [["Egusi Soup", 3000, "egusi"], ["Okro Soup", 3000, "okro"], ["Oha Soup", 3000, "oha"], ["Bitter Leaf Soup", 3000, "bitterleaf"], ["Ogbono Soup", 4000, "ogbono"], ["Afang Soup", 4000, "afang"], ["Vegetable Soup", 4000, "vegetable"], ["White Soup", 5000], ["Sea Food Okro Soup Only", 10500, "seafood-okro"], ["Fisherman Soup", 10500, "fisherman-soup"]]),
