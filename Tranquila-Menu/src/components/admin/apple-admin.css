@@ -106,3 +106,9 @@ body:has(.pro-hybrid){background:#f5f5f7}
 @media(prefers-reduced-motion:reduce){
  .pro-hybrid *, .pro-hybrid *::before,.pro-hybrid *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
+
+
+/* Preserve full product photography in admin tiles and previews. */
+.pro-hybrid .pro-food-visual>img{width:100%;height:100%;object-fit:contain!important;object-position:center;background:#f5f5f7}
+.pro-hybrid .pro-food-card:hover .pro-food-visual>img{transform:none}
+.pro-hybrid .pro-food-visual{display:flex;align-items:center;justify-content:center}
