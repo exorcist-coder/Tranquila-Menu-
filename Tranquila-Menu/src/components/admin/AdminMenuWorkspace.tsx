@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Item } from "@/lib/catalog";
 import { PHOTOS } from "@/lib/photos";
 import { AdminIcon } from "./AdminIcon";
@@ -34,6 +34,7 @@ export function AdminMenuWorkspace({
   const [view, setView] = useState<"grid" | "list">("grid");
   const [stock, setStock] = useState<"all" | "available" | "soldout">("all");
   const [sort, setSort] = useState<"menu" | "name" | "price" | "recent">("menu");
+  const [page, setPage] = useState(1);
   const entries = useMemo(() => mode === "live"
     ? items.map(item => ({ item, draft: undefined as Draft | undefined }))
     : drafts.map(draft => ({ item: draft.item, draft })), [mode, items, drafts]);
@@ -51,6 +52,11 @@ export function AdminMenuWorkspace({
   }, [entries, categories, category, query, stock, sort, mode]);
   const countFor = (id: string) => entries.filter(({ item }) => id === "all" || item.category === id).length;
   const total = entries.length;
+  const perPage = view === "grid" ? 12 : 15;
+  const pages = Math.max(1, Math.ceil(visibleEntries.length / perPage));
+  const currentPage = Math.min(page, pages);
+  const pageEntries = visibleEntries.slice((currentPage - 1) * perPage, currentPage * perPage);
+  useEffect(() => { setPage(1); }, [mode, category, query, stock, sort, view]);
 
   return <section className="pro-collection">
     <div className="pro-collection-heading">
@@ -78,10 +84,10 @@ export function AdminMenuWorkspace({
         <button type="button" className={view === "list" ? "active" : ""} aria-pressed={view === "list"} aria-label="Compact list" title="Compact list" onClick={() => setView("list")}><AdminIcon name="list" size={18}/></button>
       </div>
     </div>
-    <div className="pro-results-line"><span>Showing <strong>{visibleEntries.length}</strong> of {total} {mode === "live" ? "published items" : "saved drafts"}</span><span><i className="pro-legend-dot"/> {mode === "live" ? "Stock updates immediately" : "Drafts are not visible to guests"}</span></div>
+    <div className="pro-results-line"><span>Showing <strong>{visibleEntries.length ? (currentPage - 1) * perPage + 1 : 0}–{Math.min(currentPage * perPage, visibleEntries.length)}</strong> of {visibleEntries.length} {mode === "live" ? "published items" : "saved drafts"}</span><span><i className="pro-legend-dot"/> {mode === "live" ? "Stock updates immediately" : "Drafts are not visible to guests"}</span></div>
 
     {visibleEntries.length ? <div className={"pro-food-grid " + (view === "list" ? "as-list" : "")}>
-      {visibleEntries.map(({ item, draft }, index) => <article key={item.id} className="pro-food-card" style={{ animationDelay: Math.min(index * 24, 200) + "ms" }}>
+      {pageEntries.map(({ item, draft }, index) => <article key={item.id} className="pro-food-card" style={{ animationDelay: Math.min(index * 24, 200) + "ms" }}>
         <div className="pro-food-visual">
           {image(item) ? <img src={image(item)} alt={item.name} loading="lazy"/> : <div className="pro-food-placeholder"><AdminIcon name="image" size={38}/><span>No photograph</span></div>}
           <span className="pro-food-category">{categoryOf(categories, item.category)}</span>
@@ -106,5 +112,14 @@ export function AdminMenuWorkspace({
         </div>
       </article>)}
     </div> : <div className="pro-empty-collection"><span className="pro-empty-illustration"><AdminIcon name={mode === "live" ? "search" : "draft"} size={32}/></span><h3>{mode === "drafts" && total === 0 ? "A fresh canvas for new ideas." : "Nothing matches your filters."}</h3><p>{mode === "drafts" && total === 0 ? "Create a draft, shape the details, and publish only when it's ready." : "Try a different search term, category or stock filter."}</p><button type="button" className="pro-btn secondary" onClick={() => {onQuery("");setCategory("all");setStock("all");}}>{mode === "drafts" && total === 0 ? "Browse categories" : "Clear filters"}</button></div>}
+    {pages > 1 && <nav className="pro-pagination" aria-label="Menu pages">
+      <span>Page {currentPage} of {pages}</span>
+      <div className="pro-pagination-controls">
+        <button type="button" disabled={currentPage === 1} onClick={() => setPage(p => Math.max(1, p - 1))} aria-label="Previous page"><AdminIcon name="back" size={16}/></button>
+        {Array.from({ length: pages }, (_,i) => i + 1).filter(n => pages <= 5 || n === 1 || n === pages || Math.abs(n - currentPage) <= 1).map((n,i,visible) =>
+          <span key={n} className="pro-pagination-entry">{i > 0 && visible[i-1] !== n-1 && <span className="pro-pagination-ellipsis">…</span>}<button type="button" aria-current={currentPage === n ? "page" : undefined} className={currentPage === n ? "active" : ""} onClick={() => setPage(n)}>{n}</button></span>)}
+        <button type="button" disabled={currentPage === pages} onClick={() => setPage(p => Math.min(pages, p + 1))} aria-label="Next page"><AdminIcon name="arrow" size={16}/></button>
+      </div>
+    </nav>}
   </section>;
 }
