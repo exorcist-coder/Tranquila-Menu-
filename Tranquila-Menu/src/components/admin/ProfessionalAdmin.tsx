@@ -154,7 +154,7 @@ export default function ProfessionalAdmin() {
   const stats = { live: workspace.published.items.filter(i => i.visible !== false && i.published !== false).length, unavailable: workspace.published.items.filter(i => i.available === false).length, drafts: workspace.drafts.length, archives: workspace.archived.length };
 
   if (!token) return <main className="pro-login"><form className="pro-login-card" onSubmit={signin}>
-    <div className="pro-brand"><span className="pro-brand-icon">T</span><div><strong>TRANQUILA</strong><small>{branchName} · Administration</small></div></div>
+    <a className="pro-back" href={"/?branch=" + activeBranch} aria-label="Return to hotel menu">← Back to hotel menu</a><div className="pro-brand"><span className="pro-brand-icon">T</span><div><strong>TRANQUILA</strong><small>{branchName} · Administration</small></div></div>
     <p className="pro-eyebrow">SECURE STAFF ACCESS</p><h1>Welcome back.</h1><p>Sign in to manage the hotel menu, stock and publishing workflow.</p>
     <label>Email address<input required type="email" autoComplete="username" value={authInput.email} onChange={e => setAuthInput(v => ({ ...v, email: e.target.value }))} /></label>
     <label>Password<input required type="password" autoComplete="current-password" value={authInput.password} onChange={e => setAuthInput(v => ({ ...v, password: e.target.value }))}/></label>
