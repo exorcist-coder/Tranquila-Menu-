@@ -39,8 +39,8 @@ export default function AdminItemPreview({
         const controls = Array.from(document.querySelectorAll<HTMLButtonElement>(".pro-preview-dialog button:not([disabled])"));
         if (!controls.length) return;
         const first = controls[0], last = controls[controls.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
       }
     };
     window.addEventListener("keydown", handle);
