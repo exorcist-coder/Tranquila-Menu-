@@ -459,3 +459,15 @@ body:has(.pro-hybrid),body:has(.pro-login){padding-bottom:0!important;background
  .pro-hybrid .pro-category-save .pro-btn{width:100%}
  .pro-management-card-head h3{font-size:16px!important}
 }
+
+/* Calm, compact pagination for extensive hotel menus. */
+.pro-pagination{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-top:24px;padding:16px 18px;border:1px solid #e6ebe5;border-radius:13px;background:#fff}
+.pro-pagination>span{color:#95a198;font-size:11px;font-weight:690}
+.pro-pagination-controls{display:flex;align-items:center;gap:5px}
+.pro-pagination-entry{display:inline-flex;align-items:center;gap:5px}
+.pro-pagination-controls button{width:33px;height:33px;display:grid;place-items:center;border-radius:8px;color:#718273;border:1px solid transparent;font-size:11px;font-weight:750}
+.pro-pagination-controls button:hover:not(:disabled){background:#edf4ed;color:#27553b}
+.pro-pagination-controls button.active{background:#193f31;color:#fff}
+.pro-pagination-controls button:disabled{opacity:.3;cursor:not-allowed}
+.pro-pagination-ellipsis{color:#9aa49b;font-size:12px}
+@media(max-width:640px){.pro-pagination{padding:11px 12px;gap:9px}.pro-pagination-controls{gap:1px}.pro-pagination-controls button{width:30px;height:31px;font-size:10px}.pro-pagination>span{font-size:10px}}
