@@ -3,6 +3,7 @@ import "@fontsource-variable/bodoni-moda/opsz.css";
 import "@fontsource-variable/bodoni-moda/opsz-italic.css";
 import "@fontsource-variable/figtree/index.css";
 import "./globals.css";
+import "./apple-guest.css";
 
 export const metadata: Metadata = {
   title: "Tranquila Hotels · Food & drinks",
