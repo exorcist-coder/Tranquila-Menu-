@@ -7,8 +7,21 @@ import { CatIcon } from "./icons";
 
 const TONE = "#E4E8D8";
 export const photoOf = (item: Item, i = 0) => { const k = item.photos?.[i]; return k ? PHOTOS[k] : undefined; };
-/** First release: the supplied bottle photo is used for every drink. */
-export const bottleOf = (item: Item) => (isDrink(item.category) ? "/images/bouchon.png" : undefined);
+/** Product-specific cutouts for non-alcoholic drinks; existing bottle for wines, spirits and beers. */
+const DRINK_IMAGE: Record<string, string> = {
+  "soft-drinks": "/images/drinks/soft-drinks.png",
+  malt: "/images/drinks/malt.png",
+  "hot-drinks": "/images/drinks/hot-drinks.png",
+  water: "/images/drinks/water.png",
+  juice: "/images/drinks/juice.png",
+  smoothie: "/images/drinks/smoothie.png",
+  chapman: "/images/drinks/chapman.png",
+};
+export const bottleOf = (item: Item) => {
+  if (!isDrink(item.category)) return undefined;
+  if (item.imageUrl) return item.imageUrl;
+  return DRINK_IMAGE[item.id] ?? (item.category === "soft" ? DRINK_IMAGE["soft-drinks"] : item.category === "water" ? DRINK_IMAGE.water : "/images/bouchon.png");
+};
 
 /** Dish photo, or a quiet icon tile when a dish has no photo yet. */
 export default function Media({ item, index = 0, layoutId, radius = 20, eager = false, alt = "" }: { item: Item; index?: number; layoutId?: string; radius?: number; eager?: boolean; alt?: string }) {
