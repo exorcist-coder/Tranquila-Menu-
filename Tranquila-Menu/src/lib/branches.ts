@@ -7,8 +7,8 @@ export const BRANCHES = [
   },
   {
     id: "tranquila-nest",
-    name: "Tranquila Nest",
-    address: "12 Williams F, William F. Kumuyi St, Gwarinpa, Abuja 900108, Federal Capital Territory",
+    name: "Tranquila Nest Kado",
+    address: "Kado, Abuja, Federal Capital Territory",
     whatsapp: "2348133509133",
   },
 ] as const;
