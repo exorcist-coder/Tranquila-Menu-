@@ -172,7 +172,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
               ))
             )}
             <footer className="colophon">
-              {branch.id === "tranquila-nest" ? <div className="colophon-nest"><img className="colophon-mark" src="/images/mark.png" alt="" width={64} height={30} /><strong>NEST Abuja</strong></div> : <img className="colophon-mark" src="/images/logo.png" alt={brand.name} width={220} height={110} />}
+              {branch.id === "tranquila-nest" ? <div className="colophon-nest"><img className="colophon-mark" src="/images/mark.png" alt="" width={64} height={30} /><strong>NEST KADO</strong></div> : <img className="colophon-mark" src="/images/logo.png" alt={brand.name} width={220} height={110} />}
               <p>All prices include 7.5% VAT.</p>
               <div className="contact-support"><strong>Need help with an order?</strong><a href={`https://wa.me/${branch.whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp {branch.name}: +{branch.whatsapp}</a></div>
             </footer>
