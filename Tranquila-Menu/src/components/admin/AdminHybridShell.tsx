@@ -42,7 +42,7 @@ export default function AdminHybridShell({
   const [drawer, setDrawer] = useState(false);
   useEffect(() => { if (!drawer) return; const handle = (e: KeyboardEvent) => { if (e.key === "Escape") setDrawer(false); }; window.addEventListener("keydown", handle); return () => window.removeEventListener("keydown", handle); }, [drawer]);
   function go(id: AdminSection) { onTab(id); setDrawer(false); }
-  const branchLabel = branchId === "tranquila-nest" ? "Nest · Gwarinpa" : "Hotel · Mabushi";
+  const branchLabel = branchId === "tranquila-nest" ? "Nest · Kado" : "Hotel · Mabushi";
   return <main className="pro-shell pro-hybrid">
     {drawer && <button type="button" aria-label="Close navigation" className="pro-drawer-backdrop" onClick={() => setDrawer(false)}/>}
     <aside className={"pro-side " + (drawer ? "pro-side-open" : "")}>
