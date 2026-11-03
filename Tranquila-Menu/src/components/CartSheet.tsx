@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { findItem } from "@/lib/catalog";
-import { describeSelection, naira, unitPrice, vatBreakdown } from "@/lib/pricing";
+import { describeSelection, naira, unitPrice } from "@/lib/pricing";
 import { cart, useCart } from "./useCart";
 import { toast } from "./toastStore";
 import Sheet, { useSheetDrag } from "./Sheet";
@@ -132,8 +132,7 @@ function Body({ branchId, onClose, canOrder, closedReason }: { branchId: BranchI
                 </ul>
                 <dl className="totals">
                   <div><dt>Delivery to your room</dt><dd>Free</dd></div>
-                  <div><dt>Subtotal (excl. VAT)</dt><dd>{naira(vatBreakdown(total).net)}</dd></div>
-                  <div><dt>7.5% VAT inclusive</dt><dd>{naira(vatBreakdown(total).vat)}</dd></div>
+                  <div><dt>VAT</dt><dd>Included in prices (7.5%)</dd></div>
                   <div className="grand"><dt>Total</dt><dd>{naira(total)}</dd></div>
                 </dl>
               </>
