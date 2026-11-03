@@ -1,5 +1,5 @@
 import { findItem, type Item } from "./catalog";
-import { describeSelection, isValidSelection, naira, unitPrice, vatBreakdown, type Selection } from "./pricing";
+import { describeSelection, isValidSelection, naira, unitPrice, type Selection } from "./pricing";
 import { orderingStatus, type Hours } from "./hours";
 
 export type OrderInput = {
@@ -54,14 +54,13 @@ export function prepareOrder(input: unknown, cfg: { whatsapp: string; hotelName?
   if (errors.length) return { ok: false, errors };
 
   const total = lines.reduce((s, l) => s + l.lineTotal, 0);
-  const vb = vatBreakdown(total);
   const msg = [
     `*${cfg.hotelName ?? "Tranquila Hotels and Suites"}*`, `Order ${ref}`, "",
     body.fulfilment === "room" ? `Room delivery · Room ${room}` : "Collection",
     ...(body.fulfilment === "collect" ? [`Collection for: ${guestName}`, `Pickup contact: ${contact}`] : []),
     `Payment: ${body.payment === "cash" ? "Cash" : "POS"} (in person)`, "",
     ...lines.flatMap((l, i) => [`${l.qty} × ${l.name}${l.summary ? ` (${l.summary})` : ""} — ${naira(l.lineTotal)}`, ...(notes[i] ? [`   Note: ${notes[i]}`] : [])]),
-    "", `Subtotal (excl. VAT): ${naira(vb.net)}`, `7.5% VAT inclusive: ${naira(vb.vat)}`, `*Total: ${naira(total)}*`, ...(clean(body.note, 200) ? ["", `Guest note: ${clean(body.note, 200)}`] : []),
+    "", "All prices include 7.5% VAT.", `*Total: ${naira(total)}*`, ...(clean(body.note, 200) ? ["", `Guest note: ${clean(body.note, 200)}`] : []),
   ].join("\n");
   return { ok: true, ref, total, message: msg, waUrl: `https://wa.me/${cfg.whatsapp}?text=${encodeURIComponent(msg)}`, lines };
 }
