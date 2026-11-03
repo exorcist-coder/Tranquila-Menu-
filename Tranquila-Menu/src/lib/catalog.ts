@@ -165,6 +165,32 @@ export const ITEMS: Item[] = [
   one("chapman", "water", "Chapman", "The Nigerian classic.", 4000),
 ];
 
+/**
+ * Final approved shelf prices from the 11-page Tranquila restaurant list
+ * (3 November 2026). These amounts already include VAT. Do not calculate
+ * another VAT percentage or uplift on these approved option prices.
+ *
+ * Nestlé Water Big also has a conflicting zero-value entry in the source;
+ * the explicitly priced ₦1,350 entry is used, not the apparent placeholder.
+ */
+const approvedFinalOptionPrices: Readonly<Record<string, Readonly<Record<string, number>>>> = {
+  "buffet": { "lunch-buffet": 25500, "dinner-buffet": 25080 },
+  "porridge-local": { "porridge-plantain": 5500 },
+  "chef-sauces": { "prawn-in-curry-sauce": 12100 },
+  "pizza": { "vegetable": 11000 },
+  "water": { "nestle": 800, "nestle-big": 1350 }
+};
+for (const item of ITEMS) {
+  const changes = approvedFinalOptionPrices[item.id];
+  if (!changes) continue;
+  for (const group of item.groups) {
+    for (const option of group.options) {
+      const approved = changes[option.id];
+      if (approved !== undefined) option.price = approved;
+    }
+  }
+}
+
 export const findItem = (id: string): Item | undefined => ITEMS.find((i) => i.id === id);
 
 /** Replace the in-memory catalog after loading the published CMS menu. */
