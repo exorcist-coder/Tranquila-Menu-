@@ -9,6 +9,7 @@ import { naira, unitPrice } from "@/lib/pricing";
 import { searchMenu } from "@/lib/menuSearch";
 import type { Selection } from "@/lib/pricing";
 import Card from "./Card";
+import SearchResult from "./SearchResult";
 import CartSheet from "./CartSheet";
 import ItemSheet from "./ItemSheet";
 import Toast from "./Toast";
@@ -161,9 +162,9 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
               </section>
             )}
             {q ? (
-              <section key="results" className="sec">
+              <section key="results" className="sec search-results-section">
                 <h2 className="sec-title" data-title><span>{results.length ? "Results" : "Nothing found"}</span></h2>
-                {results.length ? <ul className="grid">{results.map((hit) => <Card key={`${hit.item.id}:${hit.option?.groupId ?? "item"}:${hit.option?.optionId ?? "parent"}`} item={hit.item} match={hit} onOpen={() => openItem(hit.item, hit.selection)} />)}</ul> : (
+                {results.length ? <ul className="search-results-list">{results.map((hit) => <SearchResult key={`${hit.item.id}:${hit.option?.groupId ?? "item"}:${hit.option?.optionId ?? "parent"}`} hit={hit} onOpen={() => openItem(hit.item, hit.selection)} />)}</ul> : (
                   <div className="none"><p>No dish matches “{query.trim()}”. Try a name or an ingredient.</p><button type="button" className="ghost" onClick={() => setQuery("")}>Clear search</button></div>
                 )}
               </section>
