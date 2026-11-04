@@ -25,17 +25,21 @@ function distance(a: string, b: string): number {
   return previous[b.length]!;
 }
 
-function matchScore(value: string, query: string): number {
+function matchScore(value: string, query: string, allowTypos = false): number {
   const name = fold(value);
   if (!name || !query) return 0;
   if (name === query) return 110;
-  if (name.startsWith(query)) return 96;
-  if (name.includes(query)) return 84;
   const terms = query.split(" ");
   const words = name.split(" ");
-  // Every query term must match: "chicken soup" should not return plain chicken dishes.
-  if (terms.every(term => words.some(word => word.startsWith(term)))) return 74;
-  if (terms.every(term => words.some(word => term.length >= 4 && distance(term, word) <= (term.length >= 8 ? 2 : 1)))) return 55;
+  // Only match whole words or the beginning of a word. "rice" must not match "price".
+  if (words[0]?.startsWith(query)) return 96;
+  if (words.some(word => word === query)) return 90;
+  if (terms.every(term => words.some(word => word.startsWith(term)))) return 78;
+  // Typo matching is a fallback, not a source of unrelated suggestions.
+  // Short queries such as "rice" and "spa" should never trigger edit-distance matches.
+  if (allowTypos && terms.every(term =>
+    term.length >= 5 && words.some(word => word.length >= 5 && distance(term, word) <= (term.length >= 8 ? 2 : 1))
+  )) return 48;
   return 0;
 }
 
@@ -61,18 +65,22 @@ function selectionFor(item: Item, group: Group, option: Option): Selection {
 export function searchMenu(items: Item[], categories: { id: string; label: string }[], rawQuery: string): MenuSearchHit[] {
   const q = fold(rawQuery);
   if (!q) return [];
+  const directHits = collect(false);
+  return directHits.length ? directHits : collect(true);
+
+  function collect(allowTypos: boolean): MenuSearchHit[] {
   const hits: MenuSearchHit[] = [];
   for (const item of items) {
     const category = categories.find(c => c.id === item.category)?.label ?? "";
-    const nameScore = matchScore(item.name, q);
-    const descriptionScore = matchScore(item.description, q);
-    const detailScore = Math.max(0, ...(item.details ?? []).map(d => matchScore(d.value, q)));
-    const categoryScore = matchScore(category, q);
-    const parentScore = Math.max(nameScore, descriptionScore ? descriptionScore - 15 : 0, detailScore ? detailScore - 20 : 0, categoryScore ? categoryScore - 45 : 0);
+    const nameScore = matchScore(item.name, q, allowTypos);
+    const descriptionScore = matchScore(item.description, q, allowTypos);
+    const detailScore = Math.max(0, ...(item.details ?? []).map(d => matchScore(d.value, q, allowTypos)));
+    const categoryScore = fold(category) === q ? 40 : 0;
+    const parentScore = Math.max(nameScore, descriptionScore ? descriptionScore - 15 : 0, detailScore ? detailScore - 20 : 0, categoryScore);
     if (parentScore > 0) hits.push({ item, label: item.name, subtitle: category, selection: {}, score: parentScore });
     for (const group of item.groups) {
       for (const option of group.options) {
-        const score = matchScore(option.label, q);
+        const score = matchScore(option.label, q, allowTypos);
         if (!score) continue;
         const selection = selectionFor(item, group, option);
         if (selection[group.id] !== option.id) continue;
@@ -88,4 +96,5 @@ export function searchMenu(items: Item[], categories: { id: string; label: strin
     }
   }
   return hits.sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
+  }
 }
