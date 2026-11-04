@@ -30,7 +30,7 @@ export default function Card({ item, onOpen, match }: { item: Item; onOpen: (i: 
     <li className="card-li">
       <motion.button type="button" className="card" disabled={soldOut} data-sold-out={soldOut ? "" : undefined} whileTap={soldOut ? undefined : { scale: 0.975 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} onClick={() => onOpen(item)}>
         {soldOut && <span className="sold-out-tag">Sold out</span>}
-        <span className="card-media" data-reveal=""><Media item={item} layoutId={`media-${item.id}`} radius={20} /></span>
+        <span className="card-media" data-reveal=""><Media item={item} layoutId={match ? undefined : `media-${item.id}`} radius={20} /></span>
         <span className="card-name">{match?.label ?? item.name}</span>
         {match?.option ? <span className="card-desc">{match.subtitle}</span> : chips.length > 0 ? <span className="chips">{chips.slice(0, 3).map((c) => <i key={c}>{c}</i>)}</span> : <span className="card-desc">{item.description}</span>}
         <span className="card-foot"><span className="card-price">{price}</span><span className="add" aria-hidden><IconPlus width={18} height={18} /></span></span>
