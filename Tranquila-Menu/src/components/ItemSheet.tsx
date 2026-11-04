@@ -11,19 +11,19 @@ import Media, { Bottle, photoOf } from "./Media";
 import Stepper from "./Stepper";
 import { IconClose } from "./icons";
 
-export default function ItemSheet({ item, branchId, onClose, canOrder, onAdded }: { item: Item | null; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
+export default function ItemSheet({ item, initialSelection = {}, branchId, onClose, canOrder, onAdded }: { item: Item | null; initialSelection?: Selection; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
   const last = useRef<Item | null>(item);
   if (item) last.current = item; // keep content mounted while the sheet animates out
   return (
     <Sheet open={!!item} onClose={onClose} label={last.current?.name ?? "Dish"}>
-      {last.current ? <Body key={last.current.id} item={last.current} branchId={branchId} onClose={onClose} canOrder={canOrder} onAdded={onAdded} /> : null}
+      {last.current ? <Body key={`${last.current.id}:${JSON.stringify(initialSelection)}`} initialSelection={initialSelection} item={last.current} branchId={branchId} onClose={onClose} canOrder={canOrder} onAdded={onAdded} /> : null}
     </Sheet>
   );
 }
 
-function Body({ item, branchId, onClose, canOrder, onAdded }: { item: Item; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
+function Body({ item, initialSelection, branchId, onClose, canOrder, onAdded }: { item: Item; initialSelection: Selection; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
   const drag = useSheetDrag();
-  const [sel, setSel] = useState<Selection>({});
+  const [sel, setSel] = useState<Selection>(() => normalize(item, initialSelection));
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
   const [tried, setTried] = useState(false);
