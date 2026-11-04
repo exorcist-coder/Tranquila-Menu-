@@ -11,25 +11,26 @@ import Media, { Bottle, photoOf } from "./Media";
 import Stepper from "./Stepper";
 import { IconClose } from "./icons";
 
-export default function ItemSheet({ item, initialSelection = {}, branchId, onClose, canOrder, onAdded }: { item: Item | null; initialSelection?: Selection; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
+export default function ItemSheet({ item, initialSelection = {}, initialPhotoIndex = 0, branchId, onClose, canOrder, onAdded }: { item: Item | null; initialSelection?: Selection; initialPhotoIndex?: number; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
   const last = useRef<Item | null>(item);
   if (item) last.current = item; // keep content mounted while the sheet animates out
   return (
     <Sheet open={!!item} onClose={onClose} label={last.current?.name ?? "Dish"}>
-      {last.current ? <Body key={`${last.current.id}:${JSON.stringify(initialSelection)}`} initialSelection={initialSelection} item={last.current} branchId={branchId} onClose={onClose} canOrder={canOrder} onAdded={onAdded} /> : null}
+      {last.current ? <Body key={`${last.current.id}:${JSON.stringify(initialSelection)}`} initialSelection={initialSelection} initialPhotoIndex={initialPhotoIndex} item={last.current} branchId={branchId} onClose={onClose} canOrder={canOrder} onAdded={onAdded} /> : null}
     </Sheet>
   );
 }
 
-function Body({ item, initialSelection, branchId, onClose, canOrder, onAdded }: { item: Item; initialSelection: Selection; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
+function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, canOrder, onAdded }: { item: Item; initialSelection: Selection; initialPhotoIndex: number; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
   const drag = useSheetDrag();
   const [sel, setSel] = useState<Selection>(() => normalize(item, initialSelection));
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
   const [tried, setTried] = useState(false);
-  const [slide, setSlide] = useState(0);
+  const [slide, setSlide] = useState(initialPhotoIndex);
   const [expandedPhoto, setExpandedPhoto] = useState<number | null>(null);
   const refs = useRef<Record<string, HTMLFieldSetElement | null>>({});
+  const galleryRef = useRef<HTMLDivElement | null>(null);
   const missing = missingGroups(item, sel);
   const groups = visibleGroups(item, sel);
   const unit = unitPrice(item, sel);
@@ -39,6 +40,7 @@ function Body({ item, initialSelection, branchId, onClose, canOrder, onAdded }: 
   const drink = isDrink(item.category);
 
   useEffect(() => { if (tried && missing.length === 0) setTried(false); }, [tried, missing.length]);
+  useEffect(() => { const gallery = galleryRef.current; if (gallery && initialPhotoIndex > 0) gallery.scrollLeft = initialPhotoIndex * gallery.clientWidth; }, [initialPhotoIndex]);
 
   function submit() {
     if (!canOrder || item.available === false) return;
@@ -69,7 +71,7 @@ function Body({ item, initialSelection, branchId, onClose, canOrder, onAdded }: 
           </div>
         ) : (
         <div className="hero">
-          <div className="gallery" onScroll={(e) => setSlide(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))} tabIndex={photos > 1 ? 0 : undefined} aria-label={photos > 1 ? `${item.name} photos` : undefined}>
+          <div className="gallery" ref={galleryRef} onScroll={(e) => setSlide(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))} tabIndex={photos > 1 ? 0 : undefined} aria-label={photos > 1 ? `${item.name} photos` : undefined}>
             {Array.from({ length: photos }, (_, i) => (
               <div className="slide" key={i}><button type="button" className="gallery-open" onClick={() => setExpandedPhoto(i)} disabled={!photoUrls[i]} aria-label={`View ${item.name} photo ${i + 1} full screen`}><Media item={item} index={i} radius={28} layoutId={i === 0 ? `media-${item.id}` : undefined} eager alt={i === 0 ? item.name : ""} /></button></div>
             ))}
