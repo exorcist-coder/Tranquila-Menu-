@@ -10,6 +10,7 @@ import { searchMenu } from "@/lib/menuSearch";
 import type { Selection } from "@/lib/pricing";
 import Card from "./Card";
 import SearchResult from "./SearchResult";
+import { searchPhotoIndex } from "@/lib/searchPhoto";
 import CartSheet from "./CartSheet";
 import ItemSheet from "./ItemSheet";
 import Toast from "./Toast";
@@ -44,7 +45,8 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
   const [query, setQuery] = useState("");
   const [item, setItem] = useState<Item | null>(null);
   const [openSelection, setOpenSelection] = useState<Selection>({});
-  const openItem = (next: Item, selection: Selection = {}) => { setOpenSelection(selection); setItem(next); };
+  const [openPhoto, setOpenPhoto] = useState(0);
+  const openItem = (next: Item, selection: Selection = {}, photo = 0) => { setOpenSelection(selection); setOpenPhoto(photo); setItem(next); };
   const [cartOpen, setCartOpen] = useState(false);
   const main = useRef<HTMLElement>(null);
   const sections = useRef<Record<string, HTMLElement | null>>({});
@@ -164,7 +166,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
             {q ? (
               <section key="results" className="sec search-results-section">
                 <h2 className="sec-title" data-title><span>{results.length ? "Results" : "Nothing found"}</span></h2>
-                {results.length ? <ul className="search-results-list">{results.map((hit) => <SearchResult key={`${hit.item.id}:${hit.option?.groupId ?? "item"}:${hit.option?.optionId ?? "parent"}`} hit={hit} onOpen={() => openItem(hit.item, hit.selection)} />)}</ul> : (
+                {results.length ? <ul className="search-results-list">{results.map((hit) => <SearchResult key={`${hit.item.id}:${hit.option?.groupId ?? "item"}:${hit.option?.optionId ?? "parent"}`} hit={hit} onOpen={() => openItem(hit.item, hit.selection, searchPhotoIndex(hit.item, hit.option, hit.label))} />)}</ul> : (
                   <div className="none"><p>No dish matches “{query.trim()}”. Try a name or an ingredient.</p><button type="button" className="ghost" onClick={() => setQuery("")}>Clear search</button></div>
                 )}
               </section>
@@ -186,7 +188,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
         </div>
 
         {count > 0 && <button type="button" className="apple-floating-order" onClick={() => setCartOpen(true)} aria-label={`View order, ${count} items, ${naira(total)}`}><span className="apple-order-icon"><IconBag width={19} height={19}/></span><span className="apple-order-details"><strong>View your order</strong><small>{count} {count === 1 ? "item" : "items"}</small></span><strong className="apple-order-total">{naira(total)}</strong><IconArrowRight width={18} height={18}/></button>}
-        <ItemSheet item={item} initialSelection={openSelection} branchId={branch.id} onClose={() => setItem(null)} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
+        <ItemSheet item={item} initialSelection={openSelection} initialPhotoIndex={openPhoto} branchId={branch.id} onClose={() => setItem(null)} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
         <CartSheet open={cartOpen} branchId={branch.id} onClose={() => setCartOpen(false)} canOrder={status.open} closedReason={status.reason} />
         <Toast lifted={false} />
         {phase !== "menu" && <Welcome branchId={branch.id} hotelName={branch.name} statusLine={statusLine} onStart={() => setPhase("entering")} onDone={enterMenu} />}
