@@ -14,7 +14,7 @@ export default function AdminAuthFrame({
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
           <span>Back to menu</span>
         </a>
-        <span className="trq-auth-nav-brand">TRANQUILA <span>RESIDENCE</span></span>
+        <span className="trq-auth-nav-brand">TRANQUILA <span>HOTELS &amp; SUITES</span></span>
       </nav>
       <div className="trq-auth-center">
         <section className="trq-auth-card" aria-labelledby="trq-auth-title">

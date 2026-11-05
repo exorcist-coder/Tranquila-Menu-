@@ -24,11 +24,11 @@ const title: Record<AdminSection, string> = {
 };
 const descriptions: Record<AdminSection, string> = {
   overview: "Your menu at a glance.",
-  live: "A curated collection, always ready for your guests.",
-  drafts: "Create, refine and review before you publish.",
-  archive: "A safe home for dishes you've taken off the menu.",
-  history: "A clear record of changes, with recovery when you need it.",
-  categories: "Thoughtfully organised dining, from first glance to last bite.",
+  live: "Review and manage your published menu.",
+  drafts: "Items saved for review before publishing.",
+  archive: "Items removed from the live menu.",
+  history: "Review previous changes and restore versions.",
+  categories: "Manage the categories shown to guests.",
   settings: "Manage dining availability and ordering preferences."
 };
 export default function AdminHybridShell({
