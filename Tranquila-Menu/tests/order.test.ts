@@ -75,7 +75,7 @@ describe("prepareOrder (server is the source of truth)", () => {
   });
   it("ignores any client-supplied price", () => {
     const r = prepareOrder({ ...good, lines: [{ ...good.lines[0], price: 1 }] }, cfg, noon);
-    expect(r.ok && r.total).toBe(24000);
+    expect(r.ok && r.total).toBe(2 * unitPrice(swallow, { swallow: "garri", soup: "egusi", protein: "goat-meat" }));
   });
   it("rejects an item marked sold out by the branch", () => {
     const r = prepareOrder(good, cfg, noon, "TRQ-SOLD01", [{ ...swallow, available: false }]);
