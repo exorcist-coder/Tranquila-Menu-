@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import AdminAuthFrame from "@/components/admin/AdminAuthFrame";
 
 export default function ResetPasswordPage() {
   const [accessToken, setAccessToken] = useState("");
@@ -21,16 +22,15 @@ export default function ResetPasswordPage() {
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
   }, []);
 
-  async function submit(event: React.FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault(); setError("");
     if (password.length < 10) { setError("Use at least 10 characters for your new password."); return; }
     if (password !== confirmPassword) { setError("The passwords do not match."); return; }
     setBusy(true);
     try {
       const response = await fetch("/api/admin/reset-password", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken, password }),
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken, password })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not update password.");
@@ -40,18 +40,17 @@ export default function ResetPasswordPage() {
     } finally { setBusy(false); }
   }
 
-  return <main className="admin-login"><form className="admin-login-card" onSubmit={submit}>
-    <div className="admin-brand">T R A N Q U I L A <span>ROOM SERVICE CMS</span></div>
-    <h1>Choose a new password</h1>
-    {!ready && <p>Checking your secure reset link…</p>}
-    {ready && success && <><p className="admin-success" role="status">Your password has been updated. You can now sign in with it.</p><a className="admin-primary admin-auth-button" href="/admin">Return to staff sign in</a></>}
-    {ready && !success && accessToken && <>
-      <p>Choose a new password for your staff account. Use at least 10 characters.</p>
-      <label>New password<input type="password" autoComplete="new-password" minLength={10} maxLength={200} required value={password} onChange={event => setPassword(event.target.value)} /></label>
-      <label>Confirm new password<input type="password" autoComplete="new-password" minLength={10} maxLength={200} required value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} /></label>
-      {error && <p className="admin-error" role="alert">{error}</p>}
-      <button className="admin-primary" disabled={busy}>{busy ? "Updating password…" : "Update password"}</button>
-    </>}
-    {ready && !accessToken && !success && <><p className="admin-error" role="alert">{error}</p><a className="admin-primary admin-auth-button" href="/admin/forgot-password">Request another reset link</a></>}
-  </form></main>;
+  return <AdminAuthFrame heading={success ? "Password updated" : "New password"} description={success ? "Your account is ready." : "Choose a new password for your staff account."}>
+    {!ready && <p className="trq-auth-hint" role="status">Checking your link…</p>}
+    {ready && success && <div className="trq-auth-form"><p className="trq-auth-success" role="status">Your password has been changed successfully.</p><a className="trq-auth-submit trq-auth-button-link" href="/admin">Return to sign in <span aria-hidden="true">→</span></a></div>}
+    {ready && !success && accessToken && <form className="trq-auth-form" onSubmit={submit}>
+      <div className="trq-auth-fields">
+        <div className="trq-auth-field"><label htmlFor="reset-new">New password</label><input id="reset-new" type="password" autoComplete="new-password" minLength={10} maxLength={200} required disabled={busy} value={password} onChange={event=>setPassword(event.target.value)} placeholder="At least 10 characters"/></div>
+        <div className="trq-auth-field"><label htmlFor="reset-confirm">Confirm password</label><input id="reset-confirm" type="password" autoComplete="new-password" minLength={10} maxLength={200} required disabled={busy} value={confirmPassword} onChange={event=>setConfirmPassword(event.target.value)} placeholder="Re-enter password"/></div>
+      </div>
+      {error && <p className="trq-auth-error" role="alert">{error}</p>}
+      <button className="trq-auth-submit" disabled={busy} type="submit"><span>{busy ? "Updating…" : "Update password"}</span>{busy ? <span className="trq-auth-spinner" aria-hidden="true"/> : <span aria-hidden="true">→</span>}</button>
+    </form>}
+    {ready && !accessToken && !success && <div className="trq-auth-form"><p className="trq-auth-error" role="alert">{error}</p><a className="trq-auth-submit trq-auth-button-link" href="/admin/forgot-password">Request another link <span aria-hidden="true">→</span></a></div>}
+  </AdminAuthFrame>;
 }

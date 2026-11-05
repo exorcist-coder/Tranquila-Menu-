@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import AdminAuthFrame from "@/components/admin/AdminAuthFrame";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -7,14 +8,12 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function submit(event: React.FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
     setBusy(true); setMessage(""); setError("");
     try {
       const response = await fetch("/api/admin/recover", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not request a reset link.");
@@ -24,14 +23,21 @@ export default function ForgotPasswordPage() {
     } finally { setBusy(false); }
   }
 
-  return <main className="admin-login"><form className="admin-login-card" onSubmit={submit}>
-    <div className="admin-brand">T R A N Q U I L A <span>ROOM SERVICE CMS</span></div>
-    <h1>Reset your password</h1>
-    <p>Enter the email address linked to your staff account. We’ll send a secure reset link if the account exists.</p>
-    <label>Staff email<input type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} /></label>
-    {error && <p className="admin-error" role="alert">{error}</p>}
-    {message && <p className="admin-success" role="status">{message}</p>}
-    <button className="admin-primary" disabled={busy}>{busy ? "Sending link…" : "Send reset link"}</button>
-    <a className="admin-auth-link" href="/admin">Back to staff sign in</a>
-  </form></main>;
+  return <AdminAuthFrame heading="Reset password" description="Enter the email associated with your staff account.">
+    <form className="trq-auth-form" onSubmit={submit}>
+      <div className="trq-auth-fields"><div className="trq-auth-field">
+        <label htmlFor="recovery-email">Email address</label>
+        <input id="recovery-email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false}
+          placeholder="name@example.com" required disabled={busy} value={email} onChange={event=>setEmail(event.target.value)}/>
+      </div></div>
+      {error && <p className="trq-auth-error" role="alert">{error}</p>}
+      {message && <p className="trq-auth-success" role="status">{message}</p>}
+      <button className="trq-auth-submit" disabled={busy} type="submit">
+        <span>{busy ? "Sending…" : "Send reset link"}</span>
+        {busy ? <span className="trq-auth-spinner" aria-hidden="true"/> : <span aria-hidden="true">→</span>}
+      </button>
+      <a className="trq-auth-forgot" href="/admin">Back to sign in</a>
+    </form>
+    <p className="trq-auth-privacy">If the account exists, a reset email will be sent.</p>
+  </AdminAuthFrame>;
 }

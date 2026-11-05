@@ -15,6 +15,7 @@ import { AdminArchivePanel, AdminHistoryPanel, AdminCategoriesPanel, AdminServic
 import "./professional-admin.css";
 import "./hybrid-admin.css";
 import "./apple-admin.css";
+import "./tranquila-admin.css";
 
 type DisplayItem = Item & { published?: boolean; visible?: boolean };
 type Menu = { categories: { id: string; label: string; visible?: boolean }[]; items: DisplayItem[] };

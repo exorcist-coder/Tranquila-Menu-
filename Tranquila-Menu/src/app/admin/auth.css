@@ -1,0 +1,126 @@
+/* Tranquila Identity. Purpose-built Apple-inspired authentication interface.
+   Scoped to .trq-auth so guest menu and the authenticated workspace are unaffected. */
+body:has(.trq-auth){margin:0!important;padding:0!important;background:#f5f5f7!important}
+.trq-auth{
+ --auth-ink:#1d1d1f;--auth-muted:#737377;--auth-line:rgba(60,60,67,.15);
+ --auth-accent:#176b4a;
+ position:relative;isolation:isolate;display:flex;flex-direction:column;
+ min-height:100svh;min-height:100dvh;max-width:none!important;width:100%;
+ overflow:hidden;background:#f5f5f7;color:var(--auth-ink);
+ font:400 16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,sans-serif;
+ -webkit-font-smoothing:antialiased;
+}
+.trq-auth *, .trq-auth *::before, .trq-auth *::after{box-sizing:border-box}
+.trq-auth-ambient{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.trq-auth-ambient span{position:absolute;border-radius:50%;filter:blur(3px);will-change:transform}
+.trq-auth-ambient span:nth-child(1){width:min(75vw,780px);height:min(75vw,780px);top:-41%;left:-20%;background:radial-gradient(circle,rgba(228,232,222,.88),rgba(245,245,247,0) 70%);animation:trq-breathe 15s ease-in-out infinite alternate}
+.trq-auth-ambient span:nth-child(2){width:min(72vw,700px);height:min(72vw,700px);bottom:-45%;right:-22%;background:radial-gradient(circle,rgba(229,228,221,.85),rgba(245,245,247,0) 70%);animation:trq-breathe 17s ease-in-out infinite alternate-reverse}
+.trq-auth-ambient span:nth-child(3){width:290px;height:290px;top:27%;right:5%;background:radial-gradient(circle,rgba(237,241,234,.65),transparent 75%)}
+@keyframes trq-breathe{from{transform:translate3d(-14px,10px,0) scale(.97)}to{transform:translate3d(22px,-12px,0) scale(1.07)}}
+.trq-auth-nav{
+ display:flex;align-items:center;justify-content:space-between;gap:16px;
+ width:100%;max-width:1320px;margin:0 auto;padding:32px clamp(24px,4vw,58px);
+}
+.trq-auth-back{display:inline-flex;align-items:center;gap:5px;color:#646469;text-decoration:none;font-size:14px;font-weight:500;transition:color .2s ease}
+.trq-auth-back svg{width:21px;height:21px;transition:transform .23s cubic-bezier(.2,.7,.3,1)}
+.trq-auth-back:hover{color:#1d1d1f}
+.trq-auth-back:hover svg{transform:translateX(-3px)}
+.trq-auth-nav-brand{font:650 11px/1.3 -apple-system,Inter,sans-serif;letter-spacing:.18em;color:#555b4d;white-space:nowrap}
+.trq-auth-nav-brand span{font-weight:450;color:#8c8c8c;letter-spacing:.15em}
+.trq-auth-center{flex:1;display:grid;place-items:center;padding:8px 20px 60px}
+.trq-auth-card{
+ width:min(100%,440px);margin:0 auto;text-align:center;
+ animation:trq-card-appear .65s cubic-bezier(.21,.83,.32,1) both;
+}
+@keyframes trq-card-appear{from{opacity:0;transform:translateY(18px) scale(.984)}to{opacity:1;transform:translateY(0) scale(1)}}
+.trq-auth-emblem{
+ display:grid;place-items:center;width:90px;height:90px;margin:0 auto 27px;
+ border-radius:23px;background:linear-gradient(145deg,#fff 8%,#ecf0eb 100%);
+ box-shadow:0 1px 1px #fff inset,0 18px 40px rgba(31,46,34,.09),0 3px 10px rgba(31,46,34,.05);
+ border:1px solid rgba(255,255,255,.86);
+ transform:translateZ(0);transition:transform .4s cubic-bezier(.2,.7,.2,1),box-shadow .4s ease;
+}
+.trq-auth-emblem:hover{transform:translateY(-3px) rotate(-1deg);box-shadow:0 23px 46px rgba(31,46,34,.13)}
+.trq-auth-emblem img{width:59px;height:59px;object-fit:contain;animation:trq-emblem-appear .85s cubic-bezier(.2,.8,.2,1) both}
+@keyframes trq-emblem-appear{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+.trq-auth-heading{margin-bottom:31px}
+.trq-auth-kicker{font:600 11px/1.5 -apple-system,Inter,sans-serif!important;letter-spacing:.14em;color:#70806c!important;margin:0 0 9px!important}
+.trq-auth-heading h1{
+ margin:0!important;font:650 clamp(30px,4.8vw,38px)/1.18 -apple-system,"SF Pro Display",Inter,system-ui,sans-serif!important;
+ letter-spacing:-.045em!important;color:#1d1d1f!important;
+}
+.trq-auth-desc{margin:13px auto 0!important;max-width:340px;color:#77777c!important;line-height:1.5;font-size:15px!important}
+.trq-auth-form{width:100%;display:flex;flex-direction:column;gap:0;margin:0!important;text-align:left}
+.trq-auth-fields{overflow:hidden;border:1px solid rgba(60,60,67,.15);border-radius:18px;background:rgba(255,255,255,.89);box-shadow:0 7px 24px rgba(50,50,58,.045),0 1px 2px rgba(50,50,58,.025)}
+.trq-auth-field{position:relative;display:block;padding:11px 16px 10px;transition:background .2s}
+.trq-auth-field + .trq-auth-field{border-top:1px solid rgba(60,60,67,.12)}
+.trq-auth-field:focus-within{background:#fff}
+.trq-auth-field label{display:block;margin:0 0 2px;color:#76767b;font-size:12px;font-weight:550;text-align:left;letter-spacing:.005em;line-height:1.35}
+.trq-auth-field input{
+ display:block;width:100%;height:30px;min-height:30px;border:0!important;background:transparent!important;
+ outline:0!important;box-shadow:none!important;border-radius:0!important;margin:0!important;padding:0!important;
+ color:#1d1d1f;font:450 17px/1.3 -apple-system,"SF Pro Text",Inter,system-ui,sans-serif!important;letter-spacing:-.015em;
+}
+.trq-auth-field input::placeholder{color:#b4b4ba;opacity:1}
+.trq-auth-field:focus-within label{color:#176b4a}
+.trq-auth-fields:focus-within{border-color:rgba(67,88,66,.42);box-shadow:0 0 0 3px rgba(67,88,66,.10),0 9px 30px rgba(60,60,67,.055)}
+.trq-auth-password-row{display:flex;align-items:center;gap:8px}
+.trq-auth-password-row input{flex:1;min-width:0}
+.trq-auth-visibility{
+ display:grid;place-items:center;flex:none;width:36px;height:36px;margin:0 -5px 0 0;
+ background:transparent!important;border:0!important;border-radius:10px!important;
+ color:#85858a;cursor:pointer;transition:background .17s,color .17s;
+}
+.trq-auth-visibility:hover{background:#f1f2f1!important;color:#303830}
+.trq-auth-visibility svg{width:19px;height:19px}
+.trq-auth-hint{font-size:13px;color:#8e682a;margin:11px 3px 0!important}
+.trq-auth-error,.trq-auth-success{margin:15px 0 0!important;padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.45;text-align:left}
+.trq-auth-error{color:#9e323b;background:#fff1f0;border:1px solid #f3cecd}
+.trq-auth-success{color:#2c6440;background:#e8f4eb;border:1px solid #c8dfce}
+.trq-auth-submit{
+ display:flex;align-items:center;justify-content:center;position:relative;gap:12px;
+ width:100%;min-height:53px;margin-top:23px;padding:12px 18px;border:0;border-radius:15px;
+ background:#425641;color:#fff!important;text-decoration:none;text-align:center;
+ font:600 16px/1.3 -apple-system,"SF Pro Text",Inter,sans-serif!important;
+ letter-spacing:-.012em;box-shadow:0 6px 18px rgba(51,76,50,.11);
+ cursor:pointer;transition:background .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+.trq-auth-submit svg{width:19px;height:19px}
+.trq-auth-submit:hover:not(:disabled){background:#11593d;box-shadow:0 11px 23px rgba(51,76,50,.18);transform:translateY(-1px)}
+.trq-auth-submit:active:not(:disabled){transform:scale(.987)}
+.trq-auth-submit:disabled{opacity:.7;cursor:wait}
+.trq-auth-button-link{justify-content:center}
+.trq-auth-spinner{display:inline-block;width:17px;height:17px;border:2px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:trq-spin .8s linear infinite}
+@keyframes trq-spin{to{transform:rotate(360deg)}}
+.trq-auth-forgot{
+ display:block;align-self:center;margin-top:19px;padding:7px 12px;
+ color:#176b4a;font-size:14px;font-weight:550;text-decoration:none;
+ border-radius:8px;transition:color .2s,background .2s;
+}
+.trq-auth-forgot:hover{background:rgba(67,88,66,.07);color:#253d2a}
+.trq-auth-privacy{display:flex;align-items:center;justify-content:center;gap:8px;margin:41px 0 0!important;color:#96969b;font-size:12px!important;line-height:1.5}
+.trq-auth-privacy svg{width:15px;height:15px}
+.trq-auth-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:18px clamp(24px,4vw,58px) 22px;width:100%;max-width:1320px;margin:0 auto;color:#a0a0a5;font-size:12px}
+.trq-auth-status{margin-top:18px}
+.trq-auth a:focus-visible,.trq-auth button:focus-visible{outline:3px solid #819c7e;outline-offset:3px}
+@media(max-width:600px){
+ .trq-auth-nav{padding:23px 20px}
+ .trq-auth-nav-brand{font-size:9px;letter-spacing:.11em}
+ .trq-auth-center{padding:15px 23px 50px;align-items:center}
+ .trq-auth-card{max-width:400px}
+ .trq-auth-emblem{width:78px;height:78px;margin-bottom:24px;border-radius:21px}
+ .trq-auth-emblem img{width:53px;height:53px}
+ .trq-auth-heading{margin-bottom:28px}
+ .trq-auth-heading h1{font-size:34px!important}
+ .trq-auth-footer{padding:18px 20px 22px;font-size:11px}
+}
+@media(max-height:650px){
+ .trq-auth-center{padding-top:30px;padding-bottom:30px}
+ .trq-auth-emblem{margin-bottom:15px}
+ .trq-auth-heading{margin-bottom:19px}
+ .trq-auth-privacy{margin-top:24px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .trq-auth *, .trq-auth *::before,.trq-auth *::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+ .trq-auth-ambient span{animation:none}
+}

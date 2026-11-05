@@ -1,40 +1,54 @@
 "use client";
 import { useState, type FormEvent } from "react";
 import type { BranchId } from "@/lib/branches";
-import { AdminIcon } from "./AdminIcon";
+import AdminAuthFrame from "./AdminAuthFrame";
 
 export default function AdminLoginScreen({
-  branchName, branchId, email, password, onEmail, onPassword, onSubmit, busy, loading, error
+  branchName, email, password, onEmail, onPassword, onSubmit, busy, loading, error
 }: {
   branchName: string; branchId: BranchId; email: string; password: string;
   onEmail: (value: string) => void; onPassword: (value: string) => void;
   onSubmit: (event: FormEvent) => void; busy: boolean; loading: boolean; error: string;
 }) {
   const [visible, setVisible] = useState(false);
-  return <main className="pro-login pro-login-hybrid">
-    <div className="pro-login-layout">
-      <section className="pro-login-story" aria-label="Tranquila Hotels hospitality">
-        <div className="pro-login-story-brand"><span className="pro-login-story-mark"><img src="/images/mark.png" alt=""/></span><div><strong>TRANQUILA</strong><span>HOTELS & SUITES</span></div></div>
-        <div className="pro-login-story-copy"><span className="pro-hero-overline"><AdminIcon name="sparkle" size={17}/> CURATED HOSPITALITY</span><h1>A little more care, in every detail.</h1><p>A considered space to create, manage and perfect your hotel's dining experience.</p></div>
-        <div className="pro-login-story-image"><img src="/images/okra-seafood.webp" alt="Beautifully presented hotel dining"/></div>
-        <div className="pro-login-story-foot"><span>TRANQUILA · DINING MANAGEMENT</span><span>Made for thoughtful service</span></div>
-      </section>
-      <section className="pro-login-form-shell">
-        <div className="pro-login-form-top"><a href={"/?branch=" + branchId} className="pro-login-return"><AdminIcon name="back" size={17}/> Return to guest menu</a><span className="pro-login-secure"><AdminIcon name="shield" size={15}/> Secure access</span></div>
-        <div className="pro-login-form-wrap">
-          <div className="pro-login-form-mark"><img src="/images/mark.png" alt="Tranquila"/></div>
-          <span className="pro-eyebrow">HOTEL ADMINISTRATION</span><h2>Welcome back.</h2><p>Sign in to your dedicated {branchName} workspace.</p>
-          <form className="pro-login-form" onSubmit={onSubmit}>
-            <label>Work email<input required type="email" autoComplete="username" value={email} onChange={e => onEmail(e.target.value)} placeholder="name@tranquilahotels.com"/></label>
-            <label>Password<div className="pro-login-password"><input required type={visible ? "text" : "password"} autoComplete="current-password" value={password} onChange={e => onPassword(e.target.value)} placeholder="Enter your password"/><button type="button" aria-label={visible ? "Hide password" : "Show password"} aria-pressed={visible} onClick={() => setVisible(v => !v)}><AdminIcon name="eye" size={18}/></button></div></label>
-            <div className="pro-login-help"><a href="/admin/forgot-password">Forgot password?</a></div>
-            {error && <div role="alert" className="pro-login-error"><span>!</span>{error}</div>}
-            <button className="pro-btn primary pro-login-submit" disabled={busy || loading}>{busy ? "Signing you in…" : loading ? "Restoring your session…" : <>Access dashboard <AdminIcon name="arrow" size={18}/></>}</button>
-          </form>
-          <div className="pro-login-trust"><AdminIcon name="shield" size={17}/><span>Your hotel's menu and management data are kept separate and protected.</span></div>
+  const [capsLock, setCapsLock] = useState(false);
+  const locked = busy || loading;
+  return (
+    <AdminAuthFrame heading="Sign in" description={"Enter your staff credentials to manage " + branchName + "."}>
+      <form className="trq-auth-form" onSubmit={onSubmit}>
+        <div className="trq-auth-fields">
+          <div className="trq-auth-field">
+            <label htmlFor="trq-email">Email address</label>
+            <input id="trq-email" type="email" autoComplete="username" inputMode="email" autoCapitalize="none" spellCheck={false}
+              value={email} onChange={e=>onEmail(e.target.value)} placeholder="name@example.com" required disabled={locked}/>
+          </div>
+          <div className="trq-auth-field trq-auth-password">
+            <label htmlFor="trq-password">Password</label>
+            <div className="trq-auth-password-row">
+              <input id="trq-password" type={visible ? "text" : "password"} autoComplete="current-password"
+                value={password} onChange={e=>onPassword(e.target.value)} placeholder="Enter password" required disabled={locked}
+                onKeyUp={e=>setCapsLock(e.getModifierState("CapsLock"))} onKeyDown={e=>setCapsLock(e.getModifierState("CapsLock"))}/>
+              <button type="button" className="trq-auth-visibility" onClick={()=>setVisible(v=>!v)}
+                aria-label={visible ? "Hide password" : "Show password"} aria-pressed={visible} disabled={locked}>
+                {visible ? (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3 21 21"/><path d="M10.7 5.1A10.7 10.7 0 0 1 12 5c5 0 8.5 4.1 10 7-0.5 1-1.2 2-2.2 3"/><path d="M6.3 6.3C4 7.6 2.6 10 2 12c1.5 2.9 5 7 10 7 1.5 0 2.9-.4 4.2-1"/><path d="M10 10a3 3 0 0 0 4 4"/></svg>
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="pro-login-form-bottom"><span>© Tranquila Hotels & Suites</span><span>Made for excellence in hospitality.</span></div>
-      </section>
-    </div>
-  </main>;
+        {capsLock && <p className="trq-auth-hint" role="status">Caps Lock is on</p>}
+        {error && <p className="trq-auth-error" role="alert">{error}</p>}
+        <button className="trq-auth-submit" type="submit" disabled={locked} aria-busy={locked}>
+          <span>{busy ? "Signing in…" : loading ? "Restoring session…" : "Continue"}</span>
+          {locked ? <span className="trq-auth-spinner" aria-hidden="true"/> :
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>}
+        </button>
+        <a href="/admin/forgot-password" className="trq-auth-forgot">Forgot password?</a>
+      </form>
+      <p className="trq-auth-privacy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Authorized staff only</p>
+    </AdminAuthFrame>
+  );
 }

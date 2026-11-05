@@ -1,0 +1,69 @@
+/* A shared, calm interaction system for Tranquila's signed-in workspace.
+   Scoped entirely to .pro-hybrid; no menu or API changes. */
+.pro-hybrid{
+ --pro-green:#176b4a;--pro-ink:#1d1d1f;--pro-bg:#f5f5f7;
+ --pro-border:rgba(60,60,67,.12);--pro-gold:#778a70;--pro-muted:#74747b;
+ background:#f5f5f7;color:#1d1d1f;
+}
+body:has(.pro-hybrid){background:#f5f5f7}
+.pro-hybrid .pro-side{
+ background:rgba(252,252,253,.94);color:#1d1d1f;border-right:1px solid rgba(0,0,0,.075);
+ box-shadow:none;backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);
+}
+.pro-hybrid .pro-hybrid-brand{gap:11px;padding-bottom:30px}
+.pro-hybrid .pro-hybrid-brand-mark{width:43px;height:43px;border:1px solid #e5e7e2;background:#f0f2ee;border-radius:12px}
+.pro-hybrid .pro-hybrid-brand-mark img{width:31px;height:31px}
+.pro-hybrid .pro-hybrid-brand strong{color:#202722;font-weight:700;font-size:13px;letter-spacing:.1em}
+.pro-hybrid .pro-hybrid-brand small{color:#829083;font-size:10px;letter-spacing:.15em}
+.pro-hybrid .pro-hotel-identity{background:#f0f2ee;border-radius:13px;border:0;box-shadow:none}
+.pro-hybrid .pro-hotel-identity>div strong{color:#303c31;font-weight:600}
+.pro-hybrid .pro-hotel-identity>div span{color:#718071;font-weight:600}
+.pro-hybrid .pro-hotel-icon{background:#e2e9e1;color:#465d49}
+.pro-hybrid .pro-nav-caption{color:#97979c!important;font-size:10px;letter-spacing:.08em;font-weight:650}
+.pro-hybrid .pro-side nav button{min-height:43px;border:0;border-radius:10px;color:#57575c;font-size:14px;font-weight:500;transition:background .16s ease,color .16s ease,transform .16s ease}
+.pro-hybrid .pro-side nav button svg{color:#86868b}
+.pro-hybrid .pro-side nav button:hover{background:#eeeeef;color:#1d1d1f}
+.pro-hybrid .pro-side nav button.selected{background:#e5eee6;color:#36533b;border:0;box-shadow:none;font-weight:650}
+.pro-hybrid .pro-side nav button.selected svg{color:#36533b}
+.pro-hybrid .pro-side nav em{background:#d7e4d8;color:#36533b}
+.pro-hybrid .pro-side-footer{border-top:1px solid #e5e5e8}
+.pro-hybrid .pro-side-footer a,.pro-hybrid .pro-side-footer button{color:#57575c;font-size:14px}
+.pro-hybrid .pro-side-footer a:hover,.pro-hybrid .pro-side-footer button:hover{background:#eeeef0}
+.pro-hybrid .pro-topbar{background:rgba(250,250,252,.78);border-bottom:1px solid rgba(0,0,0,.07);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
+.pro-hybrid .pro-topbar-route{color:#808087;font-size:13px}
+.pro-hybrid .pro-topbar-route strong{color:#28282b;font-weight:600}
+.pro-hybrid .pro-topbar-property{color:#808087;font-size:13px}
+.pro-hybrid .pro-topbar-guest{color:#36533b;font-size:13px}
+.pro-hybrid .pro-main{max-width:1420px}
+.pro-hybrid .pro-header{margin-bottom:26px}
+.pro-hybrid .pro-header h1{color:#1d1d1f;font-size:clamp(28px,3vw,35px);font-weight:700;letter-spacing:-.035em}
+.pro-hybrid .pro-header p.pro-muted{color:#86868b;font-size:14px}
+.pro-hybrid .pro-panel,.pro-hybrid .pro-metric{background:#fff;border:1px solid rgba(0,0,0,.035);border-radius:18px;box-shadow:0 6px 26px rgba(0,0,0,.035)}
+.pro-hybrid .pro-metric{padding:23px}
+.pro-hybrid .pro-metric strong{color:#1d1d1f;font-size:32px;letter-spacing:-.04em;font-weight:700}
+.pro-hybrid .pro-metric>span,.pro-hybrid .pro-metric>small{color:#77777c;font-size:13px}
+.pro-hybrid .pro-metric:after{display:none}
+.pro-hybrid .pro-panel h2,.pro-hybrid .pro-panel h3{color:#1d1d1f}
+.pro-hybrid .pro-btn,.pro-preview-dialog .pro-btn{border-radius:12px;min-height:44px;transition:background .2s,transform .2s,box-shadow .2s}
+.pro-hybrid .pro-btn.primary,.pro-preview-dialog .pro-btn.primary{background:#176b4a;color:#fff;border:0!important;box-shadow:none}
+.pro-hybrid .pro-btn.primary:hover,.pro-preview-dialog .pro-btn.primary:hover{background:#344e3a;transform:translateY(-1px)}
+.pro-hybrid .pro-btn.secondary,.pro-preview-dialog .pro-btn.secondary{background:#eceff0;color:#176b4a;border:0!important}
+.pro-hybrid .pro-quick button{background:#f6f6f7;border-radius:13px;transition:background .2s,transform .2s}
+.pro-hybrid .pro-quick button:hover{background:#edeff0;transform:translateY(-2px)}
+.pro-hybrid .pro-quick button>b{background:#e5eee6;color:#176b4a}
+.pro-hybrid .pro-food-card{border-radius:19px;background:#fff;overflow:hidden}
+.pro-hybrid .pro-food-visual{background:#f5f5f7}
+.pro-hybrid .pro-category-tabs button.active{background:#176b4a;color:#fff}
+.pro-hybrid .pro-view-switch button.active{color:#176b4a}
+.pro-hybrid .pro-search-input,.pro-hybrid .pro-filter-control{background:#fff;border:1px solid rgba(0,0,0,.055);border-radius:12px}
+.pro-hybrid .pro-footer{color:#929299}
+.pro-hybrid :is(button,a,input,select,textarea):focus-visible{outline:3px solid rgba(72,103,77,.62);outline-offset:3px}
+.pro-hybrid .pro-overview-banner{display:none!important}
+@media(max-width:900px){
+ .pro-hybrid .pro-side{background:rgba(252,252,253,.98)}
+ .pro-hybrid .pro-topbar{min-height:58px}
+ .pro-hybrid .pro-main{padding:28px 19px 100px}
+}
+@media(prefers-reduced-motion:reduce){
+ .pro-hybrid *, .pro-hybrid *::before,.pro-hybrid *::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
