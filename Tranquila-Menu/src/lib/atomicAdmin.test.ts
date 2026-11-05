@@ -60,13 +60,13 @@ describe("atomic hotel administration", () => {
   it("sends inventory and whole-menu publishing as single RPC calls", async () => {
     await setItemAvailability(branch, item.id, false, actor);
     expect(mockSuccess).toHaveBeenCalledTimes(1);
-    expect(String(mockSuccess.mock.calls[0][0])).toContain("/rpc/tranquila_admin_action");
-    expect(JSON.parse(String(mockSuccess.mock.calls[0][1]?.body)).p_available).toBe(false);
+    expect(String(mockSuccess.mock.calls[0]![0])).toContain("/rpc/tranquila_admin_action");
+    expect(JSON.parse(String(mockSuccess.mock.calls[0]![1]?.body)).p_available).toBe(false);
     mockSuccess.mockClear();
     const document = { categories: [{ id: "breakfast" as const, label: "Breakfast" }], items: [item] };
     await saveMenu(document, true, actor, branch);
     expect(mockSuccess).toHaveBeenCalledTimes(1);
-    expect(String(mockSuccess.mock.calls[0][0])).toContain("/rpc/tranquila_admin_save_menu");
+    expect(String(mockSuccess.mock.calls[0]![0])).toContain("/rpc/tranquila_admin_save_menu");
   });
 
   it("reports server failures without making a second side-effecting request", async () => {
