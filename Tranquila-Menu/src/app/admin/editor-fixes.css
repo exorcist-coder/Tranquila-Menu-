@@ -58,3 +58,26 @@
  .admin-image-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:360px){.admin-option-row{grid-template-columns:1fr}.admin-option-row>.admin-option-price{grid-column:1}.admin-image-grid{grid-template-columns:1fr 1fr}}
+
+/* Higher specificity than older Tranquila component rules prevents overlapping form fields. */
+.pro-hybrid .admin-option-builder-head{flex-wrap:wrap!important;align-items:center!important}
+.pro-hybrid .admin-option-group,.admin-shell .admin-option-group{min-width:0;max-width:100%;overflow:visible}
+.pro-hybrid .admin-option-group-head,.admin-shell .admin-option-group-head{display:grid!important;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)!important;gap:14px!important;align-items:end!important}
+.pro-hybrid .admin-option-group-head>label,.admin-shell .admin-option-group-head>label{min-width:0;max-width:100%;display:grid;gap:8px}
+.pro-hybrid .admin-option-group-head>button,.admin-shell .admin-option-group-head>button{grid-column:1/-1;justify-self:end}
+.pro-hybrid .admin-option-row,.admin-shell .admin-option-row{min-width:0;max-width:100%;gap:10px}
+.pro-hybrid .admin-option-group input,.pro-hybrid .admin-option-group select,.admin-shell .admin-option-group input,.admin-shell .admin-option-group select{min-width:0;max-width:100%;height:auto;min-height:44px;box-sizing:border-box;font-size:16px!important}
+.drink-photo-strip{display:flex;gap:9px;max-width:100%;overflow-x:auto;justify-content:center;padding:8px 5px}
+.drink-photo-strip button{flex:none;width:48px;height:48px;border:1px solid #d5ddd2;border-radius:9px;padding:2px;background:#fff;cursor:pointer}
+.drink-photo-strip img{width:100%;height:100%;object-fit:contain}
+@media(max-width:660px){
+ .pro-hybrid .admin-option-group-head,.admin-shell .admin-option-group-head{grid-template-columns:minmax(0,1fr)!important}
+ .pro-hybrid .admin-option-group-head>button,.admin-shell .admin-option-group-head>button{grid-column:1;justify-self:start}
+ .pro-hybrid .admin-option-row,.admin-shell .admin-option-row{grid-template-columns:minmax(0,1fr) minmax(0,115px)!important}
+ .pro-hybrid .admin-option-row>.admin-text-btn,.admin-shell .admin-option-row>.admin-text-btn{grid-column:1/-1;justify-self:end}
+ .pro-hybrid .admin-option-builder-head button{width:100%}
+}
+@media(max-width:360px){
+ .pro-hybrid .admin-option-row,.admin-shell .admin-option-row{grid-template-columns:minmax(0,1fr)!important}
+ .pro-hybrid .admin-option-row>.admin-option-price,.admin-shell .admin-option-row>.admin-option-price{grid-column:1}
+}

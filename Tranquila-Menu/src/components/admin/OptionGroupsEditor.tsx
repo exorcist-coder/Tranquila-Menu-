@@ -49,9 +49,8 @@ export default function OptionGroupsEditor({ groups, onChange }: OptionGroupsEdi
   return <section className="admin-option-builder" aria-labelledby="admin-options-heading">
     <div className="admin-option-builder-head">
       <div>
-        <span>FOOD CUSTOMISATION</span>
         <h3 id="admin-options-heading">Choices & add-ons</h3>
-        <p>Let guests choose portions, sides, proteins, or extras for this dish.</p>
+        <p>Manage options guests can select when ordering.</p>
       </div>
       <button className="admin-secondary" type="button" onClick={addGroup}>+ Add choice group</button>
     </div>
@@ -61,7 +60,7 @@ export default function OptionGroupsEditor({ groups, onChange }: OptionGroupsEdi
     </div> : <div className="admin-option-groups">{groups.map((group, groupIndex) => <fieldset className="admin-option-group" key={group.id}>
       <div className="admin-option-group-head">
         <label>Choice group name<input value={group.label} onChange={event => updateGroup(groupIndex, { label: event.target.value })} placeholder="e.g. Choose a side" /></label>
-        <label>Guest selection<select value={group.required ? "required" : "optional"} onChange={event => updateGroup(groupIndex, { required: event.target.value === "required" })}>
+        <label>Selection<select value={group.required ? "required" : "optional"} onChange={event => updateGroup(groupIndex, { required: event.target.value === "required" })}>
           <option value="required">Required</option>
           <option value="optional">Optional</option>
         </select></label>
@@ -72,7 +71,7 @@ export default function OptionGroupsEditor({ groups, onChange }: OptionGroupsEdi
         <option value="absolute">Set dish price from this choice</option>
       </select></label>
       <div className="admin-option-list">
-        <div className="admin-option-list-head"><span>Guest options</span><span>Additional / choice price</span><span></span></div>
+        <div className="admin-option-list-head"><span>Option</span><span>Price (₦)</span><span></span></div>
         {group.options.map((option, optionIndex) => <div className="admin-option-row" key={option.id}>
           <label className="sr-only" htmlFor={`${group.id}-${option.id}-label`}>Option name</label>
           <input id={`${group.id}-${option.id}-label`} value={option.label} onChange={event => updateOption(groupIndex, optionIndex, { label: event.target.value })} placeholder="e.g. Fried plantain" />
