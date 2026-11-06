@@ -25,3 +25,8 @@
 #app-root .guest-search-back:active{transform:scale(.97)}
 .amb-navigation-back:empty{display:none}.amb-navigation-back:not(:empty){margin-bottom:13px}
 .amb-navigation-back .admin-secondary{min-height:36px;padding:7px 12px;font-size:13px}
+
+.pro-hybrid .pro-native-back{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 11px;margin-right:12px;border:0;border-radius:9px;background:#e9efeb;color:#315641;font:650 13px/1.2 -apple-system,Inter,system-ui,sans-serif;white-space:nowrap}
+.pro-hybrid .pro-native-back:hover{background:#dee9e1}
+.pro-hybrid .pro-native-back:active{transform:scale(.97)}
+@media(max-width:650px){.pro-hybrid .pro-native-back{margin-right:4px;padding:7px 9px}.pro-hybrid .pro-topbar-route{font-size:12px}}
