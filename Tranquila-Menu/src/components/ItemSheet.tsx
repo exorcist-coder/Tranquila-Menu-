@@ -73,7 +73,7 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
         <div className="hero">
           <div className="gallery" ref={galleryRef} onScroll={(e) => setSlide(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))} tabIndex={photos > 1 ? 0 : undefined} aria-label={photos > 1 ? `${item.name} photos` : undefined}>
             {Array.from({ length: photos }, (_, i) => (
-              <div className="slide" key={i}><button type="button" className="gallery-open" onClick={() => setExpandedPhoto(i)} disabled={!photoUrls[i]} aria-label={`View ${item.name} photo ${i + 1} full screen`}><Media item={item} index={item.imageUrl ? Math.max(0,i-1) : i} radius={28} layoutId={i === 0 ? `media-${item.id}` : undefined} eager alt={i === 0 ? item.name : ""} /></button></div>
+              <div className="slide" key={i}><button type="button" className="gallery-open" onClick={() => setExpandedPhoto(i)} disabled={!photoUrls[i]} aria-label={`View ${item.name} photo ${i + 1} full screen`}><Media item={item} index={i} radius={28} layoutId={i === 0 ? `media-${item.id}` : undefined} eager alt={i === 0 ? item.name : ""} /></button></div>
             ))}
           </div>
           {photos > 1 && <div className="dots" aria-hidden>{Array.from({ length: photos }, (_, i) => <i key={i} data-on={i === slide ? "" : undefined} />)}</div>}

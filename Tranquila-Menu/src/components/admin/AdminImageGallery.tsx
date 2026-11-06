@@ -55,7 +55,7 @@ export default function AdminImageGallery({
       {left > 0 && <label className="admin-image-add">
         <span className="admin-image-plus" aria-hidden="true">+</span>
         <span>{uploading ? "Uploading…" : "Add photos"}</span>
-        <small>JPG, PNG, WebP · 5 MB each</small>
+        <small>JPG, PNG, WebP · 4 MB each</small>
         <input type="file" multiple accept="image/jpeg,image/png,image/webp" disabled={uploading}
           onChange={event => { const files = Array.from(event.target.files || []); event.target.value = ""; if (files.length) onUpload(files); }} />
       </label>}

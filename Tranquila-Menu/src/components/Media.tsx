@@ -25,7 +25,7 @@ export const bottleOf = (item: Item) => {
 
 /** Dish photo, or a quiet icon tile when a dish has no photo yet. */
 export default function Media({ item, index = 0, layoutId, radius = 20, eager = false, alt = "" }: { item: Item; index?: number; layoutId?: string; radius?: number; eager?: boolean; alt?: string }) {
-  const p = photoOf(item, index); const [failed, setFailed] = useState(false);
+  const p = photoOf(item, item.imageUrl ? index - 1 : index); const [failed, setFailed] = useState(false);
   const src = index === 0 && item.imageUrl ? item.imageUrl : p?.src;
   return <motion.div layoutId={layoutId} className="media" style={{ borderRadius: radius, background: p?.tone ?? TONE }}>
     {src && !failed
