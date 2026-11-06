@@ -82,6 +82,7 @@ export default function AdminHybridShell({
       <div className="pro-topbar">
         <div className="pro-topbar-left">
           <button type="button" className="pro-mobile-menu-button" aria-label="Open navigation" aria-expanded={drawer} onClick={openDrawer}><AdminIcon name="menu" size={23}/></button>
+          {tab !== "overview" && <button type="button" className="pro-native-back" onClick={() => window.history.back()} aria-label="Back to previous section">← Back</button>}
           <span className="pro-topbar-route">Workspace <AdminIcon name="chevron" size={14}/> <strong>{sections.find(s => s.id === tab)?.label}</strong></span>
         </div>
         <div className="pro-topbar-right">
