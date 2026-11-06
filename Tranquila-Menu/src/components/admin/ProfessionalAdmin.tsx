@@ -172,7 +172,7 @@ export default function ProfessionalAdmin() {
     if (!editor || !files.length) return;
     const room = MAX_ITEM_IMAGES - itemImageRefs(editor).length;
     if (files.length > room) { setError("You can add up to " + MAX_ITEM_IMAGES + " photos per item."); return; }
-    if (files.some(file => !["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5_000_000)) { setError("Choose JPG, PNG or WebP images under 5 MB each."); return; }
+    if (files.some(file => !["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 4_000_000)) { setError("Choose JPG, PNG or WebP images under 4 MB each."); return; }
     setBusy(true); setError("");
     let added = 0;
     try {
