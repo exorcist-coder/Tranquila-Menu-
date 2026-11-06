@@ -155,8 +155,8 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
             {!q && (
               <section className="hero-banner" aria-label="Welcome">
                 <div className="hb-copy">
-                  <p className="hb-script">Calm, served well</p>
-                  <h2>Good food.<br />Fine wine.<br /><em>Quiet moments.</em></h2>
+                  <p className="hb-script">TRANQUILA HOTELS & SUITES</p>
+                  <h2>Food & drinks.<br /><em>At your convenience.</em></h2>
                   <p className="hb-sub">Order to your room or collect from the restaurant.</p>
                   <button type="button" className="hb-cta" onClick={() => go(CATEGORIES[0]!.id)}><span>Explore the menu</span><i><IconArrowRight width={18} height={18} /></i></button>
                 </div>
