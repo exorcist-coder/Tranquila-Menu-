@@ -42,14 +42,27 @@ export default function AdminHybridShell({
   const [drawer, setDrawer] = useState(false);
   useEffect(() => { if (!drawer) return; const handle = (e: KeyboardEvent) => { if (e.key === "Escape") setDrawer(false); }; window.addEventListener("keydown", handle); return () => window.removeEventListener("keydown", handle); }, [drawer]);
   function go(id: AdminSection) { onTab(id); setDrawer(false); }
+  function openDrawer() {
+    window.history.pushState({ ...(window.history.state ?? {}), hotelDrawer: true }, "", window.location.href);
+    setDrawer(true);
+  }
+  function closeDrawer() {
+    if ((window.history.state as {hotelDrawer?:boolean} | null)?.hotelDrawer) window.history.back();
+    else setDrawer(false);
+  }
+  useEffect(() => {
+    const onPop = () => setDrawer(!!(window.history.state as {hotelDrawer?:boolean} | null)?.hotelDrawer);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
   const branchLabel = branchId === "tranquila-nest" ? "Nest · Kado" : "Hotel · Mabushi";
   return <main className="pro-shell pro-hybrid">
-    {drawer && <button type="button" aria-label="Close navigation" className="pro-drawer-backdrop" onClick={() => setDrawer(false)}/>}
+    {drawer && <button type="button" aria-label="Close navigation" className="pro-drawer-backdrop" onClick={closeDrawer}/>}
     <aside className={"pro-side " + (drawer ? "pro-side-open" : "")}>
       <div className="pro-hybrid-brand">
         <div className="pro-hybrid-brand-mark"><img src="/images/mark.png" alt="" /></div>
         <div><strong>TRANQUILA</strong><small>HOTELS & SUITES</small></div>
-        <button type="button" className="pro-drawer-close" aria-label="Close menu" onClick={() => setDrawer(false)}><AdminIcon name="close"/></button>
+        <button type="button" className="pro-drawer-close" aria-label="Close menu" onClick={closeDrawer}><AdminIcon name="close"/></button>
       </div>
       <div className="pro-hotel-identity"><span className="pro-hotel-icon"><AdminIcon name="store" size={19}/></span><div><span>ACTIVE PROPERTY</span><strong>{branchLabel}</strong></div><span className="pro-hotel-online"/></div>
       <div className="pro-side-inner">
@@ -68,7 +81,7 @@ export default function AdminHybridShell({
     <div className="pro-workspace">
       <div className="pro-topbar">
         <div className="pro-topbar-left">
-          <button type="button" className="pro-mobile-menu-button" aria-label="Open navigation" aria-expanded={drawer} onClick={() => setDrawer(true)}><AdminIcon name="menu" size={23}/></button>
+          <button type="button" className="pro-mobile-menu-button" aria-label="Open navigation" aria-expanded={drawer} onClick={openDrawer}><AdminIcon name="menu" size={23}/></button>
           <span className="pro-topbar-route">Workspace <AdminIcon name="chevron" size={14}/> <strong>{sections.find(s => s.id === tab)?.label}</strong></span>
         </div>
         <div className="pro-topbar-right">
