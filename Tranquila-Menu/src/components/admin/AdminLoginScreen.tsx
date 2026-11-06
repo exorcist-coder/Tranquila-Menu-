@@ -12,21 +12,24 @@ export default function AdminLoginScreen({
 }) {
   const [visible, setVisible] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
+  const [emailPulse, setEmailPulse] = useState(0);
+  const [passwordPulse, setPasswordPulse] = useState(0);
   const locked = busy || loading;
   return (
-    <AdminAuthFrame heading="Sign in" description={"Enter your staff credentials to manage " + branchName + "."}>
+    <AdminAuthFrame heading="Sign in" description={branchName}>
       <form className="trq-auth-form" onSubmit={onSubmit}>
         <div className="trq-auth-fields">
           <div className="trq-auth-field">
             <label htmlFor="trq-email">Email address</label>
             <input id="trq-email" type="email" autoComplete="username" inputMode="email" autoCapitalize="none" spellCheck={false}
-              value={email} onChange={e=>onEmail(e.target.value)} placeholder="name@example.com" required disabled={locked}/>
+              value={email} onChange={e=>{onEmail(e.target.value);setEmailPulse(n=>n+1);}} placeholder="name@example.com" required disabled={locked}/>
+            {email.length > 0 && <span key={emailPulse} className="trq-auth-input-activity" aria-hidden="true"/>}
           </div>
           <div className="trq-auth-field trq-auth-password">
             <label htmlFor="trq-password">Password</label>
             <div className="trq-auth-password-row">
               <input id="trq-password" type={visible ? "text" : "password"} autoComplete="current-password"
-                value={password} onChange={e=>onPassword(e.target.value)} placeholder="Enter password" required disabled={locked}
+                value={password} onChange={e=>{onPassword(e.target.value);setPasswordPulse(n=>n+1);}} placeholder="Enter password" required disabled={locked}
                 onKeyUp={e=>setCapsLock(e.getModifierState("CapsLock"))} onKeyDown={e=>setCapsLock(e.getModifierState("CapsLock"))}/>
               <button type="button" className="trq-auth-visibility" onClick={()=>setVisible(v=>!v)}
                 aria-label={visible ? "Hide password" : "Show password"} aria-pressed={visible} disabled={locked}>
@@ -37,18 +40,17 @@ export default function AdminLoginScreen({
                 )}
               </button>
             </div>
+            {password.length > 0 && <span key={passwordPulse} className="trq-auth-input-activity" aria-hidden="true"/>}
           </div>
         </div>
         {capsLock && <p className="trq-auth-hint" role="status">Caps Lock is on</p>}
         {error && <p className="trq-auth-error" role="alert">{error}</p>}
-        <button className="trq-auth-submit" type="submit" disabled={locked} aria-busy={locked}>
+        <button className="trq-auth-submit" data-ready={email.trim().length > 0 && password.length > 0} type="submit" disabled={locked} aria-busy={locked}>
           <span>{busy ? "Signing in…" : loading ? "Restoring session…" : "Continue"}</span>
           {locked ? <span className="trq-auth-spinner" aria-hidden="true"/> :
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>}
         </button>
         <a href="/admin/forgot-password" className="trq-auth-forgot">Forgot password?</a>
-      </form>
-      <p className="trq-auth-privacy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg> Authorized staff only</p>
-    </AdminAuthFrame>
+      </form>    </AdminAuthFrame>
   );
 }
