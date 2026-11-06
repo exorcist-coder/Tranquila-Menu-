@@ -1,0 +1,122 @@
+
+/* Iridescent auth refinement. Purely presentational, login and recovery only.
+   Reduced-motion and high-contrast safeguards preserve legibility. */
+body:has(.trq-auth){background:#eef0f2!important}
+.trq-auth{
+ --auth-ink:#171b22;--auth-muted:#4b5564;--auth-accent:#146849;
+ background:
+ radial-gradient(ellipse 75% 58% at 15% 13%,rgba(171,221,218,.45),transparent 82%),
+ radial-gradient(ellipse 72% 65% at 97% 26%,rgba(190,205,245,.52),transparent 80%),
+ radial-gradient(ellipse 82% 75% at 17% 97%,rgba(225,205,237,.40),transparent 80%),
+ radial-gradient(ellipse 82% 60% at 100% 100%,rgba(210,239,203,.42),transparent 78%),
+ #edf0f2;
+ color:#171b22;isolation:isolate;min-height:100svh;min-height:100dvh;
+}
+.trq-auth-ambient{z-index:-1;opacity:.64}
+.trq-auth-ambient span:nth-child(1){
+ width:65vw;height:65vw;max-width:600px;max-height:600px;top:-26%;left:-13%;
+ background:radial-gradient(circle,rgba(190,205,245,.52),transparent 72%);
+ filter:blur(28px);animation:trq-auth-drift-a 19s ease-in-out infinite alternate;
+}
+.trq-auth-ambient span:nth-child(2){
+ width:75vw;height:75vw;max-width:750px;max-height:750px;bottom:-31%;right:-23%;
+ background:radial-gradient(circle,rgba(225,205,237,.40),transparent 70%);
+ filter:blur(34px);animation:trq-auth-drift-b 23s ease-in-out infinite alternate;
+}
+.trq-auth-ambient span:nth-child(3){
+ width:38vw;height:38vw;max-width:380px;max-height:380px;left:42%;top:10%;
+ background:radial-gradient(circle,rgba(210,239,203,.42),transparent 72%);
+ filter:blur(34px);animation:trq-auth-drift-a 25s ease-in-out infinite alternate-reverse;
+}
+@keyframes trq-auth-drift-a{from{transform:translate3d(-4%,-2%,0) scale(.97)}to{transform:translate3d(12%,9%,0) scale(1.11)}}
+@keyframes trq-auth-drift-b{from{transform:translate3d(4%,9%,0) scale(1.07)}to{transform:translate3d(-12%,-8%,0) scale(.96)}}
+.trq-auth-nav{justify-content:flex-start;padding:24px clamp(22px,4vw,54px)}
+.trq-auth-back{gap:3px;color:#3a4550;font-size:14px;font-weight:600;padding:8px 10px 8px 0}
+.trq-auth-back:hover{color:#171b22}
+.trq-auth-center{padding:10px 24px 76px}
+.trq-auth-card{width:min(100%,410px);text-align:center}
+.trq-auth-emblem{
+ width:82px;height:82px;margin:0 auto 26px;border-radius:22px;
+ background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,255,255,.73));
+ border:1px solid rgba(255,255,255,.90);
+ box-shadow:0 20px 42px rgba(41,49,60,.12),inset 0 1px 1px rgba(255,255,255,.9);
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+.trq-auth-emblem img{width:56px;height:56px}
+.trq-auth-heading{margin-bottom:25px}
+.trq-auth-heading h1{font-size:37px!important;font-weight:690!important;letter-spacing:-.045em!important;color:#151a20!important}
+.trq-auth-desc{font-size:14px!important;font-weight:550!important;color:#364350!important;margin:9px auto 0!important;max-width:370px}
+.trq-auth-fields{
+ border:1px solid rgba(54,65,78,.25);
+ background:rgba(255,255,255,.86);
+ border-radius:19px;overflow:hidden;
+ box-shadow:0 15px 34px rgba(34,44,59,.095),inset 0 1px 0 rgba(255,255,255,.88);
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+ transition:border-color .22s ease,box-shadow .22s ease,transform .22s ease;
+}
+.trq-auth-fields:focus-within{
+ border-color:rgba(64,85,89,.57);
+ box-shadow:0 0 0 4px rgba(255,255,255,.72),0 17px 36px rgba(34,44,59,.16);
+ transform:translateY(-1px);
+}
+.trq-auth-field{
+ position:relative;padding:12px 17px 10px;background:transparent;
+ transition:background .2s ease;
+}
+.trq-auth-field+.trq-auth-field{border-top:1px solid rgba(57,69,82,.17)}
+.trq-auth-field:focus-within{background:rgba(255,255,255,.65)}
+.trq-auth-field label{color:#3f4a57!important;font-size:12px!important;font-weight:650!important}
+.trq-auth-field:focus-within label{color:#146849!important}
+.trq-auth-field input{
+ background:transparent!important;color:#151b22!important;
+ font-size:17px!important;font-weight:520!important;caret-color:#146849;
+ padding-right:25px!important;-webkit-text-fill-color:#151b22!important;
+}
+.trq-auth-field input::placeholder{color:#707986!important;opacity:1}
+.trq-auth-field input:-webkit-autofill{
+ -webkit-box-shadow:0 0 0 50px #f7f9fa inset!important;
+ -webkit-text-fill-color:#151b22!important;caret-color:#146849;
+}
+.trq-auth-input-activity{
+ position:absolute;top:37px;right:19px;width:9px;height:9px;border-radius:50%;
+ background:#146849;box-shadow:0 0 0 3px rgba(78,112,84,.13);
+ pointer-events:none;opacity:.92;
+ animation:trq-auth-key-pop .24s ease-out both;
+}
+.trq-auth-password .trq-auth-input-activity{right:56px}
+@keyframes trq-auth-key-pop{
+ from{transform:scale(.35);opacity:.24;box-shadow:0 0 0 12px rgba(78,112,84,.04)}
+ to{transform:scale(1);opacity:.92;box-shadow:0 0 0 3px rgba(78,112,84,.13)}
+}
+.trq-auth-password-row input{padding-right:0!important}
+.trq-auth-visibility{color:#374353!important}
+.trq-auth-submit{
+ background:#146849!important;min-height:55px;border-radius:16px;
+ box-shadow:0 12px 26px rgba(30,51,47,.20);
+ margin-top:24px;transition:transform .2s,box-shadow .2s,background .2s,opacity .2s;
+}
+.trq-auth-submit:hover:not(:disabled){box-shadow:0 15px 28px rgba(30,51,47,.27);transform:translateY(-1px)}
+.trq-auth-submit:disabled{opacity:.78}
+.trq-auth-submit[data-ready="false"]:not(:disabled){opacity:.85}
+.trq-auth-forgot{color:#146849!important;font-weight:650!important;font-size:14px!important}
+.trq-auth-error{color:#832733;background:#fff0f0;border:1px solid #e4b9bc;font-weight:520}
+.trq-auth-success{color:#21573d;background:#e9f4ed;border:1px solid #bcd9c7}
+.trq-auth-hint{color:#744c22!important}
+.trq-auth-nav-brand,.trq-auth-footer,.trq-auth-privacy,.trq-auth-kicker{display:none!important}
+.trq-auth :is(a,button,input):focus-visible{outline:3px solid #146849;outline-offset:3px}
+@media(max-width:600px){
+ .trq-auth-nav{padding:18px 21px}
+ .trq-auth-center{padding:10px 22px 72px}
+ .trq-auth-emblem{width:78px;height:78px;margin-bottom:24px}
+ .trq-auth-heading h1{font-size:35px!important}
+ .trq-auth-field{padding:12px 15px 11px}
+}
+@media(prefers-reduced-motion:reduce){
+ .trq-auth-ambient span,.trq-auth-input-activity{animation:none!important}
+ .trq-auth-fields,.trq-auth-submit{transition:none!important}
+}
+@media(forced-colors:active){
+ .trq-auth-fields{border:2px solid CanvasText;background:Canvas;box-shadow:none}
+ .trq-auth-field input{color:CanvasText!important}
+ .trq-auth-input-activity{background:Highlight}
+}
