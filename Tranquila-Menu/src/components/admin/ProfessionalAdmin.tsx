@@ -108,6 +108,45 @@ export default function ProfessionalAdmin() {
     } catch (e) { setError(e instanceof Error ? e.message : "Sign in failed."); }
     finally { setBusy(false); }
   }
+  type AdminView = { branch: string; tab: Tab; editorId?: string; previewId?: string };
+  function historyView(): AdminView | null {
+    const view = (window.history.state as { hotelAdminView?: AdminView } | null)?.hotelAdminView;
+    return view?.branch === activeBranch ? view : null;
+  }
+  function pushView(view: AdminView) {
+    window.history.pushState({ ...(window.history.state ?? {}), hotelAdminView: view }, "", window.location.href);
+  }
+  useEffect(() => {
+    const onBack = () => {
+      const view = historyView();
+      setTab(view?.tab ?? "overview");
+      const edited = view?.editorId
+        ? workspace.drafts.find(d=>d.item_id===view.editorId)?.item
+          ?? workspace.published.items.find(i=>i.id===view.editorId)
+        : undefined;
+      setEditor(edited ? structuredClone(edited) : null);
+      setOptions(edited ? structuredClone(edited.groups ?? []) : []);
+      const p = view?.previewId
+        ? workspace.drafts.find(d=>d.item_id===view.previewId)?.item
+          ?? workspace.published.items.find(i=>i.id===view.previewId)
+        : undefined;
+      setPreview(p ?? null);
+    };
+    window.addEventListener("popstate", onBack);
+    return () => window.removeEventListener("popstate", onBack);
+  }, [workspace]);
+  function navigateTab(next: Tab) {
+    pushView({ branch: activeBranch, tab: next });
+    setTab(next); setEditor(null); setPreview(null); setQuery("");
+  }
+  function closeEditor() {
+    if (historyView()?.editorId) window.history.back();
+    else setEditor(null);
+  }
+  function closePreview() {
+    if (historyView()?.previewId) window.history.back();
+    else setPreview(null);
+  }
   function signout() { sessionStorage.removeItem("tranquila-admin-token"); setToken(""); setWorkspace(blank); setEditor(null); setError(""); }
   async function action(payload: Record<string, unknown>, success: string) {
     setBusy(true); setError(""); setNotice("");
@@ -131,8 +170,8 @@ export default function ProfessionalAdmin() {
       return false;
     } finally { setBusy(false); }
   }
-  function showPreview(item: DisplayItem, isDraft: boolean) { setPreview(item); setPreviewIsDraft(isDraft); }
-  function edit(item: DisplayItem) { setEditor(structuredClone(item)); setOptions(structuredClone(item.groups ?? [])); setTab("drafts"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  function showPreview(item: DisplayItem, isDraft: boolean) { pushView({ branch: activeBranch, tab, previewId: item.id }); setPreview(item); setPreviewIsDraft(isDraft); }
+  function edit(item: DisplayItem) { pushView({ branch: activeBranch, tab: "drafts", editorId: item.id }); setEditor(structuredClone(item)); setOptions(structuredClone(item.groups ?? [])); setTab("drafts"); window.scrollTo({ top: 0, behavior: "smooth" }); }
   async function saveDraft() {
     if (!editor) return;
     const item = { ...editor, groups: options, published: true };
@@ -224,7 +263,7 @@ export default function ProfessionalAdmin() {
   return <AdminHybridShell
     tab={tab} branchName={branchName} branchId={activeBranch}
     drafts={stats.drafts} busy={busy}
-    onTab={next => { setTab(next); setEditor(null); setPreview(null); setQuery(""); }}
+    onTab={navigateTab}
     onSignout={signout}
     onRefresh={() => { void refresh(token).then(() => setNotice("Everything is up to date.")).catch(e => setError(e instanceof Error ? e.message : "Refresh failed.")); }}>
       <div className="pro-toast-stack" aria-live="polite">
@@ -234,12 +273,12 @@ export default function ProfessionalAdmin() {
       {busy && <p className="pro-working" role="status"><AdminIcon name="refresh" size={14}/> Saving changes securely…</p>}
       {tab === "overview" && <>
         <section className="pro-overview-banner">
-          <div className="pro-overview-banner-content"><h2>Menu management</h2><p>Manage live items, drafts and availability.</p><div className="pro-banner-actions"><button className="pro-btn ivory" type="button" onClick={() => setTab("live")}>Explore live menu <AdminIcon name="arrow" size={17}/></button><button className="pro-banner-secondary" type="button" onClick={() => edit(baseItem())}>Create a new dish <AdminIcon name="plus" size={16}/></button></div></div>
+          <div className="pro-overview-banner-content"><h2>Menu management</h2><p>Manage live items, drafts and availability.</p><div className="pro-banner-actions"><button className="pro-btn ivory" type="button" onClick={() => navigateTab("live")}>Explore live menu <AdminIcon name="arrow" size={17}/></button><button className="pro-banner-secondary" type="button" onClick={() => edit(baseItem())}>Create a new dish <AdminIcon name="plus" size={16}/></button></div></div>
           <div className="pro-overview-banner-photo" aria-hidden="true"><img src="/images/okra-seafood.webp" alt=""/></div>
         </section>
         <div className="pro-metrics"><Metric label="Live menu items" value={stats.live} hint="Visible to guests"/><Metric label="Sold out" value={stats.unavailable} hint="Inventory changes immediately"/><Metric label="Saved drafts" value={stats.drafts} hint="Not visible to guests"/><Metric label="Archived items" value={stats.archives} hint="Recoverable items"/></div>
-        <div className="pro-columns"><section className="pro-panel"><h2>Quick actions</h2><p>Draft changes are private until published.</p><div className="pro-quick"><button onClick={() => edit(baseItem())}><b>＋</b><span><strong>Create menu item</strong><small>Start a new editable draft</small></span>›</button><button onClick={() => setTab("drafts")}><b>✎</b><span><strong>Review drafts</strong><small>Preview, edit or publish individual items</small></span>›</button><button onClick={() => setTab("live")}><b>▤</b><span><strong>Manage availability</strong><small>Mark dishes sold out or restock</small></span>›</button></div></section>
-        <section className="pro-panel"><h2>Recent activity</h2>{workspace.history.events.length ? <div className="pro-timeline">{workspace.history.events.slice(0, 6).map(e => <div key={e.id}><span className="pro-activity-dot"/><strong>{e.action.replaceAll("_", " ")}</strong><small>{date(e.created_at)}</small></div>)}</div> : <div className="pro-empty">No recorded actions yet. Changes will appear here after they are saved.</div>}<button className="pro-btn secondary" onClick={() => setTab("history")}>View all history</button></section></div>
+        <div className="pro-columns"><section className="pro-panel"><h2>Quick actions</h2><p>Draft changes are private until published.</p><div className="pro-quick"><button onClick={() => edit(baseItem())}><b>＋</b><span><strong>Create menu item</strong><small>Start a new editable draft</small></span>›</button><button onClick={() => navigateTab("drafts")}><b>✎</b><span><strong>Review drafts</strong><small>Preview, edit or publish individual items</small></span>›</button><button onClick={() => setTab("live")}><b>▤</b><span><strong>Manage availability</strong><small>Mark dishes sold out or restock</small></span>›</button></div></section>
+        <section className="pro-panel"><h2>Recent activity</h2>{workspace.history.events.length ? <div className="pro-timeline">{workspace.history.events.slice(0, 6).map(e => <div key={e.id}><span className="pro-activity-dot"/><strong>{e.action.replaceAll("_", " ")}</strong><small>{date(e.created_at)}</small></div>)}</div> : <div className="pro-empty">No recorded actions yet. Changes will appear here after they are saved.</div>}<button className="pro-btn secondary" onClick={() => navigateTab("history")}>View all history</button></section></div>
       </>}
       {(tab === "live" || tab === "drafts") && !editor && <AdminMenuWorkspace
         mode={tab} categories={workspace.published.categories} items={workspace.published.items}
@@ -262,7 +301,7 @@ export default function ProfessionalAdmin() {
           }
         }}
       />}
-      {editor && tab === "drafts" && <div className="pro-editor"><div className="pro-editor-top"><div><span className="pro-status draft">DRAFT WORKSPACE</span><h2>{editor.name || "New menu item"}</h2><p>Changes are private until you publish from the Draft library.</p></div><button className="pro-btn secondary" onClick={() => setEditor(null)}>← Back to drafts</button></div>
+      {editor && tab === "drafts" && <div className="pro-editor"><div className="pro-editor-top"><div><span className="pro-status draft">DRAFT WORKSPACE</span><h2>{editor.name || "New menu item"}</h2><p>Changes are private until you publish from the Draft library.</p></div><button className="pro-btn secondary" onClick={closeEditor}>← Back to drafts</button></div>
         <div className="pro-editor-layout"><div className="pro-editor-fields"><div className="pro-panel"><h3>Item details</h3><div className="pro-form-grid"><label>Item name<input value={editor.name} onChange={e => setEditor({ ...editor, name: e.target.value })} placeholder="e.g. Chicken Caesar Salad"/></label><label>Category<select value={editor.category} onChange={e => setEditor({ ...editor, category: e.target.value })}>{workspace.published.categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}</select></label><label>Price (₦)<input type="number" min={0} value={editor.basePrice} onChange={e => setEditor({ ...editor, basePrice: Number(e.target.value) })}/></label><label>Item reference<input disabled={workspace.published.items.some(i => i.id === editor.id) || workspace.drafts.some(d => d.item_id === editor.id)} value={editor.id} onChange={e => setEditor({ ...editor, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}/></label><label className="span-two">Description<textarea rows={3} value={editor.description} onChange={e => setEditor({ ...editor, description: e.target.value })}/></label><label>Guest visibility<select value={editor.visible === false ? "hidden" : "visible"} onChange={e => setEditor({ ...editor, visible: e.target.value === "visible" })}><option value="visible">Visible when published</option><option value="hidden">Hidden when published</option></select></label></div></div>
         <AdminImageGallery item={editor} onChange={value => setEditor(value as DisplayItem)} onUpload={files => { void upload(files); }} uploading={busy} error={error || undefined} /><div className="pro-panel pro-options"><h3>Choices & customizations</h3><OptionGroupsEditor groups={options} onChange={setOptions}/></div></div>
         <AdminEditorAside item={{ ...editor, groups: options }} category={workspace.published.categories.find(c => c.id === editor.category)?.label ?? editor.category} onPreview={() => showPreview({ ...editor, groups: options }, true)}/>
@@ -297,7 +336,7 @@ export default function ProfessionalAdmin() {
         category={workspace.published.categories.find(c => c.id === preview.category)?.label ?? preview.category}
         isDraft={previewIsDraft}
         busy={busy}
-        onClose={() => setPreview(null)}
+        onClose={closePreview}
         onEdit={() => { const item = preview; setPreview(null); edit(item); }}
         onPublish={previewIsDraft && workspace.drafts.some(d => d.item_id === preview.id) ? () => {
           if (confirm("Publish \"" + preview.name + "\" to the live guest menu?")) {

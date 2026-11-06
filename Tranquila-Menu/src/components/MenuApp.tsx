@@ -46,8 +46,48 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
   const [item, setItem] = useState<Item | null>(null);
   const [openSelection, setOpenSelection] = useState<Selection>({});
   const [openPhoto, setOpenPhoto] = useState(0);
-  const openItem = (next: Item, selection: Selection = {}, photo = 0) => { setOpenSelection(selection); setOpenPhoto(photo); setItem(next); };
+
   const [cartOpen, setCartOpen] = useState(false);
+  const historyKey = "hotelGuestOverlay";
+  type GuestState = { branch: string; view: "item" | "cart" | "search"; itemId?: string; selection?: Selection; photo?: number; query?: string };
+  const currentGuestState = (): GuestState | null => {
+    const state = window.history.state as { hotelGuestOverlay?: GuestState } | null;
+    return state?.hotelGuestOverlay?.branch === branch.id ? state.hotelGuestOverlay : null;
+  };
+  const showGuestState = (state: GuestState | null) => {
+    setItem(state?.view === "item" ? findItem(state.itemId ?? "") ?? null : null);
+    setOpenSelection(state?.selection ?? {});
+    setOpenPhoto(state?.photo ?? 0);
+    setCartOpen(state?.view === "cart");
+    if (state?.view === "search") setQuery(state.query ?? "");
+    else if (!state) setQuery("");
+  };
+  useEffect(() => {
+    const onPop = () => showGuestState(currentGuestState());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [branch.id]);
+  function pushGuest(state: GuestState) {
+    window.history.pushState({ ...(window.history.state ?? {}), [historyKey]: state }, "", window.location.href);
+    showGuestState(state);
+  }
+  function closeGuest() {
+    if (currentGuestState()) window.history.back();
+    else { setItem(null); setCartOpen(false); }
+  }
+  const openItem = (next: Item, selection: Selection = {}, photo = 0) =>
+    pushGuest({ branch: branch.id, view: "item", itemId: next.id, selection, photo });
+  const openCart = () => pushGuest({ branch: branch.id, view: "cart" });
+  function searchChanged(text: string) {
+    const current = currentGuestState();
+    if (!text.trim() && current?.view === "search") { window.history.back(); return; }
+    if (text.trim() && !current) pushGuest({ branch: branch.id, view: "search", query: text });
+    else if (current?.view === "search") {
+      window.history.replaceState({ ...(window.history.state ?? {}), [historyKey]: { ...current, query: text } }, "", window.location.href);
+      setQuery(text);
+    } else setQuery(text);
+  }
+
   const main = useRef<HTMLElement>(null);
   const sections = useRef<Record<string, HTMLElement | null>>({});
   const rail = useRef<HTMLDivElement>(null);
@@ -129,11 +169,11 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
             <div className="toolbar-in">
               <div className="toolbar-row">
                 <label className="search"><span className="sr-only">Search the menu</span>
-                  <IconSearch width={18} height={18} />
-                  <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search dishes, wines, drinks" enterKeyHint="search" />
-                  {query && <button type="button" className="clear" onClick={() => setQuery("")} aria-label="Clear search"><IconClose width={16} height={16} /></button>}
+                  {query ? <button type="button" className="guest-search-back" aria-label="Back to full menu" onClick={() => searchChanged("")}><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg></button> : <IconSearch width={18} height={18} />}
+                  <input type="search" value={query} onChange={(e) => searchChanged(e.target.value)} placeholder="Search dishes, wines, drinks" enterKeyHint="search" />
+                  {query && <button type="button" className="clear" onClick={() => searchChanged("")} aria-label="Clear search"><IconClose width={16} height={16} /></button>}
                 </label>
-                <button type="button" className="cart-btn" onClick={() => setCartOpen(true)} aria-label={count ? `View order, ${count} ${count === 1 ? "item" : "items"}, ${naira(total)}` : "View order"}>
+                <button type="button" className="cart-btn" onClick={openCart} aria-label={count ? `View order, ${count} ${count === 1 ? "item" : "items"}, ${naira(total)}` : "View order"}>
                   <IconBag width={22} height={22} />
                   <AnimatePresence initial={false}>{count > 0 && <motion.b key="badge" className="cart-badge" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: "spring", stiffness: 500, damping: 28 }}>{count}</motion.b>}</AnimatePresence>
                 </button>
@@ -187,9 +227,9 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
           </main>
         </div>
 
-        {count > 0 && <button type="button" className="apple-floating-order" onClick={() => setCartOpen(true)} aria-label={`View order, ${count} items, ${naira(total)}`}><span className="apple-order-icon"><IconBag width={19} height={19}/></span><span className="apple-order-details"><strong>View your order</strong><small>{count} {count === 1 ? "item" : "items"}</small></span><strong className="apple-order-total">{naira(total)}</strong><IconArrowRight width={18} height={18}/></button>}
-        <ItemSheet item={item} initialSelection={openSelection} initialPhotoIndex={openPhoto} branchId={branch.id} onClose={() => setItem(null)} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
-        <CartSheet open={cartOpen} branchId={branch.id} onClose={() => setCartOpen(false)} canOrder={status.open} closedReason={status.reason} />
+        {count > 0 && <button type="button" className="apple-floating-order" onClick={openCart} aria-label={`View order, ${count} items, ${naira(total)}`}><span className="apple-order-icon"><IconBag width={19} height={19}/></span><span className="apple-order-details"><strong>View your order</strong><small>{count} {count === 1 ? "item" : "items"}</small></span><strong className="apple-order-total">{naira(total)}</strong><IconArrowRight width={18} height={18}/></button>}
+        <ItemSheet item={item} initialSelection={openSelection} initialPhotoIndex={openPhoto} branchId={branch.id} onClose={closeGuest} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
+        <CartSheet open={cartOpen} branchId={branch.id} onClose={closeGuest} canOrder={status.open} closedReason={status.reason} />
         <Toast lifted={false} />
         {phase !== "menu" && <Welcome branchId={branch.id} hotelName={branch.name} statusLine={statusLine} onStart={() => setPhase("entering")} onDone={enterMenu} />}
       </LayoutGroup>

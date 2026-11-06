@@ -1,0 +1,15 @@
+
+/* Fixed label + input geometry. Text never shares the label's line. */
+.trq-auth .trq-auth-field{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:stretch!important;gap:5px!important;position:relative!important;min-height:85px!important;padding:14px 17px!important}
+.trq-auth .trq-auth-field label{display:block!important;position:static!important;transform:none!important;float:none!important;top:auto!important;left:auto!important;margin:0!important;padding:0!important;font:600 13px/1.35 -apple-system,Inter,system-ui,sans-serif!important;letter-spacing:0!important;color:#44515b!important;opacity:1!important}
+.trq-auth .trq-auth-field input{display:block!important;position:static!important;transform:none!important;float:none!important;top:auto!important;left:auto!important;width:100%!important;height:34px!important;min-height:34px!important;padding:0 20px 0 0!important;margin:0!important;line-height:34px!important;font-size:17px!important;font-weight:520!important;text-indent:0!important;border:0!important;box-shadow:none!important;background:transparent!important;color:#161a20!important;-webkit-text-fill-color:#161a20!important}
+.trq-auth .trq-auth-field input::placeholder{color:transparent!important;opacity:0!important}
+.trq-auth .trq-auth-password-row{display:flex!important;align-items:center!important;gap:8px!important;width:100%!important}
+.trq-auth .trq-auth-password-row input{min-width:0!important;flex:1!important;padding-right:0!important}
+.trq-auth .trq-auth-visibility{position:static!important;flex:none!important;width:36px!important;height:36px!important}
+.trq-auth .trq-auth-field:focus-within label{color:#146849!important}
+.trq-auth .trq-auth-field:focus-within{background:rgba(255,255,255,.78)}
+.trq-auth .trq-auth-fields:focus-within{outline:3px solid rgba(90,123,101,.22);outline-offset:1px}
+.trq-auth .trq-auth-input-activity{top:auto!important;bottom:25px!important;right:18px!important}
+.trq-auth .trq-auth-password .trq-auth-input-activity{right:56px!important}
+@media(max-width:600px){.trq-auth .trq-auth-field{padding:13px 15px!important}}

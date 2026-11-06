@@ -22,14 +22,14 @@ export default function AdminLoginScreen({
           <div className="trq-auth-field">
             <label htmlFor="trq-email">Email address</label>
             <input id="trq-email" type="email" autoComplete="username" inputMode="email" autoCapitalize="none" spellCheck={false}
-              value={email} onChange={e=>{onEmail(e.target.value);setEmailPulse(n=>n+1);}} placeholder="name@example.com" required disabled={locked}/>
+              value={email} onChange={e=>{onEmail(e.target.value);setEmailPulse(n=>n+1);}} placeholder="" required disabled={locked}/>
             {email.length > 0 && <span key={emailPulse} className="trq-auth-input-activity" aria-hidden="true"/>}
           </div>
           <div className="trq-auth-field trq-auth-password">
             <label htmlFor="trq-password">Password</label>
             <div className="trq-auth-password-row">
               <input id="trq-password" type={visible ? "text" : "password"} autoComplete="current-password"
-                value={password} onChange={e=>{onPassword(e.target.value);setPasswordPulse(n=>n+1);}} placeholder="Enter password" required disabled={locked}
+                value={password} onChange={e=>{onPassword(e.target.value);setPasswordPulse(n=>n+1);}} placeholder="" required disabled={locked}
                 onKeyUp={e=>setCapsLock(e.getModifierState("CapsLock"))} onKeyDown={e=>setCapsLock(e.getModifierState("CapsLock"))}/>
               <button type="button" className="trq-auth-visibility" onClick={()=>setVisible(v=>!v)}
                 aria-label={visible ? "Hide password" : "Show password"} aria-pressed={visible} disabled={locked}>
