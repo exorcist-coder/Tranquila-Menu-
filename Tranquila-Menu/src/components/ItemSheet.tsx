@@ -35,8 +35,8 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
   const groups = visibleGroups(item, sel);
   const unit = unitPrice(item, sel);
   const [lo] = priceRange(item);
-  const photos = Math.max(1, item.photos?.length ?? 0);
-  const photoUrls = Array.from({ length: photos }, (_, i) => i === 0 && item.imageUrl ? item.imageUrl : photoOf(item, i)?.src);
+  const photos = Math.max(1, (item.photos?.length ?? 0) + (item.imageUrl ? 1 : 0));
+  const photoUrls = Array.from({ length: photos }, (_, i) => item.imageUrl && i === 0 ? item.imageUrl : photoOf(item, i - (item.imageUrl ? 1 : 0))?.src);
   const drink = isDrink(item.category);
 
   useEffect(() => { if (tried && missing.length === 0) setTried(false); }, [tried, missing.length]);
@@ -60,7 +60,7 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
       <div className="sheet-scroll item-sheet-scroll">
         {drink ? (
           <div className="wd-head">
-            <div className="wd-art"><Bottle item={item} /></div>
+            <div className="wd-art"><Bottle item={item} />{photos > 1 && <div className="drink-photo-strip" aria-label="More product photos">{photoUrls.map((url, i) => url && <button key={url + i} type="button" onClick={() => setExpandedPhoto(i)} aria-label={"View " + item.name + " photo " + (i + 1)}><img src={url} alt="" /></button>)}</div>}</div>
             <div className="wd-info">
               <h2>{item.name}</h2>
               <p className="item-desc">{item.description}</p>
@@ -73,7 +73,7 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
         <div className="hero">
           <div className="gallery" ref={galleryRef} onScroll={(e) => setSlide(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))} tabIndex={photos > 1 ? 0 : undefined} aria-label={photos > 1 ? `${item.name} photos` : undefined}>
             {Array.from({ length: photos }, (_, i) => (
-              <div className="slide" key={i}><button type="button" className="gallery-open" onClick={() => setExpandedPhoto(i)} disabled={!photoUrls[i]} aria-label={`View ${item.name} photo ${i + 1} full screen`}><Media item={item} index={i} radius={28} layoutId={i === 0 ? `media-${item.id}` : undefined} eager alt={i === 0 ? item.name : ""} /></button></div>
+              <div className="slide" key={i}><button type="button" className="gallery-open" onClick={() => setExpandedPhoto(i)} disabled={!photoUrls[i]} aria-label={`View ${item.name} photo ${i + 1} full screen`}><Media item={item} index={item.imageUrl ? Math.max(0,i-1) : i} radius={28} layoutId={i === 0 ? `media-${item.id}` : undefined} eager alt={i === 0 ? item.name : ""} /></button></div>
             ))}
           </div>
           {photos > 1 && <div className="dots" aria-hidden>{Array.from({ length: photos }, (_, i) => <i key={i} data-on={i === slide ? "" : undefined} />)}</div>}

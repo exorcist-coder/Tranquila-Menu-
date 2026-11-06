@@ -6,7 +6,7 @@ import { PHOTOS } from "@/lib/photos";
 import { CatIcon } from "./icons";
 
 const TONE = "#E4E8D8";
-export const photoOf = (item: Item, i = 0) => { const k = item.photos?.[i]; return k ? PHOTOS[k] : undefined; };
+export const photoOf = (item: Item, i = 0) => { const k = item.photos?.[i]; return k ? (/^https:\/\//.test(k) || k.startsWith("/") ? {src:k,tone:TONE,w:720,h:720} : PHOTOS[k]) : undefined; };
 /** Product-specific cutouts for non-alcoholic drinks; existing bottle for wines, spirits and beers. */
 const DRINK_IMAGE: Record<string, string> = {
   "soft-drinks": "/images/drinks/soft-drinks.webp",
@@ -20,7 +20,7 @@ const DRINK_IMAGE: Record<string, string> = {
 export const bottleOf = (item: Item) => {
   if (!isDrink(item.category)) return undefined;
   if (item.imageUrl) return item.imageUrl;
-  return DRINK_IMAGE[item.id] ?? (item.category === "soft" ? DRINK_IMAGE["soft-drinks"] : item.category === "water" ? DRINK_IMAGE.water : "/images/bouchon.png");
+  return photoOf(item)?.src ?? DRINK_IMAGE[item.id] ?? (item.category === "soft" ? DRINK_IMAGE["soft-drinks"] : item.category === "water" ? DRINK_IMAGE.water : "/images/bouchon.png");
 };
 
 /** Dish photo, or a quiet icon tile when a dish has no photo yet. */
