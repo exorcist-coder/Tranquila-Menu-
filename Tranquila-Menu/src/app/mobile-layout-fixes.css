@@ -1,0 +1,148 @@
+
+/* 2026 mobile layout corrections. Keep menu data, pricing, and event handlers unchanged. */
+#app-root .apple-floating-order{
+ width:min(430px,calc(100vw - 28px));
+ min-height:58px;
+ max-height:66px;
+ padding:7px 14px;
+ gap:10px;
+ bottom:calc(10px + env(safe-area-inset-bottom,0px));
+ border:1px solid rgba(40,60,46,.13);
+ border-radius:17px;
+ background:rgba(255,255,255,.96);
+ box-shadow:0 8px 28px rgba(22,35,28,.13);
+}
+#app-root .apple-floating-order .apple-order-icon{width:36px;height:36px;border-radius:11px}
+#app-root .apple-order-details{gap:0}
+#app-root .apple-order-details strong{font-size:14px;font-weight:680;line-height:1.3}
+#app-root .apple-order-details small{font-size:12px;line-height:1.3}
+#app-root .apple-order-total{font-size:15px;font-weight:750}
+#app-root .apple-floating-order svg:last-child{flex:none}
+#app-root:has(.apple-floating-order){padding-bottom:calc(95px + env(safe-area-inset-bottom,0px))!important}
+#app-root .item-sheet-bar{height:45px;min-height:45px;padding:3px 14px}
+#app-root .item-sheet-bar .round.close,.sheet-light .item-sheet-bar .round.close{
+ width:36px;height:36px;min-width:36px;min-height:36px;
+ border-radius:50%;box-shadow:none;border:1px solid rgba(40,48,41,.09);
+ background:#f4f5f2;color:#293c30;
+}
+.item-sheet-bar .grab{height:24px}
+.item-sheet-bar .grab i{width:34px;height:4px;background:#d1d5cf;box-shadow:none}
+.item-sheet-scroll .hero{padding-top:0!important;margin-top:0!important}
+.item-sheet-scroll .gallery{height:min(36dvh,305px);border-radius:18px}
+.item-sheet-scroll .gallery .media,.item-sheet-scroll .gallery .gallery-open{border-radius:18px}
+.item-sheet-scroll .item-content{padding-top:14px}
+.item-sheet-scroll .item-head{gap:10px;align-items:baseline}
+.item-sheet-scroll .item-head h2{font-size:clamp(25px,6.5vw,38px);line-height:1.13;overflow-wrap:anywhere}
+.item-sheet-scroll .item-price{white-space:nowrap;font-size:16px;font-weight:750}
+.item-sheet-scroll .group .pills{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:9px}
+.item-sheet-scroll .group .pill{
+ display:flex;align-items:center;justify-content:space-between;
+ min-height:46px;border-radius:13px;padding:11px 14px;gap:12px;
+ border:1px solid rgba(57,75,59,.12);
+ font-size:15px;line-height:1.4;
+}
+.item-sheet-scroll .group .pill-bg{border-radius:12px}
+.item-sheet-scroll .group .pill .pill-p{
+ margin-left:auto;text-decoration:none!important;
+ font-size:14px;line-height:1.4;font-weight:650;
+ color:#4e6151;
+}
+.item-sheet-scroll .group .pill[data-on] .pill-p{color:#fff}
+.item-sheet-scroll .group .pill[data-on]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.item-sheet-scroll .group .pill .pill-t{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.item-sheet-scroll .group .pill .pill-t,.item-sheet-scroll .group .pill .pill-p{text-decoration:none!important}
+.sheet-light .dock-foot{gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px))}
+.sheet-light .dock-foot .cta{min-width:0;height:50px;padding:0 15px;gap:7px;font-size:14px}
+.sheet-light .dock-foot .cta-p{font-size:13px;white-space:nowrap}
+.sheet-light .dock-foot .stepper{min-width:0}
+#app-root .grid .card-li:not(:has(.card-media)) .card{
+ border:1px solid rgba(41,65,47,.075);min-height:170px
+}
+#app-root .grid .card-name{overflow-wrap:anywhere}
+@media(max-width:600px){
+ #app-root .apple-floating-order{left:50%;width:calc(100vw - 24px);max-width:430px}
+ #app-root .grid{align-items:stretch}
+ .item-sheet-scroll .gallery{height:min(33dvh,290px)}
+ .item-sheet-scroll .group .pills{grid-template-columns:1fr}
+ .item-sheet-scroll .item-head{align-items:start;flex-wrap:wrap}
+ .item-sheet-scroll .item-head h2{flex:1 1 190px}
+ .sheet-light .dock-foot .cta{flex:1 1 auto}
+}
+@media(max-width:360px){
+ #app-root .apple-floating-order .apple-order-icon{display:none}
+ .sheet-light .dock-foot .cta{padding:0 10px;font-size:13px}
+ .sheet-light .dock-foot .cta-p{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ #app-root .apple-floating-order,#app-root .group .pill{transition:none!important}
+}
+
+
+/* Tranquila admin: legible labels, unclipped badges, responsive controls. */
+.pro-hybrid .pro-food-category{
+ top:10px;left:10px;
+ max-width:calc(100% - 105px);
+ white-space:normal!important;
+ overflow:visible!important;text-overflow:clip!important;
+ overflow-wrap:anywhere;
+ line-height:1.35;
+ font-size:11px!important;font-weight:650;
+ padding:6px 9px;border-radius:9px;
+ background:rgba(255,255,255,.97);
+}
+.pro-hybrid .pro-food-state{top:10px;right:10px;font-size:10px!important;border-radius:9px;font-weight:700}
+.pro-hybrid .pro-food-grid{gap:14px}
+.pro-hybrid .pro-food-card{border-radius:17px}
+.pro-hybrid .pro-food-visual{height:185px}
+.pro-hybrid .pro-food-title-block h3{font-size:17px!important;line-height:1.35}
+.pro-hybrid .pro-food-title-block p{font-size:13px!important;line-height:1.5;color:#657269;min-height:0}
+.pro-hybrid .pro-food-body{padding:15px 15px 14px}
+.pro-hybrid .pro-food-price{font-size:17px;font-weight:750}
+.pro-hybrid .pro-food-footer{gap:10px;flex-wrap:wrap}
+.pro-hybrid .pro-food-footer .pro-stock{
+ flex:1 1 145px;
+ display:inline-flex;justify-content:flex-start;
+ min-height:44px!important;padding:9px 11px!important;
+ gap:9px;
+}
+.pro-hybrid .pro-food-footer .pro-stock-label{font-size:12px!important;font-weight:650!important;white-space:nowrap}
+.pro-hybrid .pro-food-actions{margin-left:auto;gap:7px}
+.pro-hybrid .pro-food-actions button{width:42px;height:42px;min-width:42px;min-height:42px}
+.pro-hybrid .pro-collection-tools{gap:9px}
+.pro-hybrid .pro-filter-control{min-width:0;min-height:44px;flex:0 1 190px}
+.pro-hybrid .pro-filter-control select{font-size:13px!important;max-width:100%;min-width:0}
+.pro-hybrid .pro-view-switch{flex:none;min-height:44px}
+.pro-hybrid .pro-category-tabs button{font-size:13px!important;min-height:40px}
+.pro-hybrid .pro-topbar-left{gap:10px;min-width:0}
+.pro-hybrid .pro-topbar-route{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pro-hybrid .pro-native-back{flex:none;min-height:36px}
+@media(max-width:850px){
+ .pro-hybrid .pro-food-grid:not(.as-list){grid-template-columns:1fr!important}
+ .pro-hybrid .pro-food-visual{height:clamp(190px,42vw,270px)}
+ .pro-hybrid .pro-food-category{max-width:calc(100% - 125px);font-size:12px!important}
+ .pro-hybrid .pro-collection-tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px}
+ .pro-hybrid .pro-search-input{grid-column:1/-1;min-width:0;width:100%;min-height:44px;flex:auto}
+ .pro-hybrid .pro-filter-control{width:100%;min-width:0;max-width:none;flex:auto}
+ .pro-hybrid .pro-view-switch{grid-column:1/-1;justify-self:end}
+ .pro-hybrid .pro-food-footer .pro-stock{max-width:none}
+}
+@media(max-width:450px){
+ .pro-hybrid .pro-collection-tools{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .pro-hybrid .pro-topbar-route{font-size:12px}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-card{grid-template-columns:95px minmax(0,1fr)}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-visual{min-height:165px}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-category{
+  position:static;display:block;max-width:none;border-radius:0;padding:5px 7px;
+  font-size:10px!important;line-height:1.2;
+ }
+ .pro-hybrid .pro-food-grid.as-list .pro-food-state{position:absolute;right:5px;bottom:5px;top:auto}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-body{padding:10px}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-title-block h3{font-size:14px!important}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-title-block p{font-size:12px!important}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-footer{align-items:stretch}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-footer .pro-stock{flex:1 1 100%;min-width:0}
+ .pro-hybrid .pro-food-grid.as-list .pro-food-actions{width:100%;justify-content:flex-end}
+}
+@media(prefers-reduced-motion:reduce){
+ .pro-hybrid .pro-food-card,.pro-hybrid .pro-food-visual img{transition:none!important}
+}
