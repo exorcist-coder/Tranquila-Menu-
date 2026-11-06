@@ -19,3 +19,9 @@
 @media(prefers-reduced-motion:reduce){
  #app-root *,#app-root *::before,#app-root *::after,.admin-shell *,.admin-shell *::before,.pro-hybrid *,.pro-hybrid *::before,.ambi-auth *,.trq-auth *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+
+/* Visible return control while filtering the menu. */
+#app-root .guest-search-back{display:grid;place-items:center;width:34px;height:34px;min-width:34px;border:0;border-radius:9px;background:transparent;color:inherit;cursor:pointer;padding:0}
+#app-root .guest-search-back:active{transform:scale(.97)}
+.amb-navigation-back:empty{display:none}.amb-navigation-back:not(:empty){margin-bottom:13px}
+.amb-navigation-back .admin-secondary{min-height:36px;padding:7px 12px;font-size:13px}

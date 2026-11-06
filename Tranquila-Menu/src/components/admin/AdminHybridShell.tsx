@@ -40,8 +40,8 @@ export default function AdminHybridShell({
   children: ReactNode;
 }) {
   const [drawer, setDrawer] = useState(false);
-  useEffect(() => { if (!drawer) return; const handle = (e: KeyboardEvent) => { if (e.key === "Escape") setDrawer(false); }; window.addEventListener("keydown", handle); return () => window.removeEventListener("keydown", handle); }, [drawer]);
-  function go(id: AdminSection) { onTab(id); setDrawer(false); }
+  useEffect(() => { if (!drawer) return; const handle = (e: KeyboardEvent) => { if (e.key === "Escape") closeDrawer(); }; window.addEventListener("keydown", handle); return () => window.removeEventListener("keydown", handle); }, [drawer]);
+  function go(id: AdminSection) { if (drawer) window.history.replaceState({ ...(window.history.state ?? {}), hotelDrawer: false }, "", window.location.href); onTab(id); setDrawer(false); }
   function openDrawer() {
     window.history.pushState({ ...(window.history.state ?? {}), hotelDrawer: true }, "", window.location.href);
     setDrawer(true);

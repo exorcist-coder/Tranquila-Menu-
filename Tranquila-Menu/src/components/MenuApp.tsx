@@ -169,7 +169,7 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
             <div className="toolbar-in">
               <div className="toolbar-row">
                 <label className="search"><span className="sr-only">Search the menu</span>
-                  <IconSearch width={18} height={18} />
+                  {query ? <button type="button" className="guest-search-back" aria-label="Back to full menu" onClick={() => searchChanged("")}><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg></button> : <IconSearch width={18} height={18} />}
                   <input type="search" value={query} onChange={(e) => searchChanged(e.target.value)} placeholder="Search dishes, wines, drinks" enterKeyHint="search" />
                   {query && <button type="button" className="clear" onClick={() => searchChanged("")} aria-label="Clear search"><IconClose width={16} height={16} /></button>}
                 </label>

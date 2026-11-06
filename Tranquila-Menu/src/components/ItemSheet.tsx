@@ -143,6 +143,18 @@ function PhotoViewer({ itemName, urls, initialIndex, onClose }: { itemName: stri
   const available = urls.map((src, i) => ({ src, i })).filter((p): p is { src: string; i: number } => !!p.src);
   const [index, setIndex] = useState(() => Math.max(0, available.findIndex(p => p.i === initialIndex)));
   const closeButton = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => {
+    window.history.pushState({ ...(window.history.state ?? {}), hotelPhotoViewer: true }, "", window.location.href);
+    const pop = () => closeRef.current();
+    window.addEventListener("popstate", pop);
+    return () => window.removeEventListener("popstate", pop);
+  }, []);
+  const closePhotoViewer = () => {
+    if ((window.history.state as {hotelPhotoViewer?: boolean}|null)?.hotelPhotoViewer) window.history.back();
+    else onClose();
+  };
   const startX = useRef<number | null>(null);
   const count = available.length;
   const previous = () => setIndex(i => (i - 1 + count) % count);
@@ -157,7 +169,7 @@ function PhotoViewer({ itemName, urls, initialIndex, onClose }: { itemName: stri
   function onKeyDown(event: React.KeyboardEvent) {
     // Stop the parent sheet from interpreting Escape or trapping focus behind this dialog.
     event.stopPropagation();
-    if (event.key === "Escape") { onClose(); return; }
+    if (event.key === "Escape") { closePhotoViewer(); return; }
     if (event.key === "ArrowLeft" && count > 1) { event.preventDefault(); previous(); }
     if (event.key === "ArrowRight" && count > 1) { event.preventDefault(); next(); }
     if (event.key === "Tab") {
@@ -174,7 +186,7 @@ function PhotoViewer({ itemName, urls, initialIndex, onClose }: { itemName: stri
     <div className="photo-viewer" role="dialog" aria-modal="true" aria-label={itemName + " photo viewer"} tabIndex={-1} onKeyDown={onKeyDown}
       onTouchStart={e => { startX.current = e.touches[0]?.clientX ?? null; }}
       onTouchEnd={e => { if (startX.current === null || count < 2) return; const delta = (e.changedTouches[0]?.clientX ?? startX.current) - startX.current; startX.current = null; if (delta > 50) previous(); else if (delta < -50) next(); }}>
-      <button type="button" className="photo-viewer-close" ref={closeButton} onClick={onClose} aria-label="Close full-screen photo"><IconClose /></button>
+      <button type="button" className="photo-viewer-close" ref={closeButton} onClick={closePhotoViewer} aria-label="Back to item"><IconClose /></button>
       <div className="photo-viewer-stage">
         <img key={available[index]!.src} src={available[index]!.src} alt={itemName + " photo " + (index + 1)} draggable={false} />
       </div>
