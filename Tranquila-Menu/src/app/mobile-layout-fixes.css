@@ -146,3 +146,16 @@
 @media(prefers-reduced-motion:reduce){
  .pro-hybrid .pro-food-card,.pro-hybrid .pro-food-visual img{transition:none!important}
 }
+
+/* Small unobtrusive close control for food/drink details. */
+#app-root .item-sheet-bar{height:42px;min-height:42px;padding:2px 13px}
+#app-root .item-sheet-bar .round.close.item-close-compact,
+.sheet-light .item-sheet-bar .round.close.item-close-compact{
+ width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;
+ border-radius:10px!important;border:1px solid rgba(40,49,43,.11)!important;
+ background:rgba(247,248,246,.92)!important;color:#3b453f!important;
+ box-shadow:none!important;padding:0!important;
+}
+#app-root .item-sheet-bar .item-close-compact svg{width:17px;height:17px}
+#app-root .item-sheet-bar .item-close-compact:active{transform:scale(.96)}
+#app-root .item-sheet-bar .item-close-compact:focus-visible{outline:2px solid #326346;outline-offset:2px}
