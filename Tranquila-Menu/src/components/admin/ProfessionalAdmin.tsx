@@ -3,13 +3,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Item, Group } from "@/lib/catalog";
 import { CATEGORIES, ITEMS } from "@/lib/catalog";
 import { BRANCHES, type BranchId } from "@/lib/branches";
-import { PHOTOS } from "@/lib/photos";
+
 import OptionGroupsEditor from "./OptionGroupsEditor";
 import AdminHybridShell from "./AdminHybridShell";
 import { AdminMenuWorkspace } from "./AdminMenuWorkspace";
 import AdminItemPreview from "./AdminItemPreview";
 import AdminEditorAside from "./AdminEditorAside";
 import AdminLoginScreen from "./AdminLoginScreen";
+import AdminImageGallery, { appendItemImage, itemImageRefs, MAX_ITEM_IMAGES, imageSrc } from "./AdminImageGallery";
+import { readUploadResult } from "@/lib/readUploadResult";
 import { AdminIcon } from "./AdminIcon";
 import { AdminArchivePanel, AdminHistoryPanel, AdminCategoriesPanel, AdminServicePanel } from "./AdminManagementPanels";
 import "./professional-admin.css";
@@ -32,7 +34,7 @@ const baseItem = (): DisplayItem => ({ id: "new-item-" + Date.now().toString(36)
 const blank: Workspace = { published: initialMenu, drafts: [], archived: [], history: { events: [], revisions: [] } };
 const date = (s: string) => new Date(s).toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" });
 const cash = (n: number) => "₦" + Number(n || 0).toLocaleString("en-NG");
-const photo = (i: DisplayItem) => i.imageUrl || (i.photos?.[0] ? PHOTOS[i.photos[0]]?.src : undefined);
+const photo = (i: DisplayItem) => imageSrc(itemImageRefs(i)[0] ?? "");
 const branchName = BRANCHES.find(b => b.id === activeBranch)?.name ?? "Tranquila Hotels";
 const nav: { id: Tab; label: string; icon: string }[] = [
   { id: "overview", label: "Overview", icon: "▦" }, { id: "live", label: "Live menu", icon: "▤" },
@@ -166,19 +168,26 @@ export default function ProfessionalAdmin() {
       setError(e instanceof Error ? e.message : "The stock change could not be saved.");
     } finally { setBusy(false); }
   }
-  async function upload(file: File) {
-    if (!editor) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5_000_000) { setError("Choose a JPG, PNG or WebP under 5 MB."); return; }
+  async function upload(files: File[]) {
+    if (!editor || !files.length) return;
+    const room = MAX_ITEM_IMAGES - itemImageRefs(editor).length;
+    if (files.length > room) { setError("You can add up to " + MAX_ITEM_IMAGES + " photos per item."); return; }
+    if (files.some(file => !["image/jpeg","image/png","image/webp"].includes(file.type) || file.size > 5_000_000)) { setError("Choose JPG, PNG or WebP images under 5 MB each."); return; }
     setBusy(true); setError("");
+    let added = 0;
     try {
-      const form = new FormData(); form.append("file", file);
-      const r = await fetch("/api/admin/upload", { method: "POST", headers: { Authorization: "Bearer " + token }, body: form });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error ?? "Upload failed.");
-      setEditor(v => v ? { ...v, imageUrl: d.url, photos: [] } : null);
-      setNotice("Image uploaded. Save the item to keep it in the draft library.");
-    } catch (e) { setError(e instanceof Error ? e.message : "Upload failed."); }
-    finally { setBusy(false); }
+      for (const file of files) {
+        const form = new FormData(); form.append("file", file);
+        const response = await fetch("/api/admin/upload", { method: "POST", headers: { Authorization: "Bearer " + token }, body: form });
+        const result = await readUploadResult(response);
+        setEditor(previous => previous ? appendItemImage(previous,result.url) : null);
+        added++;
+      }
+      setNotice(added + " photo" + (added === 1 ? "" : "s") + " uploaded. Save the item to keep the changes.");
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : "Upload failed.";
+      setError(added ? added + " uploaded; next photo failed: " + message : message);
+    } finally { setBusy(false); }
   }
   async function saveService() {
     setBusy(true); setError("");
@@ -254,8 +263,8 @@ export default function ProfessionalAdmin() {
         }}
       />}
       {editor && tab === "drafts" && <div className="pro-editor"><div className="pro-editor-top"><div><span className="pro-status draft">DRAFT WORKSPACE</span><h2>{editor.name || "New menu item"}</h2><p>Changes are private until you publish from the Draft library.</p></div><button className="pro-btn secondary" onClick={() => setEditor(null)}>← Back to drafts</button></div>
-        <div className="pro-editor-layout"><div className="pro-editor-fields"><div className="pro-panel"><h3>Item details</h3><div className="pro-form-grid"><label>Item name<input value={editor.name} onChange={e => setEditor({ ...editor, name: e.target.value })} placeholder="e.g. Chicken Caesar Salad"/></label><label>Category<select value={editor.category} onChange={e => setEditor({ ...editor, category: e.target.value })}>{workspace.published.categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}</select></label><label>Price (₦)<input type="number" min={0} value={editor.basePrice} onChange={e => setEditor({ ...editor, basePrice: Number(e.target.value) })}/></label><label>Item reference<input disabled={workspace.published.items.some(i => i.id === editor.id) || workspace.drafts.some(d => d.item_id === editor.id)} value={editor.id} onChange={e => setEditor({ ...editor, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}/></label><label className="span-two">Description<textarea rows={3} value={editor.description} onChange={e => setEditor({ ...editor, description: e.target.value })}/></label><label>Guest visibility<select value={editor.visible === false ? "hidden" : "visible"} onChange={e => setEditor({ ...editor, visible: e.target.value === "visible" })}><option value="visible">Visible when published</option><option value="hidden">Hidden when published</option></select></label><label>Image upload<input type="file" accept="image/png,image/jpeg,image/webp" disabled={busy} onChange={e => { if (e.target.files?.[0]) void upload(e.target.files[0]); }}/></label>{photo(editor) && <div className="pro-image-preview"><img src={photo(editor)} alt="Item preview"/><button onClick={() => setEditor({ ...editor, imageUrl: undefined, photos: [] })}>Remove image</button></div>}</div></div>
-        <div className="pro-panel pro-options"><h3>Choices & customizations</h3><OptionGroupsEditor groups={options} onChange={setOptions}/></div></div>
+        <div className="pro-editor-layout"><div className="pro-editor-fields"><div className="pro-panel"><h3>Item details</h3><div className="pro-form-grid"><label>Item name<input value={editor.name} onChange={e => setEditor({ ...editor, name: e.target.value })} placeholder="e.g. Chicken Caesar Salad"/></label><label>Category<select value={editor.category} onChange={e => setEditor({ ...editor, category: e.target.value })}>{workspace.published.categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}</select></label><label>Price (₦)<input type="number" min={0} value={editor.basePrice} onChange={e => setEditor({ ...editor, basePrice: Number(e.target.value) })}/></label><label>Item reference<input disabled={workspace.published.items.some(i => i.id === editor.id) || workspace.drafts.some(d => d.item_id === editor.id)} value={editor.id} onChange={e => setEditor({ ...editor, id: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}/></label><label className="span-two">Description<textarea rows={3} value={editor.description} onChange={e => setEditor({ ...editor, description: e.target.value })}/></label><label>Guest visibility<select value={editor.visible === false ? "hidden" : "visible"} onChange={e => setEditor({ ...editor, visible: e.target.value === "visible" })}><option value="visible">Visible when published</option><option value="hidden">Hidden when published</option></select></label></div></div>
+        <AdminImageGallery item={editor} onChange={value => setEditor(value as DisplayItem)} onUpload={files => { void upload(files); }} uploading={busy} error={error || undefined} /><div className="pro-panel pro-options"><h3>Choices & customizations</h3><OptionGroupsEditor groups={options} onChange={setOptions}/></div></div>
         <AdminEditorAside item={{ ...editor, groups: options }} category={workspace.published.categories.find(c => c.id === editor.category)?.label ?? editor.category} onPreview={() => showPreview({ ...editor, groups: options }, true)}/>
         </div>
         <div className="pro-editor-footer"><button className="pro-btn secondary" onClick={() => showPreview({ ...editor, groups: options }, true)}>Preview item</button><button className="pro-btn primary" disabled={busy} onClick={saveDraft}>Save to draft library</button></div>
