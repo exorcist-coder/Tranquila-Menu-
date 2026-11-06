@@ -1,0 +1,21 @@
+
+/* Intentional interaction motion: short, restrained and composited. */
+:root{--ease-enter:cubic-bezier(.18,.77,.27,1);--ease-move:cubic-bezier(.45,0,.18,1)}
+@keyframes ui-enter{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ui-pop{from{opacity:0;transform:scale(.95) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes ui-feedback{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+#app-root :is(.card,.wcard,.search-result),.amb-workspace :is(.admin-panel,.amb-metrics button),.pro-hybrid :is(.pro-panel,.pro-food-card,.pro-metric){
+ animation:ui-enter 320ms var(--ease-enter) both;
+}
+#app-root :is(.card,.wcard,.search-result):nth-child(2),.amb-workspace .amb-metrics button:nth-child(2),.pro-hybrid .pro-food-card:nth-child(2){animation-delay:30ms}
+#app-root :is(.card,.wcard,.search-result):nth-child(3),.amb-workspace .amb-metrics button:nth-child(3),.pro-hybrid .pro-food-card:nth-child(3){animation-delay:60ms}
+#app-root :is(.card,.wcard,.search-result):nth-child(4),.amb-workspace .amb-metrics button:nth-child(4),.pro-hybrid .pro-food-card:nth-child(4){animation-delay:90ms}
+#app-root :is(.cart-btn,.add,.hb-cta,.card,.rail button),.admin-shell :is(.admin-primary,.admin-secondary,.amb-sidebar nav button),.pro-hybrid :is(.pro-btn,.pro-quick button,.pro-side nav button){
+ transition:transform 150ms var(--ease-move),background-color 200ms ease,box-shadow 200ms ease;
+}
+#app-root :is(.cart-btn,.add,.hb-cta,.card,.rail button):active,.admin-shell :is(.admin-primary,.admin-secondary):active,.pro-hybrid :is(.pro-btn,.pro-quick button):active{transform:scale(.97)}
+#app-root :is(.sheet,.cart-sheet,.item-sheet),:is(.admin-shell,.pro-hybrid) :is(.admin-preview,.pro-preview-dialog){transform-origin:center bottom;animation:ui-pop 220ms var(--ease-enter) both}
+:is(.admin-shell,.pro-hybrid) :is(.admin-notice,.pro-toast,.pro-error),:is(.ambi-auth,.trq-auth) :is(.ambi-auth-error,.ambi-auth-success,.trq-auth-error,.trq-auth-success){animation:ui-feedback 220ms var(--ease-enter) both}
+@media(prefers-reduced-motion:reduce){
+ #app-root *,#app-root *::before,#app-root *::after,.admin-shell *,.admin-shell *::before,.pro-hybrid *,.pro-hybrid *::before,.ambi-auth *,.trq-auth *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}

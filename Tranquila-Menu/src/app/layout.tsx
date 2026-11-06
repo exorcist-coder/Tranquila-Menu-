@@ -7,6 +7,8 @@ import "./apple-guest.css";
 import "./admin/auth.css";
 import "./admin/editor-fixes.css";
 import "./admin/auth-refinement.css";
+import "./motion-system.css";
+import "./admin/auth-field-fix.css";
 
 export const metadata: Metadata = {
   title: "Tranquila Hotels · Food & drinks",
