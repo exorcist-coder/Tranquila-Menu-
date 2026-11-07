@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { isDrink, type Item } from "@/lib/catalog";
 import { naira, priceRange, unitPrice, missingGroups } from "@/lib/pricing";
 import type { MenuSearchHit } from "@/lib/menuSearch";
-import Media, { Bottle } from "./Media";
+import Media, { Bottle, isPhotoDrink } from "./Media";
 import { IconPlus } from "./icons";
 
 /** Food: photo card with price and a quick-add button. Drinks: a wine-list row with the bottle standing out of the card. */
@@ -17,7 +17,7 @@ export default function Card({ item, onOpen, match }: { item: Item; onOpen: (i: 
     const origin = item.details?.find((d) => d.label === "Country")?.value;
     return (
       <li className="card-li wide">
-        <motion.button type="button" className="wcard" disabled={soldOut} data-sold-out={soldOut ? "" : undefined} whileTap={soldOut ? undefined : { scale: 0.98 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} onClick={() => onOpen(item)}>
+        <motion.button type="button" className={`wcard${isPhotoDrink(item) ? " wcard-photo" : ""}`} disabled={soldOut} data-sold-out={soldOut ? "" : undefined} whileTap={soldOut ? undefined : { scale: 0.98 }} transition={{ type: "spring", stiffness: 500, damping: 30 }} onClick={() => onOpen(item)}>
           {soldOut && <span className="sold-out-tag">Sold out</span>}
           <span className="wcard-t"><b>{match?.label ?? item.name}</b><span>{match?.option ? match.subtitle : origin ? `${sub} · ${origin}` : sub}</span><em className="wcard-p">{price}</em></span>
           <span className="wcard-art" aria-hidden><Bottle item={item} /></span>

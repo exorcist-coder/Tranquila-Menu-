@@ -3,13 +3,15 @@ import { PHOTOS } from "./photos";
 
 /** Search previews use photos already assigned to the parent item's gallery. */
 const aliases: Record<string, Record<string, string>> = {
-  rice: { jollof: "jollof-rice", white: "white-rice", fried: "fried-rice", basmati: "white-rice", "curry-fried": "fried-rice", "special-fried": "special-rice", "steamed-chicken-fried": "fried-rice", jambalaya: "jambalaya-rice" },
-  spaghetti: { jollof: "tomato-spaghetti", "white-sauce": "cream-spaghetti", vegetable: "tomato-spaghetti", white: "cream-spaghetti", "stir-fried": "stir-fried-spaghetti", bolognese: "bolognese-spaghetti", alfredo: "cream-spaghetti" },
+  "hot-drinks": { coffee: "approved-latte-coffee", "decaffeinated-coffee": "approved-black-coffee", "hot-chocolate": "approved-milo-hot" },
+  juice: { watermelon: "approved-watermelon-juice" },
+  rice: { jollof: "jollof-rice", white: "approved-white-rice-stew", fried: "fried-rice", basmati: "white-rice", "curry-fried": "fried-rice", "special-fried": "special-rice", "steamed-chicken-fried": "approved-chicken-fried-rice", jambalaya: "jambalaya-rice" },
+  spaghetti: { jollof: "approved-jollof-spaghetti", "white-sauce": "cream-spaghetti", vegetable: "tomato-spaghetti", white: "cream-spaghetti", "stir-fried": "stir-fried-spaghetti", bolognese: "spaghetti-bolognese", alfredo: "cream-spaghetti" },
   pasta: { "creamy-chicken": "creamy-pasta", alfredo: "alfredo-pasta", seafood: "seafood-pasta" },
-  indomie: { indomie: "indomie-noodles", "indomie-eggs": "indomie-eggs-photo" },
-  eggs: { "boiled-egg": "fried-egg", "fried-egg": "fried-egg", "scrambled-egg": "scrambled-eggs", "sunny-side-up": "fried-egg", omelette: "omelette", "spanish-omelette": "spanish-omelette", "vegetable-omelette": "omelette" },
-  sides: { "french-fries": "fries", "fried-plantain": "plantain-fried", "boiled-plantain": "plantain-boiled", "fried-yam": "yam-side", "boiled-yam": "yam-side", "mashed-potatoes": "mashed-potatoes" },
-  "swallow-soup": { egusi: "egusi", okro: "okra-fufu", "seafood-okro": "okra-seafood", "fisherman-soup": "okra-seafood", ogbono: "fufu-ogbono", vegetable: "efo-riro", "white-soup": "white-soup", beef: "efo-beef" },
+  indomie: { indomie: "indomie-noodles", "indomie-eggs": "indomie-sausage-boiled-eggs" },
+  eggs: { "boiled-egg": "fried-egg", "fried-egg": "fried-egg", "scrambled-egg": "scrambled-eggs-fries-plantain", "sunny-side-up": "fried-egg", omelette: "omelette", "spanish-omelette": "spanish-omelette", "vegetable-omelette": "omelette" },
+  sides: { "french-fries": "fries", "fried-plantain": "plantain-fried", "boiled-plantain": "plantain-boiled", "fried-yam": "fried-yam-pepper-sauce", "boiled-yam": "yam-side", "mashed-potatoes": "mashed-potatoes" },
+  "swallow-soup": { egusi: "approved-egusi-assorted", okro: "okra-fufu", "seafood-okro": "approved-okra-seafood", "fisherman-soup": "okra-seafood", ogbono: "fufu-ogbono", vegetable: "efo-riro", "white-soup": "white-soup", beef: "efo-beef" },
   peppered: { beef: "peppered-beef", chicken: "peppered-chicken", catfish: "peppered-fish", "croaker-fish": "peppered-fish-red" },
   "chef-sauces": { "chicken-curry": "chicken-curry", "shredded-beef": "shredded-beef", "shredded-chicken": "chicken-curry", "shrimps-provenc-al": "prawns" },
   "porridge-local": { "porridge-beans": "porridge-beans", "porridge-potatoes": "porridge-potatoes", "porridge-yam": "porridge-yam" },

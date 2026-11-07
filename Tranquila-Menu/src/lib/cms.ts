@@ -1,3 +1,4 @@
+import { withApprovedPhotos } from "./approvedPhotos";
 import { CATEGORIES, ITEMS, type CategoryId, type Item } from "./catalog";
 import { BRANCHES, type BranchId } from "./branches";
 
@@ -28,6 +29,7 @@ export async function getMenu(publishedOnly = true, branchId: BranchId = "tranqu
   } catch {
     return { ...fallbackMenu, items: fallbackMenu.items.map(item => ({ ...item, available: false })) };
   }
+  source = { ...source, items: source.items.map(withApprovedPhotos) };
   // Keep the stable category ID while showing the updated label, including on previously saved CMS menus.
   source = { ...source, categories: source.categories.map(category => category.id === "spirits" ? { ...category, label: "Whiskey" } : category) };
   try {

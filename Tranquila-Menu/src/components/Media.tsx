@@ -17,10 +17,12 @@ const DRINK_IMAGE: Record<string, string> = {
   smoothie: "/images/drinks/juice.webp",
   chapman: "/images/drinks/juice.webp",
 };
-export const bottleOf = (item: Item) => {
+/** Full photos use a frame; product cutouts keep their bottle silhouette. */
+export const isPhotoDrink = (item: Item) => ["hot-drinks", "juice", "smoothie"].includes(item.id) && !!(item.imageUrl || photoOf(item));
+export const bottleOf = (item: Item, index = 0) => {
   if (!isDrink(item.category)) return undefined;
-  if (item.imageUrl) return item.imageUrl;
-  return photoOf(item)?.src ?? DRINK_IMAGE[item.id] ?? (item.category === "soft" ? DRINK_IMAGE["soft-drinks"] : item.category === "water" ? DRINK_IMAGE.water : "/images/bouchon.png");
+  if (item.imageUrl && index === 0) return item.imageUrl;
+  return photoOf(item, index - (item.imageUrl ? 1 : 0))?.src ?? DRINK_IMAGE[item.id] ?? (item.category === "soft" ? DRINK_IMAGE["soft-drinks"] : item.category === "water" ? DRINK_IMAGE.water : "/images/bouchon.png");
 };
 
 /** Dish photo, or a quiet icon tile when a dish has no photo yet. */
@@ -35,16 +37,16 @@ export default function Media({ item, index = 0, layoutId, radius = 20, eager = 
 }
 
 /** Bottle photo for wines, a framed category icon for everything else. */
-export function Bottle({ item, className = "" }: { item: Item; className?: string }) {
-  const b = bottleOf(item);
+export function Bottle({ item, className = "", index = 0 }: { item: Item; className?: string; index?: number }) {
+  const b = bottleOf(item, index);
   return b
-    ? <img className={`bottle ${className}`} src={b} alt={item.name} width={260} height={450} draggable={false} />
+    ? <img className={`bottle${isPhotoDrink(item) ? " drink-photo" : ""} ${className}`} src={b} alt={item.name} width={isPhotoDrink(item) ? 400 : 260} height={isPhotoDrink(item) ? 400 : 450} loading="lazy" decoding="async" draggable={false} />
     : <span className={`bottle-ph ${className}`}><CatIcon id={item.category} width={40} height={40} strokeWidth={1.3} /></span>;
 }
 
 export function Thumb({ item }: { item: Item }) {
   const p = photoOf(item); const b = bottleOf(item); const src = item.imageUrl ?? p?.src;
   return <span className="thumb" style={{ background: p?.tone ?? TONE }}>
-    {b ? <img src={b} alt="" width={64} height={64} className="thumb-bottle" draggable={false} /> : src ? <img src={src} alt="" width={64} height={64} draggable={false} /> : <CatIcon id={item.category} width={24} height={24} />}
+    {b ? <img src={b} alt="" width={64} height={64} className={`thumb-bottle${isPhotoDrink(item) ? " drink-photo" : ""}`} draggable={false} /> : src ? <img src={src} alt="" width={64} height={64} draggable={false} /> : <CatIcon id={item.category} width={24} height={24} />}
   </span>;
 }

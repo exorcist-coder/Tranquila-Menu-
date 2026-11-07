@@ -17,7 +17,7 @@ export default function SearchResult({ hit, onOpen }: { hit: MenuSearchHit; onOp
     <li className="search-result-li">
       <button type="button" className="search-result" onClick={onOpen} disabled={soldOut} aria-label={`${hit.label}, ${naira(price)}${soldOut ? ", sold out" : ""}`}>
         <span className="search-result-photo">
-          {isDrink(item.category) ? <Bottle item={item} /> : <Media key={`${item.id}-${photoIndex}`} item={item} index={photoIndex} alt={hit.label} radius={14} />}
+          {isDrink(item.category) ? <Bottle item={item} index={photoIndex + (item.imageUrl ? 1 : 0)} /> : <Media key={`${item.id}-${photoIndex}`} item={item} index={photoIndex} alt={hit.label} radius={14} />}
         </span>
         <span className="search-result-copy">
           <strong className="search-result-name">{hit.label}</strong>

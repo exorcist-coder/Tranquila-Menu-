@@ -1,3 +1,4 @@
+import { withApprovedPhotos } from "./approvedPhotos";
 export type CategoryId = string;
 export type When = { group: string; in: string[] };
 export type Option = { id: string; label: string; price: number; when?: When };
@@ -190,6 +191,9 @@ for (const item of ITEMS) {
     }
   }
 }
+
+// Photo-only defaults; prices, choices and item identity stay unchanged.
+ITEMS.forEach((item, index) => { ITEMS[index] = withApprovedPhotos(item); });
 
 export const findItem = (id: string): Item | undefined => ITEMS.find((i) => i.id === id);
 

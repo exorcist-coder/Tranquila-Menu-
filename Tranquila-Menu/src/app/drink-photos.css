@@ -1,0 +1,89 @@
+/* Prepared drinks are photographs, while wines and water remain product cutouts. */
+#app-root .wcard.wcard-photo {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 112px;
+  gap:18px;
+  align-items:center;
+  min-height:146px;
+  padding:16px 18px;
+  overflow:hidden;
+}
+#app-root .wcard-photo .wcard-art {
+  position:static;
+  width:112px;
+  height:112px;
+  border-radius:18px;
+  overflow:hidden;
+  background:#f3f1eb;
+}
+#app-root .wcard-photo .wcard-art .drink-photo {
+  width:100%;
+  height:100%;
+  object-fit:cover!important;
+  object-position:center;
+  filter:none;
+}
+#app-root .wcard-photo .wcard-t {gap:7px}
+#app-root .wcard-photo .wcard-t b {font-size:22px;line-height:1.15}
+#app-root .wcard-photo .wcard-t>span {font-size:15px;line-height:1.4}
+#app-root .search-result-photo .drink-photo {object-fit:cover;filter:none}
+.thumb .thumb-bottle.drink-photo {width:100%;height:100%;object-fit:cover;filter:none;border-radius:inherit}
+.wd-head.wd-head-photo {display:flex;flex-direction:column;gap:18px;padding:0 18px}
+.wd-head-photo .wd-art {
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  min-height:0;
+  padding:0;
+  background:transparent;
+  border-radius:20px;
+}
+.drink-cover {
+  display:block;
+  width:100%;
+  height:clamp(200px,32dvh,300px);
+  padding:0;
+  overflow:hidden;
+  border:0;
+  border-radius:20px;
+  background:#f3f1eb;
+  cursor:zoom-in;
+}
+.wd-head-photo .drink-cover .drink-photo {
+  display:block;
+  width:100%;
+  max-width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  filter:none;
+}
+.wd-head-photo .drink-photo-strip {
+  display:flex;
+  gap:8px;
+  max-width:100%;
+  padding-top:10px;
+  overflow-x:auto;
+}
+.wd-head-photo .drink-photo-strip button {
+  display:block;
+  flex:0 0 60px;
+  width:60px;
+  height:60px;
+  padding:0;
+  overflow:hidden;
+  border:0;
+  border-radius:12px;
+  background:#f3f1eb;
+  cursor:zoom-in;
+}
+.wd-head-photo .drink-photo-strip img {display:block;width:100%;height:100%;object-fit:cover}
+.drink-cover:focus-visible,.wd-head-photo .drink-photo-strip button:focus-visible {outline:3px solid var(--forest);outline-offset:3px}
+.wd-head-photo .wd-info {padding-top:0}
+.wd-head-photo .wd-info .item-desc {font-size:16px;line-height:1.45}
+@media(max-width:360px) {
+  #app-root .wcard.wcard-photo {grid-template-columns:minmax(0,1fr) 94px;gap:12px;padding:14px;min-height:128px}
+  #app-root .wcard-photo .wcard-art {width:94px;height:94px;border-radius:15px}
+  #app-root .wcard-photo .wcard-t b {font-size:21px}
+}

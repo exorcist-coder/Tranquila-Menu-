@@ -7,7 +7,7 @@ import { describeSelection, missingGroups, naira, normalize, priceRange, showsPr
 import { cart } from "./useCart";
 import type { BranchId } from "@/lib/branches";
 import Sheet, { useSheetDrag } from "./Sheet";
-import Media, { Bottle, photoOf } from "./Media";
+import Media, { Bottle, photoOf, isPhotoDrink } from "./Media";
 import Stepper from "./Stepper";
 import { IconClose } from "./icons";
 
@@ -38,6 +38,8 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
   const photos = Math.max(1, (item.photos?.length ?? 0) + (item.imageUrl ? 1 : 0));
   const photoUrls = Array.from({ length: photos }, (_, i) => item.imageUrl && i === 0 ? item.imageUrl : photoOf(item, i - (item.imageUrl ? 1 : 0))?.src);
   const drink = isDrink(item.category);
+  const photoDrink = isPhotoDrink(item);
+  const coverIndex = Math.min(initialPhotoIndex + (item.imageUrl ? 1 : 0), photos - 1);
 
   useEffect(() => { if (tried && missing.length === 0) setTried(false); }, [tried, missing.length]);
   useEffect(() => { const gallery = galleryRef.current; if (gallery && initialPhotoIndex > 0) gallery.scrollLeft = initialPhotoIndex * gallery.clientWidth; }, [initialPhotoIndex]);
@@ -59,8 +61,8 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
       </div>
       <div className="sheet-scroll item-sheet-scroll">
         {drink ? (
-          <div className="wd-head">
-            <div className="wd-art"><Bottle item={item} />{photos > 1 && <div className="drink-photo-strip" aria-label="More product photos">{photoUrls.map((url, i) => url && <button key={url + i} type="button" onClick={() => setExpandedPhoto(i)} aria-label={"View " + item.name + " photo " + (i + 1)}><img src={url} alt="" /></button>)}</div>}</div>
+          <div className={`wd-head${photoDrink ? " wd-head-photo" : ""}`}>
+            <div className="wd-art">{photoDrink ? <button type="button" className="drink-cover" onClick={() => setExpandedPhoto(coverIndex)} aria-label={`View ${item.name} photo ${coverIndex + 1} full screen`}><Bottle item={item} index={coverIndex} /></button> : <Bottle item={item} />}{photos > 1 && <div className="drink-photo-strip" aria-label="More product photos">{photoUrls.map((url, i) => url && <button key={url + i} type="button" onClick={() => setExpandedPhoto(i)} aria-label={"View " + item.name + " photo " + (i + 1)}><img src={url} alt="" /></button>)}</div>}</div>
             <div className="wd-info">
               <h2>{item.name}</h2>
               <p className="item-desc">{item.description}</p>
