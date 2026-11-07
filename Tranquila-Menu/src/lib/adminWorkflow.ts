@@ -1,4 +1,5 @@
 import { CATEGORIES, ITEMS, type Item } from "./catalog";
+import { withApprovedPhotos } from "./approvedPhotos";
 import type { BranchId } from "./branches";
 import { getItemAvailability, type MenuDocument } from "./cms";
 
@@ -80,14 +81,14 @@ export async function getPublished(branch: BranchId): Promise<MenuDocument> {
   const menu = selectedMenu(row, true);
   const availability = await getItemAvailability(branch);
   return { ...menu, items: menu.items.map(item => ({
-    ...item, available: availability[item.id] !== false
+    ...withApprovedPhotos(item), available: availability[item.id] !== false
   })) };
 }
 
 export async function getDrafts(branch: BranchId): Promise<SavedDraft[]> {
   const rows = await query("tranquila_item_drafts?" + branchQuery(branch) +
     "&select=id,branch_id,item_id,item,created_at,updated_at&order=updated_at.desc&limit=500");
-  return Array.isArray(rows) ? rows : [];
+  return Array.isArray(rows) ? rows.map(row => ({ ...row, item: withApprovedPhotos(row.item) })) : [];
 }
 
 export async function upsertDraft(branch: BranchId, actor: string, item: Item) {

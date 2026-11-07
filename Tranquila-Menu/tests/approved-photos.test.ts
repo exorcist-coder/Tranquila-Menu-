@@ -6,6 +6,7 @@ import { ITEMS } from "../src/lib/catalog";
 import { APPROVED_GALLERIES, withApprovedPhotos } from "../src/lib/approvedPhotos";
 import { PHOTOS } from "../src/lib/photos";
 import { searchPhotoIndex } from "../src/lib/searchPhoto";
+import { getPublished, getDrafts } from "../src/lib/adminWorkflow";
 import { getMenu } from "../src/lib/cms";
 
 afterEach(() => {vi.unstubAllGlobals();vi.unstubAllEnvs();});
@@ -47,8 +48,11 @@ describe("Tranquila's approved photo set", () => {
     const saved={...ITEMS.find(i=>i.id==="rice")!,basePrice:17777,groups:[],photos:["jollof-rice","white-rice","fried-rice","special-rice","jambalaya-rice"],published:false,visible:false};
     const request=vi.fn(async(url:string,init?:RequestInit)=>{
       expect(init?.method??"GET").toBe("GET");expect(url).toContain(`branch_id=eq.${branch}`);
+      if (url.includes("tranquila_item_drafts")) return Response.json([{id:1,branch_id:branch,item_id:"rice",item:saved}]);
       return Response.json(url.includes("tranquila_branch_cms")?[{menu:{categories:[],items:[saved]},published_menu:{categories:[],items:[saved]},draft_initialized:true,published_initialized:true}]:[{item_id:"rice",available:false}]);
     });vi.stubGlobal("fetch",request);
+    const publishedMenu=await getPublished(branch);expect(publishedMenu.items[0]!.photos).toEqual(APPROVED_GALLERIES.rice);
+    const drafts=await getDrafts(branch);expect(drafts[0]!.item.photos).toEqual(APPROVED_GALLERIES.rice);
     for(const published of [false,true]){
       const menu=await getMenu(published,branch);const actual=menu.items[0]!;
       expect(actual.photos).toEqual(APPROVED_GALLERIES.rice);
