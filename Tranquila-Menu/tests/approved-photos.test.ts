@@ -20,7 +20,7 @@ describe("Tranquila's approved photo set", () => {
     expect(Object.keys(APPROVED_GALLERIES)).toHaveLength(14);
     for(const [key,p] of photos) {
       expect(existsSync(join(process.cwd(),"public",p.src)),key).toBe(true);
-      expect(ITEMS.filter(i=>i.photos?.includes(key)),key).toHaveLength(1);
+      expect(ITEMS.filter(i=>i.photos?.includes(key)),key).toHaveLength(key === "approved-mixed-vegetable-salad" ? 2 : 1);
     }
     for(const i of ITEMS)expect(i.photos?.length??0,i.id).toBeLessThanOrEqual(10);
     expect(ITEMS.find(i=>i.id==="veg-salad")!.photos).not.toContain("approved-mixed-salad-egg");
@@ -30,6 +30,11 @@ describe("Tranquila's approved photo set", () => {
     const item=ITEMS.find(i=>i.id==="rice")!;
     for(const custom of [{...item,photos:[]},{...item,photos:["/custom.webp"]},{...item,imageUrl:"https://example.com/custom.webp"},{...item,photos:[...item.photos!].reverse()}])expect(withApprovedPhotos(custom)).toBe(custom);
     expect(withApprovedPhotos(item)).toBe(item);
+  });
+  it("uses the plain vegetable photo for coleslaw", () => {
+    const sides=ITEMS.find(i=>i.id==="sides")!;
+    const index=searchPhotoIndex(sides,{groupId:"choice",optionId:"coleslaw"});
+    expect(sides.photos![index]).toBe("approved-mixed-vegetable-salad");
   });
   it("matches search options to their assigned gallery photos",()=>{
     for(const [id,optionId,key] of [["spaghetti","bolognese","spaghetti-bolognese"],["indomie","indomie-eggs","indomie-sausage-boiled-eggs"],["hot-drinks","hot-chocolate","approved-milo-hot"],["sides","fried-yam","fried-yam-pepper-sauce"]]){

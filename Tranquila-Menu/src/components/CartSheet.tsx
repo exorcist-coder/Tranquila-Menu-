@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { findItem } from "@/lib/catalog";
 import { describeSelection, naira, unitPrice } from "@/lib/pricing";
 import { cart, useCart } from "./useCart";
+import { notify } from "@/lib/notifications";
+import { searchPhotoIndex } from "@/lib/searchPhoto";
 import { toast } from "./toastStore";
 import Sheet, { useSheetDrag } from "./Sheet";
 import Stepper from "./Stepper";
@@ -66,19 +68,19 @@ function Body({ branchId, onClose, canOrder, closedReason }: { branchId: BranchI
     const contactDigits = contact.replace(/\D/g, "").length;
     if (fulfilment === "collect" && (contactDigits < 10 || contactDigits > 15)) local.push(PICKUP_CONTACT_ERROR);
     if (!payment) local.push("Choose how you will pay.");
-    if (local.length) return setErrors(local);
+    if (local.length) { setErrors(local); notify.warning(local.join(" ")); return; }
     setBusy(true); setErrors([]);
     try {
       const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ branchId, lines: rows.map(({ l }) => ({ itemId: l.itemId, sel: l.sel, qty: l.qty, note: l.note })), fulfilment, room, guestName, contact, payment, note }) });
       const data = await res.json();
-      if (data.ok) { setPrepared(data); go("review"); } else setErrors(data.errors ?? ["Something went wrong. Try again."]);
-    } catch { setErrors(["No connection. Check your network and try again."]); }
+      if (data.ok) { setPrepared(data); go("review"); } else { const messages = data.errors ?? ["Something went wrong. Try again."]; setErrors(messages); notify.error(messages.join(" ")); }
+    } catch { const message = "No connection. Check your network and try again."; setErrors([message]); notify.error(message); }
     setBusy(false);
   }
 
   const sentDone = () => { cart.clear(branchId); onClose(); toast.show("Order cleared. Enjoy your meal."); };
   const cancelOrder = () => { const prev = cart.clear(branchId); onClose(); toast.show("Order cancelled", { label: "Undo", run: () => cart.restore(prev, branchId) }); };
-  const copy = async () => { try { await navigator.clipboard.writeText(prepared!.message); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { /* the text is selectable */ } };
+  const copy = async () => { try { await navigator.clipboard.writeText(prepared!.message); setCopied(true); notify.success("Order copied"); setTimeout(() => setCopied(false), 1800); } catch { notify.error("Could not copy the order. Select and copy the text instead."); } };
 
   const title = step === "basket" ? "Your order" : step === "details" ? "Delivery & payment" : "Review & send";
   const slideV = { enter: (d: number) => ({ x: 36 * d, opacity: 0 }), center: { x: 0, opacity: 1 }, exit: (d: number) => ({ x: -36 * d, opacity: 0 }) };
@@ -115,7 +117,7 @@ function Body({ branchId, onClose, canOrder, closedReason }: { branchId: BranchI
                   <AnimatePresence initial={false}>
                     {rows.map(({ l, item, unit }) => (
                       <motion.li key={l.id} layout="position" exit={{ opacity: 0, x: -28, transition: { duration: 0.2 } }} transition={{ type: "spring", stiffness: 420, damping: 38 }}>
-                        <Thumb item={item} />
+                        <Thumb item={item} index={item.id === "sides" && l.sel.choice === "coleslaw" ? searchPhotoIndex(item, { groupId: "choice", optionId: "coleslaw" }) : 0} />
                         <div className="line-main">
                           <b>{item.name}</b>
                           {describeSelection(item, l.sel) && <span>{describeSelection(item, l.sel)}</span>}

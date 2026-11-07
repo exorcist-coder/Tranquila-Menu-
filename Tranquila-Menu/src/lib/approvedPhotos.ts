@@ -53,6 +53,7 @@ export const APPROVED_GALLERIES: Readonly<Record<string, readonly string[]>> = {
   ],
   "sides": [
     "fried-yam-pepper-sauce",
+    "approved-mixed-vegetable-salad",
     "fries",
     "plantain-fried",
     "plantain-boiled",

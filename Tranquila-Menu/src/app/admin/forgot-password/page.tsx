@@ -1,12 +1,14 @@
 "use client";
 import { useState, type FormEvent } from "react";
+import { notify } from "@/lib/notifications";
 import AdminAuthFrame from "@/components/admin/AdminAuthFrame";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [error, setErrorState] = useState("");
+  const setError = (message: string) => { setErrorState(message); if (message) notify.error(message); };
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -17,7 +19,8 @@ export default function ForgotPasswordPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not request a reset link.");
-      setMessage(data.message || "Check your inbox for a password reset link.");
+      const text = data.message || "Check your inbox for a password reset link.";
+      setMessage(text); notify.success("Check your inbox", text);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not request a reset link.");
     } finally { setBusy(false); }

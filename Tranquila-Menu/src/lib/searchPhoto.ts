@@ -10,7 +10,7 @@ const aliases: Record<string, Record<string, string>> = {
   pasta: { "creamy-chicken": "creamy-pasta", alfredo: "alfredo-pasta", seafood: "seafood-pasta" },
   indomie: { indomie: "indomie-noodles", "indomie-eggs": "indomie-sausage-boiled-eggs" },
   eggs: { "boiled-egg": "fried-egg", "fried-egg": "fried-egg", "scrambled-egg": "scrambled-eggs-fries-plantain", "sunny-side-up": "fried-egg", omelette: "omelette", "spanish-omelette": "spanish-omelette", "vegetable-omelette": "omelette" },
-  sides: { "french-fries": "fries", "fried-plantain": "plantain-fried", "boiled-plantain": "plantain-boiled", "fried-yam": "fried-yam-pepper-sauce", "boiled-yam": "yam-side", "mashed-potatoes": "mashed-potatoes" },
+  sides: { coleslaw: "approved-mixed-vegetable-salad", "french-fries": "fries", "fried-plantain": "plantain-fried", "boiled-plantain": "plantain-boiled", "fried-yam": "fried-yam-pepper-sauce", "boiled-yam": "yam-side", "mashed-potatoes": "mashed-potatoes" },
   "swallow-soup": { egusi: "approved-egusi-assorted", okro: "okra-fufu", "seafood-okro": "approved-okra-seafood", "fisherman-soup": "okra-seafood", ogbono: "fufu-ogbono", vegetable: "efo-riro", "white-soup": "white-soup", beef: "efo-beef" },
   peppered: { beef: "peppered-beef", chicken: "peppered-chicken", catfish: "peppered-fish", "croaker-fish": "peppered-fish-red" },
   "chef-sauces": { "chicken-curry": "chicken-curry", "shredded-beef": "shredded-beef", "shredded-chicken": "chicken-curry", "shrimps-provenc-al": "prawns" },

@@ -11,6 +11,7 @@ import AdminItemPreview from "./AdminItemPreview";
 import AdminEditorAside from "./AdminEditorAside";
 import AdminLoginScreen from "./AdminLoginScreen";
 import AdminImageGallery, { appendItemImage, itemImageRefs, MAX_ITEM_IMAGES, imageSrc } from "./AdminImageGallery";
+import { notify } from "@/lib/notifications";
 import { readUploadResult } from "@/lib/readUploadResult";
 import { AdminIcon } from "./AdminIcon";
 import { AdminArchivePanel, AdminHistoryPanel, AdminCategoriesPanel, AdminServicePanel } from "./AdminManagementPanels";
@@ -50,8 +51,9 @@ export default function ProfessionalAdmin() {
   const [tab, setTab] = useState<Tab>("overview");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [notice, setNotice] = useState("");
-  const [error, setError] = useState("");
+  const [error, setErrorState] = useState("");
+  const setError = useCallback((message: string) => { setErrorState(message); if (message) notify.error(message); }, []);
+  const setNotice = (message: string) => { if (message) notify.success("All set", message); };
   const [query, setQuery] = useState("");
   const [editor, setEditor] = useState<DisplayItem | null>(null);
   const [options, setOptions] = useState<Group[]>([]);
@@ -60,18 +62,6 @@ export default function ProfessionalAdmin() {
   const [revisionPreview, setRevisionPreview] = useState<{ id: number; reason: string; menu: Menu } | null>(null);
   const [settings, setSettings] = useState<Settings>({ whatsapp: BRANCHES.find(b => b.id === activeBranch)?.whatsapp ?? "", open: "08:00", close: "22:00", paused: false });
   const [categories, setCategories] = useState<Menu["categories"]>(initialMenu.categories);
-
-  // Success and error notifications are temporary, accessible, and dismissible.
-  useEffect(() => {
-    if (!notice) return;
-    const timeout = window.setTimeout(() => setNotice(""), 4800);
-    return () => window.clearTimeout(timeout);
-  }, [notice]);
-  useEffect(() => {
-    if (!error) return;
-    const timeout = window.setTimeout(() => setError(""), 8500);
-    return () => window.clearTimeout(timeout);
-  }, [error]);
 
   const headers = useCallback(() => ({ Authorization: "Bearer " + token, "Content-Type": "application/json" }), [token]);
   const workspaceUrl = "/api/admin/workspace?branch=" + activeBranch;
@@ -104,7 +94,7 @@ export default function ProfessionalAdmin() {
       if (!r.ok) throw new Error(data.error ?? "Unable to sign in.");
       await refresh(data.access_token);
       setToken(data.access_token); sessionStorage.setItem("tranquila-admin-token", data.access_token);
-      setAuthInput({ email: "", password: "" });
+      setAuthInput({ email: "", password: "" }); notify.success("Signed in");
     } catch (e) { setError(e instanceof Error ? e.message : "Sign in failed."); }
     finally { setBusy(false); }
   }
@@ -147,7 +137,7 @@ export default function ProfessionalAdmin() {
     if (historyView()?.previewId) window.history.back();
     else setPreview(null);
   }
-  function signout() { sessionStorage.removeItem("tranquila-admin-token"); setToken(""); setWorkspace(blank); setEditor(null); setError(""); }
+  function signout() { sessionStorage.removeItem("tranquila-admin-token"); setToken(""); setWorkspace(blank); setEditor(null); setError(""); notify.info("Signed out"); }
   async function action(payload: Record<string, unknown>, success: string) {
     setBusy(true); setError(""); setNotice("");
     try {
@@ -266,10 +256,6 @@ export default function ProfessionalAdmin() {
     onTab={navigateTab}
     onSignout={signout}
     onRefresh={() => { void refresh(token).then(() => setNotice("Everything is up to date.")).catch(e => setError(e instanceof Error ? e.message : "Refresh failed.")); }}>
-      <div className="pro-toast-stack" aria-live="polite">
-        {error && <div role="alert" className="pro-alert error"><span aria-hidden="true">!</span><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Dismiss error">×</button></div>}
-        {notice && <div role="status" className="pro-alert success"><span aria-hidden="true">✓</span><span>{notice}</span><button type="button" onClick={() => setNotice("")} aria-label="Dismiss notification">×</button></div>}
-      </div>
       {busy && <p className="pro-working" role="status"><AdminIcon name="refresh" size={14}/> Saving changes securely…</p>}
       {tab === "overview" && <>
         <section className="pro-overview-banner">

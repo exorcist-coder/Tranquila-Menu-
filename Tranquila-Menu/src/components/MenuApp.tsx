@@ -13,7 +13,6 @@ import SearchResult from "./SearchResult";
 import { searchPhotoIndex } from "@/lib/searchPhoto";
 import CartSheet from "./CartSheet";
 import ItemSheet from "./ItemSheet";
-import Toast from "./Toast";
 import Welcome from "./Welcome";
 import { toast } from "./toastStore";
 import { cart, useCart } from "./useCart";
@@ -230,7 +229,6 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
         {count > 0 && <button type="button" className="apple-floating-order" onClick={openCart} aria-label={`View order, ${count} items, ${naira(total)}`}><span className="apple-order-icon"><IconBag width={19} height={19}/></span><span className="apple-order-details"><strong>View your order</strong><small>{count} {count === 1 ? "item" : "items"}</small></span><strong className="apple-order-total">{naira(total)}</strong><IconArrowRight width={18} height={18}/></button>}
         <ItemSheet item={item} initialSelection={openSelection} initialPhotoIndex={openPhoto} branchId={branch.id} onClose={closeGuest} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
         <CartSheet open={cartOpen} branchId={branch.id} onClose={closeGuest} canOrder={status.open} closedReason={status.reason} />
-        <Toast lifted={false} />
         {phase !== "menu" && <Welcome branchId={branch.id} hotelName={branch.name} statusLine={statusLine} onStart={() => setPhase("entering")} onDone={enterMenu} />}
       </LayoutGroup>
     </MotionConfig>

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { isDrink, type Item } from "@/lib/catalog";
 import { describeSelection, missingGroups, naira, normalize, priceRange, showsPrice, unitPrice, visibleGroups, visibleOptions, type Selection } from "@/lib/pricing";
+import { notify } from "@/lib/notifications";
+import { searchPhotoIndex } from "@/lib/searchPhoto";
 import { cart } from "./useCart";
 import type { BranchId } from "@/lib/branches";
 import Sheet, { useSheetDrag } from "./Sheet";
@@ -45,8 +47,8 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
   useEffect(() => { const gallery = galleryRef.current; if (gallery && initialPhotoIndex > 0) gallery.scrollLeft = initialPhotoIndex * gallery.clientWidth; }, [initialPhotoIndex]);
 
   function submit() {
-    if (!canOrder || item.available === false) return;
-    if (missing.length) { setTried(true); refs.current[missing[0]!.id]?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+    if (!canOrder || item.available === false) { notify.warning(item.available === false ? "This item is sold out." : "Ordering is currently closed."); return; }
+    if (missing.length) { notify.warning("Choose " + missing.map(g => g.label.toLowerCase()).join(", ") + " before adding this item."); setTried(true); refs.current[missing[0]!.id]?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     cart.add(branchId, { itemId: item.id, sel: normalize(item, sel), qty, note: note.trim() });
     onAdded(item.name);
     onClose();
@@ -100,7 +102,7 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
                     const on = sel[g.id] === o.id;
                     return (
                       <label key={o.id} className="pill" data-on={on ? "" : undefined}>
-                        <input type="radio" name={g.id} checked={on} onChange={() => setSel((p) => normalize(item, { ...p, [g.id]: o.id }))} />
+                        <input type="radio" name={g.id} checked={on} onChange={() => { setSel((p) => normalize(item, { ...p, [g.id]: o.id })); if (item.id === "sides" && o.id === "coleslaw") { const i = searchPhotoIndex(item, { groupId: g.id, optionId: o.id }); galleryRef.current?.scrollTo({ left: i * galleryRef.current.clientWidth, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); } }} />
                         {on && <motion.span layoutId={`pill-${g.id}`} className="pill-bg" transition={{ type: "spring", stiffness: 520, damping: 38 }} />}
                         <span className="pill-t">{o.label}</span>
                         {showsPrice(g, o) && <span className="pill-p">{g.mode === "addon" ? "+" : ""}{naira(o.price)}</span>}

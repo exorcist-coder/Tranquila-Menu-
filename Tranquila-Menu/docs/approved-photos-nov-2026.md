@@ -56,3 +56,11 @@ No database writes or schema changes. Original CMS galleries are upgraded on rea
 - 24 automated tests passed, including existing order and atomic admin workflow tests.
 - TypeScript check and Next.js build passed.
 - All 30 source images decode successfully and retain their exact supplied bytes.
+
+## Coleslaw and Sileo follow-up
+
+- The plain mixed vegetable salad image is now assigned to Coleslaw. On Tranquila, Coleslaw is a Sides option: search, option selection and cart thumbnails use that photo.
+- Sileo 0.1.6 is pinned in the lockfile and mounted once at the root for all guest and admin routes.
+- Item additions, cancellation with Undo, checkout validation, copying an order, admin results and authentication feedback use Sileo. Inline field errors and explicit destructive-action confirmations are retained.
+- Juice, tea/coffee and smoothie photographs use bounded cards, preserved proportions in details and fullscreen viewing.
+- No live database writes or production releases were performed.

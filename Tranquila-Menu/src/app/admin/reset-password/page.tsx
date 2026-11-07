@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, type FormEvent } from "react";
+import { notify } from "@/lib/notifications";
 import AdminAuthFrame from "@/components/admin/AdminAuthFrame";
 
 export default function ResetPasswordPage() {
@@ -8,7 +9,8 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setErrorState] = useState("");
+  const setError = (message: string) => { setErrorState(message); if (message) notify.error(message); };
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export default function ResetPasswordPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not update password.");
+      notify.success("Password updated", "You can now sign in with your new password.");
       setSuccess(true); setPassword(""); setConfirmPassword(""); setAccessToken("");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not update password.");

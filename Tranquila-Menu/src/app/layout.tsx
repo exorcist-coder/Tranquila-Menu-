@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import AppNotifications from "@/components/AppNotifications";
+import "sileo/styles.css";
 import "@fontsource-variable/bodoni-moda/opsz.css";
 import "@fontsource-variable/bodoni-moda/opsz-italic.css";
 import "@fontsource-variable/figtree/index.css";
@@ -11,6 +13,7 @@ import "./motion-system.css";
 import "./admin/auth-field-fix.css";
 import "./mobile-layout-fixes.css";
 import "./drink-photos.css";
+import "./notifications.css";
 
 export const metadata: Metadata = {
   title: "Tranquila Hotels · Food & drinks",
@@ -26,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: boot }} /></head>
-      <body>{children}</body>
+      <body>{children}<AppNotifications /></body>
     </html>
   );
 }
