@@ -64,3 +64,13 @@ No database writes or schema changes. Original CMS galleries are upgraded on rea
 - Item additions, cancellation with Undo, checkout validation, copying an order, admin results and authentication feedback use Sileo. Inline field errors and explicit destructive-action confirmations are retained.
 - Juice, tea/coffee and smoothie photographs use bounded cards, preserved proportions in details and fullscreen viewing.
 - No live database writes or production releases were performed.
+
+## Notification interaction refinement
+
+- The persisted-cart order bar stays hidden until the menu is fully entered, and while an item or basket sheet is open.
+- Mobile notifications sit above the measured cart bar, sheet footer or virtual keyboard. Desktop notifications use the top-right corner.
+- Brief confirmations last two seconds and remain compact. Errors and Undo retain longer reading/action time.
+- Drag or swipe left, right, up or down to dismiss. Small taps are ignored; interrupted gestures snap back. Undo buttons retain their normal tap behavior.
+- Stale gestures and obsolete Undo callbacks cannot dismiss or alter a newer notification, even when Sileo reuses the same toast ID.
+- Form validation stays beside its fields instead of also generating a duplicate notification.
+- No changes to prices, backend writes or production hosting.

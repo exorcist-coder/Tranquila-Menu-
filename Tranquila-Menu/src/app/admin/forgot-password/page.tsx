@@ -7,8 +7,7 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const [error, setErrorState] = useState("");
-  const setError = (message: string) => { setErrorState(message); if (message) notify.error(message); };
+  const [error, setError] = useState("");
 
   async function submit(event: FormEvent) {
     event.preventDefault();

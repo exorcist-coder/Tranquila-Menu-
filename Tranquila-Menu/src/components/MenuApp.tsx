@@ -226,8 +226,8 @@ export default function MenuApp({ branch, hours: initialHours, serverNow }: { br
           </main>
         </div>
 
-        {count > 0 && <button type="button" className="apple-floating-order" onClick={openCart} aria-label={`View order, ${count} items, ${naira(total)}`}><span className="apple-order-icon"><IconBag width={19} height={19}/></span><span className="apple-order-details"><strong>View your order</strong><small>{count} {count === 1 ? "item" : "items"}</small></span><strong className="apple-order-total">{naira(total)}</strong><IconArrowRight width={18} height={18}/></button>}
-        <ItemSheet item={item} initialSelection={openSelection} initialPhotoIndex={openPhoto} branchId={branch.id} onClose={closeGuest} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2200)} />
+        {phase === "menu" && count > 0 && !item && !cartOpen && <button type="button" className="apple-floating-order" onClick={openCart} aria-label={`View order, ${count} items, ${naira(total)}`}><span className="apple-order-icon"><IconBag width={19} height={19}/></span><span className="apple-order-details"><strong>View your order</strong><small>{count} {count === 1 ? "item" : "items"}</small></span><strong className="apple-order-total">{naira(total)}</strong><IconArrowRight width={18} height={18}/></button>}
+        <ItemSheet item={item} initialSelection={openSelection} initialPhotoIndex={openPhoto} branchId={branch.id} onClose={closeGuest} canOrder={status.open} onAdded={(n) => toast.show(`${n} added to your order`, undefined, 2000)} />
         <CartSheet open={cartOpen} branchId={branch.id} onClose={closeGuest} canOrder={status.open} closedReason={status.reason} />
         {phase !== "menu" && <Welcome branchId={branch.id} hotelName={branch.name} statusLine={statusLine} onStart={() => setPhase("entering")} onDone={enterMenu} />}
       </LayoutGroup>

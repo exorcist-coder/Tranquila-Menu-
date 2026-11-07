@@ -9,8 +9,7 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setErrorState] = useState("");
-  const setError = (message: string) => { setErrorState(message); if (message) notify.error(message); };
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {

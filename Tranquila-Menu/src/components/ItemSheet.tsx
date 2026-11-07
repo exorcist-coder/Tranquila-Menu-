@@ -48,7 +48,7 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
 
   function submit() {
     if (!canOrder || item.available === false) { notify.warning(item.available === false ? "This item is sold out." : "Ordering is currently closed."); return; }
-    if (missing.length) { notify.warning("Choose " + missing.map(g => g.label.toLowerCase()).join(", ") + " before adding this item."); setTried(true); refs.current[missing[0]!.id]?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
+    if (missing.length) { setTried(true); refs.current[missing[0]!.id]?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     cart.add(branchId, { itemId: item.id, sel: normalize(item, sel), qty, note: note.trim() });
     onAdded(item.name);
     onClose();

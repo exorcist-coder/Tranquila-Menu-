@@ -68,13 +68,13 @@ function Body({ branchId, onClose, canOrder, closedReason }: { branchId: BranchI
     const contactDigits = contact.replace(/\D/g, "").length;
     if (fulfilment === "collect" && (contactDigits < 10 || contactDigits > 15)) local.push(PICKUP_CONTACT_ERROR);
     if (!payment) local.push("Choose how you will pay.");
-    if (local.length) { setErrors(local); notify.warning(local.join(" ")); return; }
+    if (local.length) { setErrors(local); return; }
     setBusy(true); setErrors([]);
     try {
       const res = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ branchId, lines: rows.map(({ l }) => ({ itemId: l.itemId, sel: l.sel, qty: l.qty, note: l.note })), fulfilment, room, guestName, contact, payment, note }) });
       const data = await res.json();
-      if (data.ok) { setPrepared(data); go("review"); } else { const messages = data.errors ?? ["Something went wrong. Try again."]; setErrors(messages); notify.error(messages.join(" ")); }
-    } catch { const message = "No connection. Check your network and try again."; setErrors([message]); notify.error(message); }
+      if (data.ok) { setPrepared(data); go("review"); } else { const messages = data.errors ?? ["Something went wrong. Try again."]; setErrors(messages); }
+    } catch { const message = "No connection. Check your network and try again."; notify.error(message); }
     setBusy(false);
   }
 
