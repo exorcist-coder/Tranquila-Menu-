@@ -1,6 +1,6 @@
 
 /* 2026 mobile layout corrections. Keep menu data, pricing, and event handlers unchanged. */
-#app-root .apple-floating-order{
+.apple-floating-order{
  width:min(430px,calc(100vw - 28px));
  min-height:62px;
  max-height:70px;
@@ -15,13 +15,13 @@
  -webkit-backdrop-filter:none;
  box-shadow:0 0 0 2px rgba(255,255,255,.94),0 10px 32px rgba(8,35,24,.32);
 }
-#app-root .apple-floating-order .apple-order-icon{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.14);color:#fff}
-#app-root .apple-order-details{gap:0}
-#app-root .apple-order-details strong{font-size:15px;font-weight:680;line-height:1.3;color:#fff}
-#app-root .apple-order-details small{font-size:13px;line-height:1.3;color:#dcebe3}
-#app-root .apple-order-total{font-size:16px;font-weight:750;color:#fff}
-#app-root .apple-floating-order svg:last-child{flex:none;color:#fff}
-#app-root:has(.apple-floating-order){padding-bottom:calc(95px + env(safe-area-inset-bottom,0px))!important}
+.apple-floating-order .apple-order-icon{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.14);color:#fff}
+.apple-floating-order .apple-order-details{gap:0}
+.apple-floating-order .apple-order-details strong{font-size:15px;font-weight:680;line-height:1.3;color:#fff}
+.apple-floating-order .apple-order-details small{font-size:13px;line-height:1.3;color:#dcebe3}
+.apple-floating-order .apple-order-total{font-size:16px;font-weight:750;color:#fff}
+.apple-floating-order svg:last-child{flex:none;color:#fff}
+body:has(.apple-floating-order) #app-root{padding-bottom:calc(95px + env(safe-area-inset-bottom,0px))!important}
 #app-root .item-sheet-bar{height:45px;min-height:45px;padding:3px 14px}
 #app-root .item-sheet-bar .round.close,.sheet-light .item-sheet-bar .round.close{
  width:36px;height:36px;min-width:36px;min-height:36px;
@@ -63,7 +63,7 @@
 }
 #app-root .grid .card-name{overflow-wrap:anywhere}
 @media(max-width:600px){
- #app-root .apple-floating-order{left:50%;width:calc(100vw - 24px);max-width:430px}
+ .apple-floating-order{left:50%;width:calc(100vw - 24px);max-width:430px}
  #app-root .grid{align-items:stretch}
  .item-sheet-scroll .gallery{height:min(33dvh,290px)}
  .item-sheet-scroll .group .pills{grid-template-columns:1fr}
@@ -72,12 +72,12 @@
  .sheet-light .dock-foot .cta{flex:1 1 auto}
 }
 @media(max-width:360px){
- #app-root .apple-floating-order .apple-order-icon{display:none}
+ .apple-floating-order .apple-order-icon{display:none}
  .sheet-light .dock-foot .cta{padding:0 10px;font-size:13px}
  .sheet-light .dock-foot .cta-p{font-size:12px}
 }
 @media(prefers-reduced-motion:reduce){
- #app-root .apple-floating-order,#app-root .group .pill{transition:none!important}
+ .apple-floating-order,#app-root .group .pill{transition:none!important}
 }
 
 
