@@ -2,6 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { findItem } from "@/lib/catalog";
+import { ROOM_DELIVERY_FEE } from "@/lib/order";
 import { describeSelection, naira, unitPrice } from "@/lib/pricing";
 import { cart, useCart } from "./useCart";
 import { notify } from "@/lib/notifications";
@@ -39,10 +40,11 @@ function Body({ branchId, onClose, canOrder, closedReason }: { branchId: BranchI
   const drag = useSheetDrag();
   const lines = useCart(branchId);
   const rows = useMemo(() => lines.flatMap((l) => { const item = findItem(l.itemId); return item ? [{ l, item, unit: unitPrice(item, l.sel) }] : []; }), [lines]);
-  const total = rows.reduce((s, r) => s + r.unit * r.l.qty, 0);
+  const subtotal = rows.reduce((s, r) => s + r.unit * r.l.qty, 0);
   const [step, setStepRaw] = useState<Step>("basket");
   const [dir, setDir] = useState(1);
   const [fulfilment, setFulfilment] = useState<"room" | "collect" | "">("");
+  const total = subtotal + (fulfilment === "room" ? ROOM_DELIVERY_FEE : 0);
   const [room, setRoom] = useState("");
   const [guestName, setGuestName] = useState("");
   const [contact, setContact] = useState("");
@@ -133,7 +135,7 @@ function Body({ branchId, onClose, canOrder, closedReason }: { branchId: BranchI
                   </AnimatePresence>
                 </ul>
                 <dl className="totals">
-                  <div><dt>Delivery to your room</dt><dd>Free</dd></div>
+                  <div><dt>Room delivery (if selected)</dt><dd>{naira(ROOM_DELIVERY_FEE)}</dd></div>
                   <div><dt>VAT</dt><dd>Included in prices (7.5%)</dd></div>
                   <div className="grand"><dt>Total</dt><dd>{naira(total)}</dd></div>
                 </dl>
@@ -144,7 +146,7 @@ function Body({ branchId, onClose, canOrder, closedReason }: { branchId: BranchI
               <>
                 <fieldset className="group"><legend><span>How should we serve you?</span></legend>
                   <div className="choices">
-                    <Choice group="f" checked={fulfilment === "room"} onChange={() => setFulfilment("room")} title="Deliver to my room" sub="Free" />
+                    <Choice group="f" checked={fulfilment === "room"} onChange={() => setFulfilment("room")} title="Deliver to my room" sub={naira(ROOM_DELIVERY_FEE)} />
                     <Choice group="f" checked={fulfilment === "collect"} onChange={() => setFulfilment("collect")} title="I’ll collect it" sub="From the restaurant counter" />
                   </div>
                 </fieldset>
