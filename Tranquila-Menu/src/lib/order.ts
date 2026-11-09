@@ -15,6 +15,8 @@ export type OrderResult =
   | { ok: true; ref: string; total: number; message: string; waUrl: string; lines: { name: string; summary: string; qty: number; lineTotal: number }[] }
   | { ok: false; errors: string[] };
 
+export const ROOM_DELIVERY_FEE = 200;
+
 const clean = (s: unknown, max: number): string => (typeof s === "string" ? s.replace(/[\u0000-\u001f\u007f]+/g, " ").trim().slice(0, max) : "");
 
 /** The server is the source of truth for price, availability and hours. Nothing from the client is trusted. */
@@ -53,14 +55,15 @@ export function prepareOrder(input: unknown, cfg: { whatsapp: string; hotelName?
   if (body.payment !== "cash" && body.payment !== "pos") errors.push("Choose how you will pay.");
   if (errors.length) return { ok: false, errors };
 
-  const total = lines.reduce((s, l) => s + l.lineTotal, 0);
+  const deliveryFee = body.fulfilment === "room" ? ROOM_DELIVERY_FEE : 0;
+  const total = lines.reduce((s, l) => s + l.lineTotal, 0) + deliveryFee;
   const msg = [
     `*${cfg.hotelName ?? "Tranquila Hotels and Suites"}*`, `Order ${ref}`, "",
     body.fulfilment === "room" ? `Room delivery · Room ${room}` : "Collection",
     ...(body.fulfilment === "collect" ? [`Collection for: ${guestName}`, `Pickup contact: ${contact}`] : []),
     `Payment: ${body.payment === "cash" ? "Cash" : "POS"} (in person)`, "",
     ...lines.flatMap((l, i) => [`${l.qty} × ${l.name}${l.summary ? ` (${l.summary})` : ""} — ${naira(l.lineTotal)}`, ...(notes[i] ? [`   Note: ${notes[i]}`] : [])]),
-    "", "All prices include 7.5% VAT.", `*Total: ${naira(total)}*`, ...(clean(body.note, 200) ? ["", `Guest note: ${clean(body.note, 200)}`] : []),
+    "", ...(deliveryFee ? [`Room delivery fee: ${naira(deliveryFee)}`] : []), "All item prices include 7.5% VAT.", `*Total: ${naira(total)}*`, ...(clean(body.note, 200) ? ["", `Guest note: ${clean(body.note, 200)}`] : []),
   ].join("\n");
   return { ok: true, ref, total, message: msg, waUrl: `https://wa.me/${cfg.whatsapp}?text=${encodeURIComponent(msg)}`, lines };
 }
