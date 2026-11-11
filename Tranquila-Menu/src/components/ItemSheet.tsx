@@ -124,6 +124,7 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
       </div>
 
       {browseOnly ? <footer className="dock-foot public-order-footer">
+        {drink && <p className="public-menu-price" aria-live="polite"><span>{unit > 0 ? "Price" : "From"}</span><strong>{naira(unit > 0 ? unit : lo)}</strong></p>}
         {showOrderingHelp && <p role="status">To place an order, please scan the QR code in your room or ask a member of staff for the ordering link.</p>}
         <motion.button type="button" className="cta" whileTap={{ scale: 0.97 }} onClick={submit}>Order at the hotel</motion.button>
       </footer> : drink ? (

@@ -6,6 +6,9 @@
 .public-order-footer { flex-direction: column; align-items: stretch; gap: 14px; }
 .public-order-footer p { margin: 0; color: #1d1d1f; font-size: 16px; line-height: 1.55; }
 .public-order-footer .cta { flex: none; min-height: 54px; width: 100%; }
+.public-menu-price { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.public-menu-price span { font-size: 14px; }
+.public-menu-price strong { font-size: 21px; font-variant-numeric: tabular-nums; }
 @media (max-width: 600px) {
   .public-order-help { padding: 28px 22px; }
   .public-order-help h2 { font-size: 26px; }
