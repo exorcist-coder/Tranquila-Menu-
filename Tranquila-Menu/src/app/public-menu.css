@@ -1,0 +1,12 @@
+/* The public route reuses the live menu. Only ordering controls differ. */
+.public-order-help { padding: 32px 28px; color: #1d1d1f; }
+.public-order-help h2 { margin: 0 0 16px; font-size: 28px; line-height: 1.2; }
+.public-order-help p { margin: 0 0 26px; max-width: 44ch; font-size: 17px; line-height: 1.6; }
+.public-order-help .cta { width: 100%; min-height: 52px; }
+.public-order-footer { flex-direction: column; align-items: stretch; gap: 14px; }
+.public-order-footer p { margin: 0; color: #1d1d1f; font-size: 16px; line-height: 1.55; }
+.public-order-footer .cta { flex: none; min-height: 54px; width: 100%; }
+@media (max-width: 600px) {
+  .public-order-help { padding: 28px 22px; }
+  .public-order-help h2 { font-size: 26px; }
+}

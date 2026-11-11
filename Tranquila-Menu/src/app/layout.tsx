@@ -14,6 +14,7 @@ import "./admin/auth-field-fix.css";
 import "./mobile-layout-fixes.css";
 import "./drink-photos.css";
 import "./notifications.css";
+import "./public-menu.css";
 
 export const metadata: Metadata = {
   title: "Tranquila Hotels · Food & drinks",

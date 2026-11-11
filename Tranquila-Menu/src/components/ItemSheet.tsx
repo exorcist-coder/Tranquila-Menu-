@@ -13,22 +13,23 @@ import Media, { Bottle, photoOf, isPhotoDrink } from "./Media";
 import Stepper from "./Stepper";
 import { IconClose } from "./icons";
 
-export default function ItemSheet({ item, initialSelection = {}, initialPhotoIndex = 0, branchId, onClose, canOrder, onAdded }: { item: Item | null; initialSelection?: Selection; initialPhotoIndex?: number; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
+export default function ItemSheet({ item, initialSelection = {}, initialPhotoIndex = 0, branchId, onClose, canOrder, onAdded, browseOnly = false }: { item: Item | null; initialSelection?: Selection; initialPhotoIndex?: number; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void; browseOnly?: boolean }) {
   const last = useRef<Item | null>(item);
   if (item) last.current = item; // keep content mounted while the sheet animates out
   return (
     <Sheet open={!!item} onClose={onClose} label={last.current?.name ?? "Dish"}>
-      {last.current ? <Body key={`${last.current.id}:${JSON.stringify(initialSelection)}`} initialSelection={initialSelection} initialPhotoIndex={initialPhotoIndex} item={last.current} branchId={branchId} onClose={onClose} canOrder={canOrder} onAdded={onAdded} /> : null}
+      {last.current ? <Body key={`${last.current.id}:${JSON.stringify(initialSelection)}`} initialSelection={initialSelection} initialPhotoIndex={initialPhotoIndex} item={last.current} branchId={branchId} onClose={onClose} canOrder={canOrder} onAdded={onAdded} browseOnly={browseOnly} /> : null}
     </Sheet>
   );
 }
 
-function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, canOrder, onAdded }: { item: Item; initialSelection: Selection; initialPhotoIndex: number; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void }) {
+function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, canOrder, onAdded, browseOnly }: { item: Item; initialSelection: Selection; initialPhotoIndex: number; branchId: BranchId; onClose: () => void; canOrder: boolean; onAdded: (name: string) => void; browseOnly: boolean }) {
   const drag = useSheetDrag();
   const [sel, setSel] = useState<Selection>(() => normalize(item, initialSelection));
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
   const [tried, setTried] = useState(false);
+  const [showOrderingHelp, setShowOrderingHelp] = useState(false);
   const [slide, setSlide] = useState(initialPhotoIndex);
   const [expandedPhoto, setExpandedPhoto] = useState<number | null>(null);
   const refs = useRef<Record<string, HTMLFieldSetElement | null>>({});
@@ -47,6 +48,7 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
   useEffect(() => { const gallery = galleryRef.current; if (gallery && initialPhotoIndex > 0) gallery.scrollLeft = initialPhotoIndex * gallery.clientWidth; }, [initialPhotoIndex]);
 
   function submit() {
+    if (browseOnly) { setShowOrderingHelp(true); return; }
     if (!canOrder || item.available === false) { notify.warning(item.available === false ? "This item is sold out." : "Ordering is currently closed."); return; }
     if (missing.length) { setTried(true); refs.current[missing[0]!.id]?.scrollIntoView({ behavior: "smooth", block: "center" }); return; }
     cart.add(branchId, { itemId: item.id, sel: normalize(item, sel), qty, note: note.trim() });
@@ -114,14 +116,17 @@ function Body({ item, initialSelection, initialPhotoIndex, branchId, onClose, ca
             );
           })}
 
-          <label className="note-field"><span>Special request <em>optional</em></span>
+          {!browseOnly && <label className="note-field"><span>Special request <em>optional</em></span>
             <textarea rows={2} maxLength={120} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Allergies, no pepper, extra sauce…" />
-          </label>
-          <p className="allergen-hint"><strong>Food allergies?</strong> Confirm ingredients and cross-contact with staff in WhatsApp before ordering. A note alone cannot guarantee an allergen-free meal.</p>
+          </label>}
+          <p className="allergen-hint"><strong>Food allergies?</strong> {browseOnly ? "Please ask a member of staff about ingredients and cross-contact before ordering." : "Confirm ingredients and cross-contact with staff in WhatsApp before ordering. A note alone cannot guarantee an allergen-free meal."}</p>
         </div>
       </div>
 
-      {drink ? (
+      {browseOnly ? <footer className="dock-foot public-order-footer">
+        {showOrderingHelp && <p role="status">To place an order, please scan the QR code in your room or ask a member of staff for the ordering link.</p>}
+        <motion.button type="button" className="cta" whileTap={{ scale: 0.97 }} onClick={submit}>Order at the hotel</motion.button>
+      </footer> : drink ? (
         <footer className="wfoot">
           <div className="wprice"><small>{unit > 0 ? "Total" : "From"}</small><b>{unit > 0 ? naira(unit * qty) : naira(lo * qty)}</b></div>
           <Stepper value={qty} tone="light" size="sm" label="Quantity" onDec={() => setQty((q) => Math.max(1, q - 1))} onInc={() => setQty((q) => Math.min(20, q + 1))} incDisabled={qty >= 20} />
