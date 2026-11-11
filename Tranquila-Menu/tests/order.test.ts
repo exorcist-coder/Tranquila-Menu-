@@ -3,6 +3,7 @@ import { findItem, isDrink, VAT_RATE } from "../src/lib/catalog";
 import { vatBreakdown, isValidSelection, missingGroups, priceRange, unitPrice } from "../src/lib/pricing";
 import { orderingStatus } from "../src/lib/hours";
 import { prepareOrder } from "../src/lib/order";
+import { BRANCHES } from "../src/lib/branches";
 
 const swallow = findItem("swallow-soup")!, rice = findItem("rice")!, lager = findItem("lager")!, wineItem = findItem("wine-nederburg-red")!;
 const cfg = { whatsapp: "2348000000000", hours: { open: "08:00", close: "22:00", paused: false } };
@@ -59,7 +60,7 @@ describe("prepareOrder (server is the source of truth)", () => {
   it("builds a message and WhatsApp link with server-computed totals", () => {
     const r = prepareOrder(good, cfg, noon, "TRQ-TEST01");
     expect(r.ok).toBe(true);
-    if (r.ok) { expect(r.total).toBe(2 * (Math.round(1500 * (1 + VAT_RATE)) + Math.round(3000 * (1 + VAT_RATE)) + Math.round(6000 * (1 + VAT_RATE)))); expect(r.message).toContain("Room 204"); expect(r.waUrl.startsWith("https://wa.me/2348000000000?text=")).toBe(true); }
+    if (r.ok) { expect(r.total).toBe(2 * (Math.round(1500 * (1 + VAT_RATE)) + Math.round(3000 * (1 + VAT_RATE)) + Math.round(6000 * (1 + VAT_RATE))) + 200); expect(r.message).toContain("Room 204"); expect(r.waUrl.startsWith("https://wa.me/2348000000000?text=")).toBe(true); }
   });
   it("requires a name and reachable contact for collection and includes both in the WhatsApp message", () => {
     const collect = { ...good, fulfilment: "collect", room: undefined };
@@ -75,7 +76,23 @@ describe("prepareOrder (server is the source of truth)", () => {
   });
   it("ignores any client-supplied price", () => {
     const r = prepareOrder({ ...good, lines: [{ ...good.lines[0], price: 1 }] }, cfg, noon);
-    expect(r.ok && r.total).toBe(2 * unitPrice(swallow, { swallow: "garri", soup: "egusi", protein: "goat-meat" }));
+    expect(r.ok && r.total).toBe(2 * unitPrice(swallow, { swallow: "garri", soup: "egusi", protein: "goat-meat" }) + 200);
+  });
+  it.each(BRANCHES)("charges one ₦200 room delivery fee at $name and leaves collection free", (branch) => {
+    const branchCfg = { ...cfg, hotelName: branch.name, whatsapp: branch.whatsapp };
+    const roomOrder = prepareOrder({ ...good, deliveryFee: 0, total: 1 }, branchCfg, noon, "TRQ-ROOM");
+    const collectionOrder = prepareOrder({ ...good, fulfilment: "collect", guestName: "Test Guest", contact: "08012345678", deliveryFee: 200 }, branchCfg, noon, "TRQ-COLLECT");
+    expect(roomOrder.ok).toBe(true);
+    expect(collectionOrder.ok).toBe(true);
+    if (roomOrder.ok && collectionOrder.ok) {
+      const subtotal = roomOrder.lines.reduce((sum, line) => sum + line.lineTotal, 0);
+      expect(roomOrder.total).toBe(subtotal + 200);
+      expect(collectionOrder.total).toBe(subtotal);
+      expect(roomOrder.message).toContain("Room delivery fee: ₦200");
+      expect(collectionOrder.message).not.toContain("Room delivery fee:");
+      expect(roomOrder.message).toContain(branch.name);
+      expect(roomOrder.waUrl).toContain(`https://wa.me/${branch.whatsapp}?text=`);
+    }
   });
   it("rejects an item marked sold out by the branch", () => {
     const r = prepareOrder(good, cfg, noon, "TRQ-SOLD01", [{ ...swallow, available: false }]);
