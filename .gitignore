@@ -1,4 +1,9 @@
 node_modules
 .next
-.env*\n!.env.example
+.env*
+!.env.example
 *.tsbuildinfo
+# Cloudflare local credentials and generated output
+.dev.vars*
+.wrangler/
+.open-next/

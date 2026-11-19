@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "tranquila-main-test",
+  "account_id": "75d74b2148c26e94da25edd537beb5d9",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": true,
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "observability": { "enabled": true },
+  "vars": { "CLOUDFLARE_TEST_READ_ONLY": "1", "NEXT_PUBLIC_HOTEL_BRANCH_ID": "tranquila" },
+  "env": {
+    "nest": {
+      "name": "tranquila-nest-test",
+      "vars": { "CLOUDFLARE_TEST_READ_ONLY": "1", "NEXT_PUBLIC_HOTEL_BRANCH_ID": "tranquila-nest" }
+    }
+  }
+}
