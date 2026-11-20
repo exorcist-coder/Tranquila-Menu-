@@ -17,6 +17,8 @@ This Next.js 15 application uses server-rendered pages and API routes. OpenNext 
 
 ## Build and deploy
 
+Only deploy on the Workers Free plan. Do not enable paid subscriptions or metered add-ons. Confirm the account plan in the dashboard before the first deployment: the OAuth connector cannot read billing subscriptions, and `default_usage_model: standard` alone does not prove that the account is free. Observability is disabled in the test configuration to avoid log ingestion and storage usage.
+
 Use only Git branch `migration/cloudflare-test`, directory `Tranquila-Menu`, Node.js 24, and `npm ci`.
 
 Main build/deploy: `npm run deploy:cloudflare:main`.

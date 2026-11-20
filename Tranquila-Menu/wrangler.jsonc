@@ -8,7 +8,7 @@
   "workers_dev": true,
   "preview_urls": true,
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
-  "observability": { "enabled": true },
+  "observability": { "enabled": false },
   "vars": { "CLOUDFLARE_TEST_READ_ONLY": "1", "NEXT_PUBLIC_HOTEL_BRANCH_ID": "tranquila" },
   "env": {
     "nest": {
